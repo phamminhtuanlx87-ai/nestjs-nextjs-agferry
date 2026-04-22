@@ -1,7 +1,9 @@
-⛴️ AG Ferry Management System (Backend)
+# ⛴️ AG Ferry Management System (Backend)
+
 Hệ thống quản lý thông tin nhân sự và quy trình sửa chữa tàu phà tại Công ty Cổ phần Phà An Giang. Dự án được xây dựng trên nền tảng NestJS với kiến trúc bảo mật đa lớp.
 
-🚀 Tính năng nổi bật
+# 🚀 Tính năng nổi bật
+
 Authentication: Đăng ký, đăng nhập và xác thực qua JWT (JSON Web Token).
 
 RBAC (Role-Based Access Control): Phân quyền chặt chẽ giữa các vai trò ADMIN, USER, và GUEST.
@@ -12,7 +14,8 @@ Data Validation: Kiểm soát dữ liệu đầu vào bằng DTO (Data Transfer 
 
 Database: Quản lý dữ liệu linh hoạt với MongoDB & Mongoose.
 
-🛠️ Công nghệ sử dụng
+# 🛠️ Công nghệ sử dụng
+
 Core: NestJS (Node.js framework)
 
 Database: MongoDB & Mongoose ODM
@@ -24,30 +27,28 @@ Validation: Class-validator, Class-transformer
 Tools: Postman, MongoDB Compass, Git/GitHub
 
 Clone dự án
+
 git clone https://github.com/phamminhtuanlx87-ai/nest-nestjs-agferry.git
+
 cd nest-nestjs-agferry
 
 Cài đặt thư viện
+
 npm install
 
-⚙️ Environment Variables (Biến môi trường)
+# ⚙️ Environment Variables (Biến môi trường)
 Để dự án hoạt động, bạn bắt buộc phải tạo một file .env ở thư mục gốc (ngang hàng với package.json) và điền các thông tin sau:
 
-Đoạn mã
-# Cấu hình Database MongoDB
-# Ví dụ: mongodb://localhost:27017/ag_ferry_db hoặc tài khoản MongoDB Atlas
 MONGODB_URI=your_mongodb_connection_string
 
-# Cấu hình JWT (Xác thực)
-# Secret key dùng để mã hóa Token (nên đặt chuỗi dài và khó đoán)
 JWT_SECRET=your_super_secret_key_123
 
-# Thời gian hết hạn của Token (ví dụ: 1d = 1 ngày, 3600 = 1 giờ)
 JWT_EXPIRE=1d
 
-# Cấu hình Cổng chạy ứng dụng (Mặc định là 3000)
 PORT=3000
-🛡️ Phân quyền (Roles)
+
+# 🛡️ Phân quyền (Roles)
+
 Hệ thống hỗ trợ 3 vai trò mặc định:
 
 ADMIN: Toàn quyền quản trị hệ thống, quản lý nhân sự.
@@ -57,15 +58,19 @@ USER: Nhân viên chính thức, thực hiện các nghiệp vụ sửa chữa.
 GUEST: Người dùng mới đăng ký, cần Admin kích hoạt và phân phòng ban.
 
 Chạy ứng dụng
-Bash
+
 # Chế độ phát triển
+
 npm run start:dev
 
 # Chế độ Production
+
 npm run build
+
 npm run start:prod
 
-📝 Giấy phép (License)
+# 📝 Giấy phép (License)
+
 Dự án này được phát triển bởi Phạm Minh Tuấn. Vui lòng liên hệ tác giả nếu muốn sử dụng cho mục đích thương mại.
 
 Dự án đang trong giai đoạn phát triển module Quản lý sửa chữa tàu phà.
