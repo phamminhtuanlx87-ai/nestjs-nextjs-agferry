@@ -1,71 +1,62 @@
 ⛴️ AG Ferry Management System (Backend)
-Hệ thống quản lý thông tin nhân sự và quy trình sửa chữa tàu phà tại Công ty Cổ phần Phà An Giang. Dự án được xây dựng trên nền tảng NestJS với kiến trúc bảo mật đa lớp.
+A specialized system for managing personnel information and ferry maintenance workflows at An Giang Ferry Joint Stock Company. Built on NestJS with a robust multi-layer security architecture.
 
-🚀 Tính năng nổi bật
-Authentication: Đăng ký, đăng nhập và xác thực qua JWT (JSON Web Token).
+🚀 Key Features
+Authentication: Secure Registration, Login, and Identity Verification via JWT (JSON Web Token).
 
-RBAC (Role-Based Access Control): Phân quyền chặt chẽ giữa các vai trò ADMIN, USER, và GUEST.
+RBAC (Role-Based Access Control): Strict permission management between ADMIN, USER, and GUEST roles.
 
-Security Guards: Hệ thống bảo vệ API đa lớp (JwtAuthGuard, RolesGuard).
+Security Guards: Multi-layer API protection using custom JwtAuthGuard and RolesGuard.
 
-Data Validation: Kiểm soát dữ liệu đầu vào bằng DTO (Data Transfer Object) và ValidationPipe.
+Data Validation: Input control using DTOs (Data Transfer Objects) and ValidationPipe.
 
-Database: Quản lý dữ liệu linh hoạt với MongoDB & Mongoose.
+Database: Scalable and flexible data management with MongoDB & Mongoose ODM.
 
-🛠️ Công nghệ sử dụng
+🛠️ Tech Stack
 Core: NestJS (Node.js framework)
 
-Database: MongoDB & Mongoose ODM
+Database: MongoDB & Mongoose
 
 Security: Passport.js, JWT, Bcrypt
 
 Validation: Class-validator, Class-transformer
 
-Tools: Postman, MongoDB Compass, Git/GitHub
+Workflow: Git/GitHub, Postman, MongoDB Compass
 
-📁 Cấu trúc thư mục chính
-Plaintext
-src/
-├── common/              # Các decorator, filter, interceptor dùng chung
-├── config/              # Cấu hình hệ thống (Database, JWT)
-├── modules/
-│   ├── auth/            # Xử lý đăng nhập, guards và chiến lược xác thực
-│   └── users/           # Quản lý người dùng, phân quyền và phòng ban
-├── app.module.ts        # Module gốc của ứng dụng
-└── main.ts              # Điểm bắt đầu của ứng dụng
-⚙️ Hướng dẫn cài đặt
-1. Clone dự án
-Bash
+⚙️ Installation & Setup
+1. Clone the repository
 git clone https://github.com/phamminhtuanlx87-ai/nest-nestjs-agferry.git
 cd nest-nestjs-agferry
-2. Cài đặt thư viện
-Bash
+
+2. Install dependencies
 npm install
-3. Cấu hình môi trường (Environment Variables)
-Tạo file .env tại thư mục gốc và cấu hình các biến sau:
+
+3. Environment Configuration
+Create a .env file in the root directory and add the following variables:
 
 Đoạn mã
-MONGODB_URI=mongodb://localhost:27017/agferry_db
-JWT_SECRET=your_secret_key_here
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_super_secret_key_123
 JWT_EXPIRE=1d
-4. Chạy ứng dụng
+PORT=3000
+
+4. Run the application
 Bash
-# Chế độ phát triển
+# Development mode
 npm run start:dev
 
-# Chế độ Production
+# Production mode
 npm run build
 npm run start:prod
-🛡️ Phân quyền (Roles)
-Hệ thống hỗ trợ 3 vai trò mặc định:
 
-ADMIN: Toàn quyền quản trị hệ thống, quản lý nhân sự.
+🛡️ Role-Based Access Control (RBAC)
+The system supports 3 default roles:
 
-USER: Nhân viên chính thức, thực hiện các nghiệp vụ sửa chữa.
+ADMIN: Full system administration and HR management.
 
-GUEST: Người dùng mới đăng ký, cần Admin kích hoạt và phân phòng ban.
+USER: Official employees authorized to perform maintenance tasks.
 
-📝 Giấy phép (License)
-Dự án này được phát triển bởi Phạm Minh Tuấn. Vui lòng liên hệ tác giả nếu muốn sử dụng cho mục đích thương mại.
+GUEST: Newly registered users awaiting Admin activation and department assignment.
 
-Dự án đang trong giai đoạn phát triển module Quản lý sửa chữa tàu phà.
+📝 License
+Developed by Pham Minh Tuan. Please contact the author for commercial usage inquiries.

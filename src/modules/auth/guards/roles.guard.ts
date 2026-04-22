@@ -25,7 +25,7 @@ export class RolesGuard implements CanActivate {
 
     // 3. So sánh với Role của User (đã được JwtStrategy giải mã vào req.user)
     const { user } = context.switchToHttp().getRequest();
-    
+
     // 3. So sánh thực sự
     if (!user || !user.role) {
       return false; // Không có user hoặc role thì chặn ngay

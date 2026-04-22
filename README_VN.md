@@ -23,39 +23,30 @@ Validation: Class-validator, Class-transformer
 
 Tools: Postman, MongoDB Compass, Git/GitHub
 
-📁 Cấu trúc thư mục chính
-Plaintext
-src/
-├── common/              # Các decorator, filter, interceptor dùng chung
-├── config/              # Cấu hình hệ thống (Database, JWT)
-├── modules/
-│   ├── auth/            # Xử lý đăng nhập, guards và chiến lược xác thực
-│   └── users/           # Quản lý người dùng, phân quyền và phòng ban
-├── app.module.ts        # Module gốc của ứng dụng
-└── main.ts              # Điểm bắt đầu của ứng dụng
-⚙️ Hướng dẫn cài đặt
-1. Clone dự án
-Bash
+Clone dự án
 git clone https://github.com/phamminhtuanlx87-ai/nest-nestjs-agferry.git
 cd nest-nestjs-agferry
-2. Cài đặt thư viện
-Bash
+
+Cài đặt thư viện
 npm install
-3. Cấu hình môi trường (Environment Variables)
-Tạo file .env tại thư mục gốc và cấu hình các biến sau:
+
+⚙️ Environment Variables (Biến môi trường)
+Để dự án hoạt động, bạn bắt buộc phải tạo một file .env ở thư mục gốc (ngang hàng với package.json) và điền các thông tin sau:
 
 Đoạn mã
-MONGODB_URI=mongodb://localhost:27017/agferry_db
-JWT_SECRET=your_secret_key_here
-JWT_EXPIRE=1d
-4. Chạy ứng dụng
-Bash
-# Chế độ phát triển
-npm run start:dev
+# Cấu hình Database MongoDB
+# Ví dụ: mongodb://localhost:27017/ag_ferry_db hoặc tài khoản MongoDB Atlas
+MONGODB_URI=your_mongodb_connection_string
 
-# Chế độ Production
-npm run build
-npm run start:prod
+# Cấu hình JWT (Xác thực)
+# Secret key dùng để mã hóa Token (nên đặt chuỗi dài và khó đoán)
+JWT_SECRET=your_super_secret_key_123
+
+# Thời gian hết hạn của Token (ví dụ: 1d = 1 ngày, 3600 = 1 giờ)
+JWT_EXPIRE=1d
+
+# Cấu hình Cổng chạy ứng dụng (Mặc định là 3000)
+PORT=3000
 🛡️ Phân quyền (Roles)
 Hệ thống hỗ trợ 3 vai trò mặc định:
 
@@ -64,6 +55,15 @@ ADMIN: Toàn quyền quản trị hệ thống, quản lý nhân sự.
 USER: Nhân viên chính thức, thực hiện các nghiệp vụ sửa chữa.
 
 GUEST: Người dùng mới đăng ký, cần Admin kích hoạt và phân phòng ban.
+
+Chạy ứng dụng
+Bash
+# Chế độ phát triển
+npm run start:dev
+
+# Chế độ Production
+npm run build
+npm run start:prod
 
 📝 Giấy phép (License)
 Dự án này được phát triển bởi Phạm Minh Tuấn. Vui lòng liên hệ tác giả nếu muốn sử dụng cho mục đích thương mại.
