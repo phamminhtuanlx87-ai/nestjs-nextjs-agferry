@@ -8,10 +8,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/AGFerryDB'),
+    ConfigModule.forRoot({
+      envFilePath: '.env', // Chỉ định rõ file của bạn
+      isGlobal: true, // Giúp các module khác như Auth, Users không cần import lại
+    }),
+    MongooseModule.forRoot(process.env.MONGODB_URI!),
     ProductsModule,
     UsersModule,
     AuthModule,

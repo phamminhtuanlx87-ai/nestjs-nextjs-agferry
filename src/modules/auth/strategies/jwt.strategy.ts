@@ -8,7 +8,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Lấy token từ Header
       ignoreExpiration: false,
-      secretOrKey: 'AN_GIANG_FERRY_SECRET_KEY',
+      secretOrKey: process.env.JWT_SECRET!, // Sử dụng biến môi trường để lưu secret key
     });
   }
 
