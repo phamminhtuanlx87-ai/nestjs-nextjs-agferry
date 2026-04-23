@@ -28,7 +28,7 @@ Workflow: Git/GitHub, Postman, MongoDB Compass
 # ⚙️ Installation & Setup
 1. Clone the repository 
 
-git clone https://github.com/phamminhtuanlx87-ai/nest-nestjs-agferry.git
+git clone https://github.com/phamminhtuanlx87-ai/nestjs-nextjs-agferry.git
 
 cd nest-nestjs-agferry
 
