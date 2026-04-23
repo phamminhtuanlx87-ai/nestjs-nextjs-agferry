@@ -28,7 +28,7 @@ Tools: Postman, MongoDB Compass, Git/GitHub
 
 Clone dự án
 
-git clone https://github.com/phamminhtuanlx87-ai/nest-nestjs-agferry.git
+git clone https://github.com/phamminhtuanlx87-ai/nestjs-nextjs-agferry.git
 
 cd nest-nestjs-agferry
 
