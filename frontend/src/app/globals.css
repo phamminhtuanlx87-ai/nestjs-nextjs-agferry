@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@theme {
+  /* Header, sidebar, button chính */
+  --color-primary: #2d336b;
+  --color-primary-surface: #87a2b5;
+  /* Hover, highlight, icon */
+  --color-secondary: #7886c7;
+  /* CTA, badge, trạng thái quan trọng */
+  --color-accent: #f97316;
+  /* Neutral */
+  --color-neutral-bg: #f5f7fb;
+  --color-neutral-surface: #ffffff;
+  --color-neutral-border: #9ca3af;
+  --color-neutral-text-muted: #6b7280;
+  --color-neutral-text-main: #111827;
+  --color-neutral-bg-header: #2f3473;
+}
+@layer base {
+  :root {
+    --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    --font-heading: "Inter", "Inter", sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+}
+@layer components {
+  .font-heading {
+    font-family: var(--font-heading);
+    font-weight: 600;
+  }
+  .font-body {
+    font-family: var(--font-sans);
+    font-weight: 400;
+  }
+  .font-menu {
+    font-family: var(--font-sans);
+    font-weight: 500;
+  }
+  .font-btn {
+    font-family: var(--font-sans);
+    font-weight: 500;
+  }
+   .nav__link {
+    @apply text-white px-4 py-2 rounded-md relative;
+  }
+  .nav__link:hover {
+    @apply text-accent transition-colors duration-200;
+  }
+
+  .nav__link.is-active {
+    @apply text-accent font-semibold;
+  }
+
+  .nav__link.is-active::after {
+    content: "";
+    @apply absolute left-0 bottom-0 h-0.5 w-full bg-accent rounded-full;
+  }
+}
+/* boder */
+@utility border-shadow {
+  @apply border border-neutral-border shadow-lg outline outline-neutral-border rounded-lg p-5;
+}
+/* Card / Panel */
+@utility card {
+  @apply bg-white rounded-xl border border-neutral-border shadow-md p-5;
+}
+
+/* Button */
+@utility btn-primary {
+  @apply bg-primary text-white rounded-lg px-4 py-2 hover:bg-secondary transition;
+}
+
+@utility btn-secondary {
+  @apply bg-gray-100 text-white rounded-lg px-4 py-2 hover:bg-gray-200 transition;
+}
+
+@utility btn-danger {
+  @apply bg-amber-400 text-white rounded-lg px-4 py-2 hover:bg-amber-500 transition;
+}
+
+@utility input-primary{
+  @apply border border-gray-300 rounded px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all shadow-sm;
+}
+
+@utility card-elevated {
+  @apply bg-white
+    border border-neutral-border/60
+    rounded-xl
+    shadow-[0_8px_30px_rgba(0,0,0,0.06)]
+    p-5;
+}
+/* Login, Modal, Form nhỏ */
+@utility card-soft {
+  @apply bg-white
+    border border-neutral-border/40
+    rounded-xl
+    shadow-[0_4px_12px_rgba(0,0,0,0.05)]
+    p-5;
+}
+/* Dashboard, Card thống kê, Nội dung chính */
+@utility card-strong {
+  @apply bg-white
+    border border-neutral-border/70
+    rounded-2xl
+    shadow-[0_12px_40px_rgba(0,0,0,0.12)]
+    p-6;
+}
+
+@utility btn-elevated {
+  @apply inline-flex items-center justify-center
+    rounded-lg
+    font-semibold
+    transition-all duration-150
+    shadow-[0_6px_16px_rgba(0,0,0,0.15)]
+    hover:shadow-[0_8px_22px_rgba(0,0,0,0.18)]
+    active:translate-y-0.5
+    active:shadow-[0_3px_10px_rgba(0,0,0,0.20)];
+}
+
+@utility btn-soft {
+  @apply inline-flex items-center justify-center
+    rounded-lg
+    font-medium
+    transition-all duration-150
+    shadow-[0_3px_8px_rgba(0,0,0,0.08)]
+    hover:shadow-[0_5px_14px_rgba(0,0,0,0.12)]
+    active:translate-y-0.5;
+}
+
+@utility input-soft {
+  @apply bg-white border border-neutral-border/70
+  rounded-md
+  px-3
+  h-11
+  text-gray-700
+  focus:outline-none
+  focus:ring-2
+  focus:ring-blue-400;
+}

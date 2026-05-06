@@ -1,0 +1,46 @@
+# --- Compiled Output ---
+/dist
+/node_modules
+/build
+
+# --- NestJS & Logs ---
+/prebuild-error.log
+/terminus.log
+logs
+*.log
+*-debug.log*
+*-error.log*
+
+# --- OS & Runtime ---
+.DS_Store
+Thumbs.db
+pids
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# --- Environmental Variables (QUAN TRỌNG) ---
+.env
+.env.*
+!.env.example 
+
+# --- IDEs & Editors ---
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# --- Testing & Temp ---
+/coverage
+/.nyc_output
+.temp
+.tmp
