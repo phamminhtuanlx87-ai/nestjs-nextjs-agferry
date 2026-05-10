@@ -64,7 +64,7 @@ This project is developed by **Pham Minh Tuan**. Please contact the author for a
 ### 2git add README.md. Biến môi trường (Environment Variables)
 Để dự án hoạt động, bạn cần tạo file `.env` tại thư mục gốc của **backend** và điền các thông tin sau:
 
-env
+```env
 # Kết nối Database
 MONGODB_URI=your_mongodb_connection_string
 
@@ -74,17 +74,56 @@ JWT_EXPIRE=1d
 
 # Cấu hình cổng chạy App
 PORT=3000
+```
+---
+# 📅 Tiến độ & Roadmap
+
+## ✅ Đã hoàn thành (10/05/2026)
+
+- [x] Triển khai Silent Refresh Token xử lý lỗi `401`
+- [x] Thiết kế giao diện cập nhật hồ sơ công trình
+- [x] Chuẩn hóa cấu trúc dữ liệu giai đoạn cố định:
+  - DT
+  - TK
+  - PD
+  - TC
+  - QT
+
 ---
 
-📅 Tiến độ & Kế hoạch (Progress & Roadmap)
-✅ Đã hoàn thành (Completed - 10/05/2026)
-[x] Triển khai Silent Refresh Token xử lý lỗi 401.
+## 🛠️ Công việc tiếp theo
 
-[x] Thiết kế giao diện Cập nhật hồ sơ công trình.
+- [ ] Cấu hình sub-form nhận index cố định:
+  - `giai_doan.0`
+  - `giai_doan.1`
+  - ...
+- [ ] Hoàn thiện logic update dữ liệu lên Backend
+- [ ] Tối ưu phân quyền API
+- [ ] Bổ sung upload file hồ sơ công trình
+- [ ] Triển khai Docker & CI/CD
 
-[x] Thống nhất cấu trúc dữ liệu mảng giai đoạn cố định (DT, TK, PD, TC, QT).
+---
 
-🛠 Công việc ngày mai (Next Steps)
-[ ] Cấu hình lại các sub-form để nhận index cố định (giai_doan.0, giai_doan.1...).
+# 🔒 Bảo mật hệ thống
 
-[ ] Hoàn thiện logic gửi dữ liệu cập nhật (Update) về Backend.
+Hệ thống áp dụng mô hình bảo mật nhiều lớp:
+
+- JWT Authentication
+- Refresh Token Rotation
+- Route Guards
+- Role-based Authorization
+- DTO Validation
+- Password Hashing
+- Secure API Access
+
+---
+
+# 🌟 Định hướng phát triển
+
+- 📱 Responsive UI
+- ☁️ Deploy Azure / VPS
+- 🐳 Docker hóa hệ thống
+- 📊 Dashboard thống kê
+- 📂 Upload & quản lý tài liệu công trình
+- 🔔 Notification realtime
+
