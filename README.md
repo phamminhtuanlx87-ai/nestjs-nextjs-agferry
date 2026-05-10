@@ -61,10 +61,10 @@ This project is developed by **Pham Minh Tuan**. Please contact the author for a
 
 ## ⚙️ Cài đặt & Hướng dẫn chạy (Installation & Setup)
 
-### 2. Biến môi trường (Environment Variables)
+### 2git add README.md. Biến môi trường (Environment Variables)
 Để dự án hoạt động, bạn cần tạo file `.env` tại thư mục gốc của **backend** và điền các thông tin sau:
 
-```env
+env
 # Kết nối Database
 MONGODB_URI=your_mongodb_connection_string
 
@@ -74,19 +74,17 @@ JWT_EXPIRE=1d
 
 # Cấu hình cổng chạy App
 PORT=3000
-
-
----
-## 📅 Tiến độ & Kế hoạch (Progress & Roadmap)
-
-### ✅ Đã hoàn thành (Completed - 10/05/2026)
-- [x] Triển khai **Silent Refresh Token** xử lý lỗi 401.
-- [x] Thiết kế giao diện **Cập nhật hồ sơ công trình**.
-- [x] Thống nhất cấu trúc dữ liệu mảng giai đoạn cố định (DT, TK, PD, TC, QT) để tối ưu Frontend.
-
-### 🛠 Công việc ngày mai (Next Steps)
-- [ ] Cấu hình lại các sub-form để nhận index cố định (giai_doan.0, giai_doan.1...).
-- [ ] Hoàn thiện logic gửi dữ liệu cập nhật (Update) về Backend theo cấu trúc mảng mới.
-
 ---
 
+📅 Tiến độ & Kế hoạch (Progress & Roadmap)
+✅ Đã hoàn thành (Completed - 10/05/2026)
+[x] Triển khai Silent Refresh Token xử lý lỗi 401.
+
+[x] Thiết kế giao diện Cập nhật hồ sơ công trình.
+
+[x] Thống nhất cấu trúc dữ liệu mảng giai đoạn cố định (DT, TK, PD, TC, QT).
+
+🛠 Công việc ngày mai (Next Steps)
+[ ] Cấu hình lại các sub-form để nhận index cố định (giai_doan.0, giai_doan.1...).
+
+[ ] Hoàn thiện logic gửi dữ liệu cập nhật (Update) về Backend.
