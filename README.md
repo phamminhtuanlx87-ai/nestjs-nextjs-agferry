@@ -53,7 +53,30 @@ This project is developed by **Pham Minh Tuan**. Please contact the author for a
 *Copyright © 2026 Pham Minh Tuan. All rights reserved.*
 
 ---
+## ⚙️ Cài đặt & Cấu hình (Installation & Setup)
 
+1. **Clone dự án:**
+   ```bash
+   git clone [https://github.com/phamminhtuanlx87-ai/nestjs-nextjs-agferry.git](https://github.com/phamminhtuanlx87-ai/nestjs-nextjs-agferry.git)
+
+## ⚙️ Cài đặt & Hướng dẫn chạy (Installation & Setup)
+
+### 2. Biến môi trường (Environment Variables)
+Để dự án hoạt động, bạn cần tạo file `.env` tại thư mục gốc của **backend** và điền các thông tin sau:
+
+```env
+# Kết nối Database
+MONGODB_URI=your_mongodb_connection_string
+
+# Cấu hình bảo mật JWT
+JWT_SECRET=your_super_secret_key_123
+JWT_EXPIRE=1d
+
+# Cấu hình cổng chạy App
+PORT=3000
+
+
+---
 ## 📅 Tiến độ & Kế hoạch (Progress & Roadmap)
 
 ### ✅ Đã hoàn thành (Completed - 10/05/2026)
@@ -67,8 +90,3 @@ This project is developed by **Pham Minh Tuan**. Please contact the author for a
 
 ---
 
-## ⚙️ Cài đặt & Cấu hình (Installation & Setup)
-
-1. **Clone dự án:**
-   ```bash
-   git clone [https://github.com/phamminhtuanlx87-ai/nestjs-nextjs-agferry.git](https://github.com/phamminhtuanlx87-ai/nestjs-nextjs-agferry.git)
