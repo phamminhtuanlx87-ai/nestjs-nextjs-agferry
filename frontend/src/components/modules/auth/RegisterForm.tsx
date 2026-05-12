@@ -4,9 +4,9 @@ import { authRegister, RegisterFormData } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import Input from "../ui/Input";
-import Button from "../ui/Button";
 import { useForm } from "react-hook-form";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -107,7 +107,7 @@ export default function RegisterForm() {
 
               <Button
                 type="submit"
-                className="btn-login btn-primary min-w-60 mx-auto btn-elevated mt-3"
+                className={`btn-login btn-primary min-w-60 mx-auto btn-elevated mt-3 ${isLoading ? "cursor-not-allowed disabled:" : ""}`}
               >
                 {isLoading ? "Đang đăng ký..." : "Đăng ký tài khoản"}
               </Button>

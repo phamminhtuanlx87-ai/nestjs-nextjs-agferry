@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, HydratedDocument } from 'mongoose';
 import {
   UserDepartment,
   UserPermission,
@@ -7,11 +7,12 @@ import {
   UserRole,
 } from '../constants/user.constants';
 
+export type UserDocument = HydratedDocument<User>;
 @Schema({
   timestamps: true, // Tự động quản lý createdAt và updatedAt cho bạn
   collection: 'users', // Tên collection trong MongoDB
 })
-export class User extends Document {
+export class User {
   @Prop({ required: true, unique: true, trim: true })
   userName: string;
 
@@ -82,7 +83,12 @@ export class User extends Document {
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.pre('save', function () {
   if (this.fullName) {
-    this.fullName = this.fullName.trim().replace(/\s+/g, ' ');
+    this.fullName = this.fullName
+      .trim() // Xóa khoảng trắng 2 đầu
+      .replace(/\s+/g, ' ') // Thu gọn khoảng trắng ở giữa thành 1 khoảng duy nhất
+      .split(' ') // Cắt chuỗi thành mảng các từ
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Viết hoa chữ đầu, viết thường các chữ sau của mỗi từ
+      .join(' '); // Ghép lại thành chuỗi hoàn chỉnh
   }
   // Không cần gọi next() nếu dùng hàm async
 });

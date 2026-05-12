@@ -1,10 +1,10 @@
-'use client';
+"use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuthStore();
+  const { user, token, refreshToken } = useAuthStore();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -15,16 +15,32 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    // Chỉ thực hiện kiểm tra khi đã Mounted (đã có thể truy cập localStorage)
-    if (isMounted && !user) {
-      router.push("/login");
+    if (isMounted) {
+      // 1. CHỈ kiểm tra xem đã login chưa (có user và token không)
+      if (!user || !token || !refreshToken) {
+        if (window.location.pathname !== "/login") {
+          router.push("/login");
+        }
+        return;
+      }
+
+      // Hãy để Interceptor tự xử lý khi gọi API bị 401.
     }
-  }, [isMounted, user, router]);
+  }, [isMounted, user, token, router, refreshToken]);
 
-  // Trong lúc đợi nạp dữ liệu hoặc không có user, trả về null để tránh nháy giao diện
-  if (!isMounted || !user) {
-    return null; 
+  // Trong khi chờ đợi hoặc chưa login thì không cho xem nội dung
+  if (!isMounted || !user || !token || !refreshToken) {
+    return null;
   }
-
+  if (!isMounted || !user || !token || !refreshToken) {
+    // Thêm dòng này để nếu đang ở trang login thì không trả về null (tránh trang trắng)
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname === "/login"
+    ) {
+      return <>{children}</>;
+    }
+    return null;
+  }
   return <>{children}</>;
 };

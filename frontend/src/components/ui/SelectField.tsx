@@ -1,3 +1,4 @@
+"use client";
 import { RiArrowDownSLine } from "@remixicon/react";
 import React, { forwardRef } from "react";
 

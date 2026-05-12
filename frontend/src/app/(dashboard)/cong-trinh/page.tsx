@@ -2,11 +2,37 @@
 import CongTrinhTable from "@/components/modules/cong-trinh/CongTrinhTable";
 import ThemCongTrinhForm from "@/components/modules/cong-trinh/ThemCongTrinhForm";
 import Button from "@/components/ui/Button";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import Modal from "@/components/ui/Modal";
-import React, { useState } from "react";
+import { getAllCongTrinh, ICongTrinh } from "@/services/congTrinhService";
+import React, { useEffect, useState } from "react";
 
 export default function CongTrinhpage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [dsCongTrinh, setDsCongTrinh] = useState<ICongTrinh[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  // Tại trang quản lý (Parent)
+  const loadData = async () => {
+    const data = await getAllCongTrinh();
+    setDsCongTrinh(data);
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        await loadData();
+      } catch (error) {
+        console.error("Lỗi khi load danh sách công trình:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <LoadingScreen />;
+
   return (
     <div>
       <section className="flex-1 p-6 overflow-y-auto md:ml-10">
@@ -25,7 +51,12 @@ export default function CongTrinhpage() {
               + Thêm công trình
             </Button>
           </div>
-          <CongTrinhTable rowsPerPage={5} />
+          <CongTrinhTable
+            key={dsCongTrinh.length}
+            onSuccess={loadData}
+            data={dsCongTrinh}
+            rowsPerPage={5}
+          />
         </div>
       </section>
       <Modal
@@ -33,7 +64,10 @@ export default function CongTrinhpage() {
         onClose={() => setIsModalOpen(false)}
         title="Thêm công trình"
       >
-        <ThemCongTrinhForm onClose={() => setIsModalOpen(false)} />
+        <ThemCongTrinhForm
+          onSuccess={loadData}
+          onClose={() => setIsModalOpen(false)}
+        />
       </Modal>
     </div>
   );

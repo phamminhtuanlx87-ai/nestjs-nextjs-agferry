@@ -30,7 +30,7 @@ export class AuthController {
     );
     // 2. Lấy thông tin user vừa xác thực thành công để tạo Token
     // Chúng ta truyền authData.user vào hàm login
-    const tokenData = this.authService.login(authData.user);
+    const tokenData = await this.authService.login(authData.user);
 
     // 3. Trả về cả thông tin user và access_token cho Client
     return {
@@ -48,12 +48,18 @@ export class AuthController {
   // -------------------------------------
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('me')
   async getProfile(@Request() req: any) {
     // 1. Lấy userId đã được Passport giải mã và đặt vào req.user
     const userId = req.user.userId;
 
     // 2. Gọi trực tiếp UsersService để lấy thông tin chi tiết
     return await this.usersService.findOne(userId as string);
+  }
+  // Hàm này tạo ra cả Access Token và Refresh Token
+  @Public() // Cho phép gọi mà không cần token vì đây là hàm tạo token
+  @Post('refresh')
+  async refresh(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshTokens(refreshToken);
   }
 }

@@ -11,9 +11,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useAuthStore } from "@/store/useAuthStore";
-import { toast } from "sonner";
 import { authLogin, LoginFormData } from "@/services/authService";
 import LoadingScreen from "@/components/ui/LoadingScreen";
+import { alertService } from "@/utils/swal";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function LoginPage() {
   // 2. Nếu đã nạp xong và có user, đẩy đi ngay
   useEffect(() => {
     if (isHydrated && user) {
-      router.replace("/pha");
+      router.replace("/cong-trinh");
     }
   }, [isHydrated, user, router]);
 
@@ -61,17 +61,18 @@ export default function LoginPage() {
         userName: data.userName,
         password: data.password,
       });
-
+      console.log("Login response:", response); // Kiểm tra phản hồi từ server
       if (response.data) {
-        login(response.data.user, response.data.access_token); // Lưu vào Zustand
-        toast.success("Đăng nhập thành công!");
+        const { user, accessToken, refreshToken } = response.data;
+        login(user, accessToken, refreshToken); // Lưu vào Zustand
+        alertService.success("Đăng nhập thành công!");
         setTimeout(() => {
           // Chuyển hướng sang trang quản lý phà
-          router.replace("/pha");
+          router.replace("/cong-trinh");
         }, 1500);
       }
     } catch (error) {
-      toast.error("Sai tài khoản hoặc mật khẩu! Vui lòng thử lại.");
+      alertService.error("Sai tài khoản hoặc mật khẩu! Vui lòng thử lại.");
       console.error("Login error:", error);
     } finally {
       setIsLoading(false); // Kết thúc load

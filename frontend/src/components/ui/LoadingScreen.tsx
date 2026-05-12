@@ -9,6 +9,7 @@ export default function LoadingScreen() {
         <div className="relative bg-white p-4 rounded-full shadow-lg">
           {/* Thay bằng icon phà của Tuấn */}
           <span className="text-3xl">🚢</span>
+          <span className="sr-only">Loading...</span>
         </div>
       </div>
     </div>

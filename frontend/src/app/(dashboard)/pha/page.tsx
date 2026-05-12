@@ -45,7 +45,12 @@ export default function PhaPage() {
       </Button>
       <h1 className="text-2xl font-bold mb-6">Quản lý Đội Phà</h1>
 
-      <Table headers={["Mã Phà", "Tên Phà", "Trọng Tải", "Trạng Thái"]}>
+      <Table headers={[
+        { key: "id", label: "Mã Phà" },
+        { key: "ten", label: "Tên Phà" },
+        { key: "trong_tai", label: "Trọng Tải" },
+        { key: "trang_thai", label: "Trạng Thái" }
+      ]}>
         {dsTau.map((tau) => (
           <tr
             key={tau.id}
