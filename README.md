@@ -129,29 +129,41 @@ Hệ thống áp dụng mô hình bảo mật nhiều lớp:
 
 --- 
 
-📅 Tiến độ & Kế hoạch (Progress & Roadmap)
-✅ Đã hoàn thành (Completed - 12/05/2026)
-🇻🇳 Tự động hóa Logic Form: Triển khai tính toán tự động Ngày hoàn thành (theo PGV) và Số ngày thi công thực tế bằng useEffect và watch.
+# 📅 Tiến độ & Kế hoạch (Progress & Roadmap)
+## ✅ Đã hoàn thành (Completed - 12/05/2026)
+### 🇻🇳 Tự động hóa Logic Form: 
+Triển khai tính toán tự động Ngày hoàn thành (theo PGV) và Số ngày thi công thực tế bằng useEffect và watch.
 
-🇺🇸 Form Logic Automation: Implemented automatic calculation for Completion Date (PGV) and Actual Construction Days using useEffect and watch hooks.
+### 🇺🇸 Form Logic Automation: 
+Implemented automatic calculation for Completion Date (PGV) and Actual Construction Days using useEffect and watch hooks.
 
-🇻🇳 Chuẩn hóa dữ liệu (Sanitization): Fix triệt để lỗi 400 Bad Request bằng cách ép kiểu Number và xử lý ngày tháng về dạng ISO 8601 (hoặc null khi trống).
+### 🇻🇳 Chuẩn hóa dữ liệu (Sanitization): 
+Fix triệt để lỗi 400 Bad Request bằng cách ép kiểu Number và xử lý ngày tháng về dạng ISO 8601 (hoặc null khi trống).
 
-🇺🇸 Data Sanitization: Resolved 400 Bad Request errors by enforcing Number types and formatting dates to ISO 8601 (or null for empty fields).
+#### 🇺🇸 Data Sanitization: 
+Resolved 400 Bad Request errors by enforcing Number types and formatting dates to ISO 8601 (or null for empty fields).
 
-🇻🇳 Đồng bộ giao diện: Sử dụng useState để quản lý danh sách giai đoạn, giúp UI cập nhật ngay lập tức sau khi cập nhật thành công mà không cần tải lại trang.
+### 🇻🇳 Đồng bộ giao diện: 
+Sử dụng useState để quản lý danh sách giai đoạn, giúp UI cập nhật ngay lập tức sau khi cập nhật thành công mà không cần tải lại trang.
 
-🇺🇸 UI Synchronization: Leveraged useState to manage project phases, ensuring the UI reflects updates instantly without page reloads.
+### 🇺🇸 UI Synchronization: 
+Leveraged useState to manage project phases, ensuring the UI reflects updates instantly without page reloads.
 
-🇻🇳 Khắc phục lỗi TypeScript: Xử lý lỗi Type Assignment trong hàm setValue bằng cách ép kiểu dữ liệu chặt chẽ.
+### 🇻🇳 Khắc phục lỗi TypeScript: 
+Xử lý lỗi Type Assignment trong hàm setValue bằng cách ép kiểu dữ liệu chặt chẽ.
 
-🇺🇸 TypeScript Fixes: Resolved Type Assignment errors within setValue functions through strict type casting.
+### 🇺🇸 TypeScript Fixes: 
+Resolved Type Assignment errors within setValue functions through strict type casting.
 
-🛠 Công việc tiếp theo (Next Steps)
-🇻🇳 Quản lý vật tư: Xây dựng module quản lý vật tư và định mức cho từng hạng mục sửa chữa.
+## 🛠 Công việc tiếp theo (Next Steps)
+### 🇻🇳 Quản lý vật tư: 
+Xây dựng module quản lý vật tư và định mức cho từng hạng mục sửa chữa.
 
-🇺🇸 Material Management: Build modules for tracking materials and standards for each repair category.
+#### 🇺🇸 Material Management: 
+Build modules for tracking materials and standards for each repair category.
 
-🇻🇳 Báo cáo & Thống kê: Tối ưu hóa giao diện Dashboard và xuất báo cáo PDF cho Ban Giám đốc.
+### 🇻🇳 Báo cáo & Thống kê: 
+Tối ưu hóa giao diện Dashboard và xuất báo cáo PDF cho Ban Giám đốc.
 
-🇺🇸 Reports & Analytics: Optimize Dashboard UI and implement PDF report generation for the Board of Directors.
+### 🇺🇸 Reports & Analytics: 
+Optimize Dashboard UI and implement PDF report generation for the Board of Directors.
