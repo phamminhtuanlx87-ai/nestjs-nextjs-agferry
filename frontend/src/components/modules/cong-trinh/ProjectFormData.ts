@@ -1,8 +1,8 @@
 
 
 export interface FileLinkDto {
-  name: string;
-  url: string;
+  link_name: string;
+  link_url: string;
 }
 
 export interface GiaiDoanDto {

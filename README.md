@@ -167,3 +167,66 @@ Tối ưu hóa giao diện Dashboard và xuất báo cáo PDF cho Ban Giám đ�
 
 ### 🇺🇸 Reports & Analytics: 
 Optimize Dashboard UI and implement PDF report generation for the Board of Directors.
+
+---
+
+# 📝 Nhật ký cập nhật tiến độ | Progress Update Log
+## Ngày cập nhật | Update Date: 13/05/2026
+
+### 1. Tối ưu hóa UI/UX cho MultiFileControl | UI/UX Optimization for MultiFileControl
+#### Tiếng Việt:
+
+Chuyển đổi giao diện danh sách file từ dạng input rời rạc sang dạng thẻ (Card-based list) hiện đại, giúp tiết kiệm diện tích.
+
+Thêm trạng thái trực quan: Sử dụng màu nền emerald-50 và biểu tượng tệp tin cho các tệp đã có liên kết URL (tải lên thành công).
+
+Bổ sung nút "Xem tài liệu" (Eye icon) cho phép mở link trực tiếp và nút "Xóa" tinh gọn.
+
+#### English:
+
+Transformed the file list interface from scattered inputs into a modern card-based list, optimizing screen real estate.
+
+Added visual states: Used emerald-50 background and file icons for items with valid URLs (successfully uploaded).
+
+Integrated a "View Document" button (Eye icon) for direct link access and a streamlined "Delete" button.
+
+### 2. Hệ thống điều hướng giai đoạn hồ sơ | Project Stages Navigation System
+#### Tiếng Việt:
+
+Sidebar độc lập: Tách menu điều hướng thành component riêng (ProjectSidebar) để dễ dàng bảo trì.
+
+Hiệu ứng Active: Tự động đánh dấu mục đang chọn bằng vạch chỉ báo (indicator) màu xanh và hiệu ứng dịch chuyển nhẹ (transition).
+
+Cuộn thông minh (Smart Scroll):
+
+Tự động cuộn mượt (Smooth scroll) đến đúng giai đoạn khi click.
+
+Khắc phục lỗi bị che tiêu đề bằng cách áp dụng scroll-mt-48 (Scroll Margin Top), đảm bảo nội dung không bị Header đè lên.
+
+Mặc định kích hoạt mục "I. Thông tin chung" khi khởi tạo trang.
+
+#### English:
+
+Independent Sidebar: Decoupled the navigation menu into a standalone component (ProjectSidebar) for better maintainability.
+
+Active Effects: Automatically highlights the selected stage with a blue indicator and a subtle text transition.
+
+Smart Scroll:
+
+Implements smooth scrolling to the target stage upon clicking.
+
+Resolved header overlap issues by applying scroll-mt-48 (Scroll Margin Top), ensuring content visibility below the fixed header.
+
+Set "I. General Information" as the default active stage on page load.
+
+### 🛠 Công nghệ áp dụng | Tech Stack Applied
+React-hook-form: Quản lý dữ liệu mảng động (Field Array). | Managed dynamic array fields.
+
+Tailwind CSS: Xử lý layout, hiệu ứng cuộn và trạng thái Active. | Handled layout, scroll behaviors, and active states.
+
+React Icons (Fi): Cải thiện trải nghiệm thị giác qua hệ thống icon đồng bộ. | Enhanced visual experience with a unified icon set.
+
+### 🚀 Kế hoạch tiếp theo | Next Steps
+[ ] Scroll Spy: Tự động cập nhật menu sidebar khi người dùng cuộn chuột thủ công qua các phần. | Automatically update the sidebar menu as the user manually scrolls through sections.
+
+[ ] Form Validation: Kiểm tra tính hợp lệ của đường dẫn URL trước khi lưu. | Validate URL format before data submission.

@@ -7,10 +7,10 @@ export type CongTrinhDocument = HydratedDocument<CongTrinh>;
 @Schema({ _id: false }) // Không cần tạo ID riêng cho từng link file
 class FileLink {
   @Prop({ required: true })
-  name: string;
+  link_name: string;
 
   @Prop({ required: true })
-  url: string;
+  link_url: string;
 }
 
 // 2. Schema cho từng Giai Đoạn

@@ -6,6 +6,7 @@ import { GiaiDoanDto, ProjectFormData } from "../ProjectFormData";
 import { useCongTrinh } from "@/context/CongTrinhContext";
 import { formatCurrency } from "@/utils/formatnumber";
 import { MA_HIEU_MAPPING } from "../GiaiDoan";
+import { MultiFileControl } from "@/components/ui/MultiFile";
 // ĐỊNH NGHĨA DANH SÁCH Ở ĐÂY CHO DỄ TÌM
 const OPTIONS_DU_TOAN = [
   { value: "KTC", label: "Cty CP Tư vấn Xây dựng giao thông KTC" },
@@ -24,6 +25,7 @@ interface Props {
 export function DuToanForm({ stage }: Props) {
   const {
     register,
+    control,
     formState: { errors },
   } = useFormContext<ProjectFormData>();
   const data = useCongTrinh();
@@ -34,7 +36,8 @@ export function DuToanForm({ stage }: Props) {
         {/* Tiêu đề khối */}
         <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between">
           <h3 className="font-bold text-sm uppercase text-blue-800">
-            II. Dự toán & Thẩm tra: <span className="hidden">{data?.ten_cong_trinh}</span>
+            II. Dự toán & Thẩm tra:{" "}
+            <span className="hidden">{data?.ten_cong_trinh}</span>
           </h3>
           <span className="text-[10px] text-gray-400 italic font-medium">
             Đơn vị: VNĐ
@@ -92,6 +95,13 @@ export function DuToanForm({ stage }: Props) {
                   })}
                   error={errors.giai_doan?.[0]?.ma_don_vi?.message}
                 ></SelectField>
+
+                <MultiFileControl
+                  control={control}
+                  // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
+                  name="giai_doan.0.file_links"
+                  label="Danh sách tài liệu đính kèm"
+                />
               </>
             </div>
           </div>
@@ -143,6 +153,13 @@ export function DuToanForm({ stage }: Props) {
                   options={OPTIONS_THAM_TRA}
                   {...register(`giai_doan.1.ma_don_vi`)}
                 ></SelectField>
+
+                <MultiFileControl
+                  control={control}
+                  // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
+                  name="giai_doan.1.file_links"
+                  label="Danh sách tài liệu đính kèm"
+                />
               </div>
             </div>
           )}

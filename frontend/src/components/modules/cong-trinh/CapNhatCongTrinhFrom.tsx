@@ -6,6 +6,7 @@ import { GiaiDoanDto, ProjectFormData } from "./ProjectFormData";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   ICongTrinh,
+  ILinkFile,
   UpdateCongtrinhRequest,
   updateProject,
 } from "@/services/congTrinhService";
@@ -18,6 +19,9 @@ import { useRouter } from "next/navigation";
 import PDDuToanForm from "./giai-doan/PDDuToanForm";
 import ThiCongForm from "./giai-doan/ThiCongForm";
 import DuToanPSForm from "./giai-doan/DuToanPSForm";
+import PDDuToanPSForm from "./giai-doan/PDDuToanPSForm";
+import QuyetToanForm from "./giai-doan/QuyetToanForm";
+import { CongTrinhSiderbar } from "./CongTrinhSiderbar";
 interface Props {
   congTrinh: ICongTrinh; // Sử dụng interface bạn đã định nghĩa
 }
@@ -35,6 +39,17 @@ const OPTIONS_DU_TOAN = [
   { value: "TL", label: "Cty TNHH Thiết kế Công nghiệp Thắng Lợi" },
   { value: "PDT", label: "Phòng Đầu tư" },
 ];
+
+const GIAI_DOAN_SiDER = [
+  { id: "thong-tin-chung", label: "I. Thông tin chung" },
+  { id: "du-toan", label: "II. Dự toán & Thẩm tra" },
+  { id: "pd-du-toan", label: "III. Phê duyệt Dự toán" },
+  { id: "thi-cong", label: "IV. Thi công & Nghiệm thu" },
+  { id: "du-toan-ps", label: "V. Dự toán & Thẩm tra (Điều chỉnh)" },
+  { id: "pd-du-toan-ps", label: "VI. Phê duyệt Dự toán (Điều chỉnh))" },
+  { id: "quyet-toan", label: "VII. Quyết toán" },
+];
+
 export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
   const router = useRouter();
   // const [data, setData] = useState();
@@ -174,6 +189,12 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
           chi_phi_xay_dung: parseToNumber(gd.chi_phi_xay_dung as string),
           ma_don_vi: gd.ma_don_vi || "",
           ten_don_vi: gd.ten_don_vi || donViTuOptions?.label || "",
+          file_links: gd.file_links?.map((link: ILinkFile) => {
+            return {
+              link_name: link.link_name,
+              link_url: link.link_url,
+            };
+          }),
         };
       }),
       isActive: true,
@@ -246,6 +267,16 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
     }
   };
 
+  const [activeTab, setActiveTab] = useState("thong-tin-chung");
+
+  const scrollToSection = (id: string) => {
+    setActiveTab(id);
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <FormProvider {...methods}>
@@ -291,51 +322,43 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
           </header>
           <main className="w-full mx-auto px-8 py-10 flex gap-8">
             {/* Thanh điều hướng nhanh bên trái (Sticky Menu) */}
-            <aside className="w-64 hidden lg:block sticky top-28 h-fit">
-              <ul className="space-y-1 text-sm font-medium text-slate-600">
-                <li className="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg cursor-pointer">
-                  I. Thông tin chung
-                </li>
-                <li className="hover:bg-slate-100 px-4 py-2 rounded-lg cursor-pointer transition-all">
-                  II. Dự toán & Thẩm tra
-                </li>
-                <li className="hover:bg-slate-100 px-4 py-2 rounded-lg cursor-pointer transition-all">
-                  III. Phê duyệt Dự toán
-                </li>
-                <li className="hover:bg-slate-100 px-4 py-2 rounded-lg cursor-pointer transition-all">
-                  IV. Thi công & Nghiệm thu
-                </li>
-                <li className="hover:bg-slate-100 px-4 py-2 rounded-lg cursor-pointer transition-all">
-                  V. Dự toán bổ sung (PS)
-                </li>
-                <li className="hover:bg-slate-100 px-4 py-2 rounded-lg cursor-pointer transition-all">
-                  VI. Quyết toán
-                </li>
-              </ul>
-            </aside>
+            {/* Sidebar riêng */}
+            <CongTrinhSiderbar
+              steps={GIAI_DOAN_SiDER}
+              activeId={activeTab}
+              onStepClick={scrollToSection}
+            />
 
             {/* Content chính - Gom vào một khối liền mạch hoặc các Card bo góc lớn */}
             <div className="flex-1 space-y-6">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 {/* Mỗi Section giờ là một Card trắng tinh tế */}
-                <section id="thong-tin-chung">
+                <section id="thong-tin-chung" className="scroll-mt-30">
                   <TongQuanForm />
                 </section>
 
-                <section>
+                <section id="du-toan" className="scroll-mt-30">
                   <DuToanForm stage={giaiDoans || []} />
                 </section>
 
-                <section>
+                <section id="pd-du-toan" className="scroll-mt-30">
                   <PDDuToanForm stage={giaiDoans || []} />
                 </section>
 
-                <section>
+                <section id="thi-cong" className="scroll-mt-30">
                   <ThiCongForm stage={giaiDoans || []} />
                 </section>
 
-                <section>
+                <section id="du-toan-ps" className="scroll-mt-30">
                   <DuToanPSForm stage={giaiDoans || []} />
+                </section>
+
+                <section id="pd-du-toan-ps" className="scroll-mt-30">
+                  <PDDuToanPSForm stage={giaiDoans || []} />
+                </section>
+
+                <section id="quyet-toan" className="scroll-mt-30">
+                  <QuyetToanForm stage={giaiDoans || []} />
                 </section>
               </form>
             </div>

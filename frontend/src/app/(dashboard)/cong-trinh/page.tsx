@@ -14,6 +14,7 @@ export default function CongTrinhpage() {
   // Tại trang quản lý (Parent)
   const loadData = async () => {
     const data = await getAllCongTrinh();
+
     setDsCongTrinh(data);
   };
   useEffect(() => {

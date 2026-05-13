@@ -47,8 +47,14 @@ export interface IGiaiDoan {
   chi_phi_xay_dung?: string | number;
   ngay_thuc_hien?: string;
   ngay_hoan_thanh?: string;
+  file_links?: ILinkFile[];
 }
 
+export interface ILinkFile
+{
+   link_name: string;
+   link_url: string;
+}
 export const getAllCongTrinh = async (): Promise<ICongTrinh[]> => {
   const response = await api.get<ApiResponse>("/congtrinh");
   return response.data.data; // Giả sử API trả về { data: [...] }

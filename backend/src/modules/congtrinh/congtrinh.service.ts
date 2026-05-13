@@ -44,7 +44,7 @@ export class CongtrinhService {
   async getAll(): Promise<CongTrinhDocument[]> {
     return await this.congTrinhModel
       .find({ isActive: true })
-      .sort({ createdAt: -1 })
+      .sort({ updatedAt: -1 })
       .select('-permissions -__v')
       .exec();
   }

@@ -14,11 +14,11 @@ import { Type } from 'class-transformer';
 class FileLinkDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  link_name: string;
 
   @IsString()
   @IsNotEmpty()
-  url: string;
+  link_url: string;
 }
 
 // DTO nhỏ cho từng Giai đoạn

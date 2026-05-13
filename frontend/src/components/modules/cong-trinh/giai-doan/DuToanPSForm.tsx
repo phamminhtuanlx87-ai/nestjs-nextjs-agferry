@@ -6,6 +6,7 @@ import { useCongTrinh } from "@/context/CongTrinhContext";
 import { SelectField } from "@/components/ui/SelectField";
 import { MA_HIEU_MAPPING } from "../GiaiDoan";
 import { formatCurrency } from "@/utils/formatnumber";
+import { MultiFileControl } from "@/components/ui/MultiFile";
 
 interface Props {
   stage: GiaiDoanDto[];
@@ -24,6 +25,7 @@ const OPTIONS_THAM_TRA = [
 export default function DuToanPSForm({ stage }: Props) {
   const {
     register,
+    control,
     formState: { errors },
   } = useFormContext<ProjectFormData>();
   const data = useCongTrinh();
@@ -97,6 +99,13 @@ export default function DuToanPSForm({ stage }: Props) {
                   })}
                   error={errors.giai_doan?.[5]?.ma_don_vi?.message}
                 ></SelectField>
+
+                <MultiFileControl
+                  control={control}
+                  // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
+                  name="giai_doan.5.file_links"
+                  label="Danh sách tài liệu đính kèm"
+                />
               </div>
             </div>
 
@@ -158,6 +167,13 @@ export default function DuToanPSForm({ stage }: Props) {
                     })}
                     error={errors.giai_doan?.[6]?.ma_don_vi?.message}
                   ></SelectField>
+
+                  <MultiFileControl
+                    control={control}
+                    // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
+                    name="giai_doan.6.file_links"
+                    label="Danh sách tài liệu đính kèm"
+                  />
                 </div>
               </div>
             )}
