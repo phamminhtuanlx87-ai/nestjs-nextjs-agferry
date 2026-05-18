@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect } from "react";
 import { GiaiDoanDto, ProjectFormData } from "../ProjectFormData";
 import { useFormContext } from "react-hook-form";

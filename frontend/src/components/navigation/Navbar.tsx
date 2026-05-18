@@ -18,9 +18,9 @@ function Navbar() {
     <div>
       <nav className="flex items-center justify-between bg-neutral-bg-header p-4">
         <div className="flex gap-4">
-          <NavbarLink href="/dashboard">Trang chủ</NavbarLink>
+          <NavbarLink href="/tong-quan">Trang chủ</NavbarLink>
           <NavbarLink href="/pha">Phương tiện</NavbarLink>
-          <NavbarLink href="/sua-chua">Tiền lương</NavbarLink>
+          <NavbarLink href="/tien-luong">Tiền lương</NavbarLink>
         </div>
         <nav className="hidden md:flex gap-3 text justify-start items-center">
           <div className="relative w-10 h-10">

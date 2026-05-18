@@ -2,7 +2,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -41,7 +41,7 @@ api.interceptors.response.use(
         if (!refreshToken) throw new Error("No refresh token");
 
         // Dùng axios gốc để tránh bị interceptor này bắt lại
-        const res = await axios.post("http://localhost:3000/api/auth/refresh", {
+        const res = await axios.post( process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api", {
           refreshToken: refreshToken,
         });
         console.log("Refresh response:", res); // Kiểm tra phản hồi từ server

@@ -53,6 +53,8 @@ const GIAI_DOAN_SiDER = [
 export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
   const router = useRouter();
   // const [data, setData] = useState();
+  // 1. Khởi tạo state từ props
+  const [localCongTrinh, setLocalCongTrinh] = useState(congTrinh);
   // Khai báo công cụ quản lý form
   const methods = useForm<ProjectFormData>({
     defaultValues: {
@@ -88,6 +90,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
 
   const { reset, handleSubmit } = methods;
   const [giaiDoans, setGiaiDoans] = useState<GiaiDoanDto[]>();
+
   useEffect(() => {
     if (congTrinh?.giai_doan) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -105,6 +108,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
               : "",
         })),
       );
+       setLocalCongTrinh(congTrinh)
     }
   }, [congTrinh]);
 
@@ -258,8 +262,8 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
                 : "",
           })) ?? [],
         );
+        setLocalCongTrinh(updatedData);
         router.refresh();
-        router.replace(`/cong-trinh/${congTrinh._id}`);
       }
     } catch (error) {
       console.error("Lỗi:", error);
@@ -276,7 +280,6 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
-
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <FormProvider {...methods}>
@@ -324,7 +327,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
             {/* Thanh điều hướng nhanh bên trái (Sticky Menu) */}
             {/* Sidebar riêng */}
             <CongTrinhSiderbar
-              steps={GIAI_DOAN_SiDER}
+              steps={GIAI_DOAN_SiDER.slice(0, localCongTrinh.giai_doan?.length)}
               activeId={activeTab}
               onStepClick={scrollToSection}
             />

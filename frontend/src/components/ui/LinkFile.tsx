@@ -1,3 +1,4 @@
+"use client"
 import { FiPaperclip, FiTrash2 } from 'react-icons/fi';
 
 interface LinkFileProps {

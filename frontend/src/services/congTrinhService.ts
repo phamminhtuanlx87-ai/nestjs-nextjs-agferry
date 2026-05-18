@@ -12,7 +12,7 @@ export interface CongtrinhRequest {
   don_vi_chu_quan?: string;
   isActive?: boolean; // Thêm trường isActive để quản lý trạng thái công trình
 }
-export type UpdateCongtrinhRequest = Partial<CongtrinhRequest>& {
+export type UpdateCongtrinhRequest = Partial<CongtrinhRequest> & {
   giai_doan?: IGiaiDoan[]; // Thêm mảng giai đoạn vào đây
 };
 
@@ -21,7 +21,10 @@ export async function addProject(ctrData: CongtrinhRequest) {
   return response.data.data; // Giả sử API trả về { data: [...] }
 }
 
-export async function updateProject(id: string, ctrData: UpdateCongtrinhRequest) {
+export async function updateProject(
+  id: string,
+  ctrData: UpdateCongtrinhRequest,
+) {
   const response = await api.patch<ApiResponse>(`/congtrinh/${id}`, ctrData);
   return response.data.data; // Giả sử API trả về { data: [...] }
 }
@@ -33,6 +36,8 @@ export interface ICongTrinh {
   don_vi_chu_quan: string;
   ngay_tao_du_an: string;
   giai_doan: IGiaiDoan[];
+  updatedAt: string | Date; // Đảm bảo có trường này
+  createdAt: string | Date;
 }
 export interface IGiaiDoan {
   ma_hieu: string;
@@ -50,13 +55,20 @@ export interface IGiaiDoan {
   file_links?: ILinkFile[];
 }
 
-export interface ILinkFile
-{
-   link_name: string;
-   link_url: string;
+export interface ILinkFile {
+  link_name: string;
+  link_url: string;
 }
-export const getAllCongTrinh = async (): Promise<ICongTrinh[]> => {
-  const response = await api.get<ApiResponse>("/congtrinh");
+export const getAllCongTrinh = async (
+  month: number,
+  year: number,
+): Promise<ICongTrinh[]> => {
+  const response = await api.get<ApiResponse>("/congtrinh", {
+    params: {
+      month,
+      year,
+    },
+  });
   return response.data.data; // Giả sử API trả về { data: [...] }
 };
 

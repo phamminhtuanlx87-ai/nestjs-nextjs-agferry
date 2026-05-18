@@ -7,15 +7,15 @@ import Button from "../ui/Button";
 import { useAuthStore } from "@/store/useAuthStore";
 
 const menuItems = [
-  { name: "Tổng quan", href: "/dashboard", icon: "📊" },
+  { name: "Tổng quan", href: "/tong-quan", icon: "📊" },
   { name: "Công trình / Dự án", href: "/cong-trinh", icon: "🛠️" },
   { name: "Hồ sơ / Văn bản", href: "/ho-so", icon: "📄" },
   { name: "Quản lý vật tư", href: "/vat-tu", icon: "📦" },
   { name: "Tua chuyến", href: "/tua-chuyen", icon: "⛴️" },
   { name: "Doanh thu / Lợi nhuận", href: "/doanh-thu", icon: "💰" },
   { name: "Nhân viên", href: "/nhan-vien", icon: "👥" },
-  { name: "Báo cáo", href: "/bao-cao", icon: "📊" },
-  { name: "Cài đặt", href: "/cai-dat", icon: "⚙️" },
+  // { name: "Báo cáo", href: "/bao-cao", icon: "📊" },
+  // { name: "Cài đặt", href: "/cai-dat", icon: "⚙️" },
 ];
 
 export default function Sidebar() {

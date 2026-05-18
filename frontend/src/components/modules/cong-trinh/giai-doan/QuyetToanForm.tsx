@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { GiaiDoanDto, ProjectFormData } from "../ProjectFormData";
 import Input from "@/components/ui/Input";
