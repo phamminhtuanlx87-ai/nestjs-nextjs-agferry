@@ -33,7 +33,7 @@ function Navbar() {
           </div>
           <div className="flex gap-1">
             <Link
-              href="profile"
+              href="#"
               className="hover:text-accent text-white transition"
             >
               {fullName}
