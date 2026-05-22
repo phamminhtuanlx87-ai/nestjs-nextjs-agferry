@@ -23,7 +23,19 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    if (error.response?.status === 429) {
+      // Nếu NestJS trả về thông báo mặc định tiếng Anh, ta tự đè lại bằng câu tiếng Việt dễ hiểu
+      if (
+        !error.response.data.message ||
+        error.response.data.message.includes("Throttler")
+      ) {
+        error.response.data.message =
+          "Thao tác quá nhanh, vui lòng thử lại sau!";
+      }
 
+      // Chỉ ném lỗi ra (Reject) để file Form tự bắt lấy thông báo này hiển thị
+      return Promise.reject(error);
+    }
     // QUAN TRỌNG: Nếu API refresh cũng bị 401 thì phải logout ngay, không retry nữa
     if (originalRequest.url?.includes("/auth/refresh")) {
       useAuthStore.getState().logout();
@@ -37,14 +49,19 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
+        // 1. Lấy Base URL từ biến môi trường
+        const baseUrl =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
         const refreshToken = useAuthStore.getState().refreshToken;
         if (!refreshToken) throw new Error("No refresh token");
 
         // Dùng axios gốc để tránh bị interceptor này bắt lại
-        const res = await axios.post( process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api", {
-          refreshToken: refreshToken,
-        });
-        console.log("Refresh response:", res); // Kiểm tra phản hồi từ server
+        const res = await axios.post(
+          `${baseUrl}/auth/refresh` || "http://localhost:3000/api/auth/refresh",
+          {
+            refreshToken: refreshToken,
+          },
+        );
         const { accessToken, refreshToken: newRefreshToken } = res.data;
         const currentUser = useAuthStore.getState().user;
 
@@ -70,6 +87,7 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   },
 );

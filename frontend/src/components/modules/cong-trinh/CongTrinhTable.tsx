@@ -8,6 +8,8 @@ import { ICongTrinh } from "@/services/congTrinhService";
 import api from "@/lib/axios";
 import { alertService } from "@/utils/swal";
 import { useState } from "react";
+import { Guard } from "@/components/common/Guard";
+import { UserPermission } from "@/store/useAuthStore";
 
 interface CongTrinhTableProps {
   // projects: ICongTrinh[];
@@ -150,35 +152,45 @@ export default function CongTrinhTable({
 
             <td className="px-6 py-4">
               <div className="flex items-center justify-end gap-1">
-                <Button
-                  type="button"
-                  className="p-2 rounded-lg text-indigo-600 bg-white hover:bg-indigo-300 transition-colors"
-                >
-                  <RiEyeLine size={18}></RiEyeLine>
-                </Button>
-                <Button
-                  type="button"
-                  className="p-2 rounded-lg text-indigo-600 bg-white hover:bg-indigo-300 transition-colors"
-                  onClick={() => {
-                    const targetId = project._id;
-                    router.push(`/cong-trinh/${targetId}`);
-                  }}
-                >
-                  <RiEdit2Line size={18}></RiEdit2Line>
-                </Button>
-                <Button
-                  type="button"
-                  className="p-2 rounded-lg text-red-500 bg-white hover:bg-indigo-300 transition-colors"
-                  onClick={() =>
-                    handleDelete(
-                      project._id,
-                      project.ma_cong_trinh,
-                      project.ten_cong_trinh,
-                    )
-                  }
-                >
-                  <RiDeleteBinLine size={18}></RiDeleteBinLine>
-                </Button>
+                <Guard requiredPermission={UserPermission.PROJECT_VIEW}>
+                  <Button
+                    type="button"
+                    className="p-2 rounded-lg text-indigo-600 bg-white hover:bg-indigo-300 transition-colors"
+                      onClick={() => {
+                      const targetId = project._id;
+                      router.push(`/cong-trinh/${targetId}/view`);
+                    }}
+                  >
+                    <RiEyeLine size={18}></RiEyeLine>
+                  </Button>
+                </Guard>
+                <Guard requiredPermission={UserPermission.PROJECT_UPDATE}>
+                  <Button
+                    type="button"
+                    className="p-2 rounded-lg text-indigo-600 bg-white hover:bg-indigo-300 transition-colors"
+                    onClick={() => {
+                      const targetId = project._id;
+                      router.push(`/cong-trinh/${targetId}`);
+                    }}
+                  >
+                    <RiEdit2Line size={18}></RiEdit2Line>
+                  </Button>
+                </Guard>
+                <Guard requiredPermission={UserPermission.PROJECT_DELETE}>
+                  <Button
+                    type="button"
+                    className="p-2 rounded-lg text-red-500 bg-white hover:bg-indigo-300 transition-colors"
+                    onClick={() =>
+                      handleDelete(
+                        project._id,
+                        project.ma_cong_trinh,
+                        project.ten_cong_trinh,
+                      )
+                    }
+                  >
+                    <RiDeleteBinLine size={18}></RiDeleteBinLine>
+                  </Button>
+                </Guard>
               </div>
             </td>
           </tr>

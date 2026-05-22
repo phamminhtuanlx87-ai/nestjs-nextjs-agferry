@@ -7,10 +7,14 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import axios from "axios";
+import { alertService } from "@/utils/swal";
 
 export default function RegisterForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  // Tạo thêm 1 state ở đầu Component để lưu thời gian đếm ngược (nếu có)
+  const [cooldownTime, setCooldownTime] = useState<number>(0);
   // Khai báo hook form
   const {
     register,
@@ -34,9 +38,32 @@ export default function RegisterForm() {
     } catch (error) {
       toast.error("Đăng ký thất bại! Vui lòng thử lại.");
       console.error("Register error:", error);
-    } finally {
-      setIsLoading(false); // Kết thúc load
-    }
+
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+        // 1. Bắn thông báo cảnh cáo nghiêm túc
+        alertService.error(
+          "Hệ thống phát hiện hành vi spam dữ liệu liên tục! Bạn bị tạm khóa nút gửi trong 5 phút.",
+        );
+
+        // 2. Kích hoạt trạng thái khóa nút bấm
+        setIsLoading(true);
+        setCooldownTime(300); // 300 giây = 5 phút
+
+        // 3. Chạy bộ đếm ngược hiển thị ra nút bấm
+        const interval = setInterval(() => {
+          setCooldownTime((prev) => {
+            if (prev <= 1) {
+              clearInterval(interval);
+              setIsLoading(false); // Mở khóa nút khi hết giờ
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+
+        return; // Thoát hàm, không chạy xuống finally
+      }
+    } 
   };
 
   return (
@@ -104,13 +131,28 @@ export default function RegisterForm() {
                   {errors.email.message as string}
                 </span>
               )}
-
-              <Button
-                type="submit"
-                className={`btn-login btn-primary min-w-60 mx-auto btn-elevated mt-3 ${isLoading ? "cursor-not-allowed disabled:" : ""}`}
-              >
-                {isLoading ? "Đang đăng ký..." : "Đăng ký tài khoản"}
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-w-50 mx-auto btn-elevated mt-3"
+                  onClick={() => router.push("/login")}
+                >
+                  Quay lại
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="min-w-50 mx-auto btn-elevated mt-3"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Đang đăng ký..." : "Đăng ký tài khoản"}
+                  <br />
+                  {cooldownTime > 0
+                    ? `Vui lòng đợi (${Math.floor(cooldownTime / 60)}p:${cooldownTime % 60}s)`
+                    : ""}
+                </Button>
+              </div>
             </form>
           </div>
         </div>

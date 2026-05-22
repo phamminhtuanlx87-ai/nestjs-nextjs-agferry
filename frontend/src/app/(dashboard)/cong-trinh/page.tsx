@@ -7,6 +7,8 @@ import Modal from "@/components/ui/Modal";
 import { getAllCongTrinh, ICongTrinh } from "@/services/congTrinhService";
 import React, { useCallback, useEffect, useState } from "react";
 import ProjectStatsBlock from "@/components/modules/cong-trinh/ProjectStatsBlock";
+import { Guard } from "@/components/common/Guard";
+import { UserPermission } from "@/store/useAuthStore";
 
 export default function CongTrinhpage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,6 +17,7 @@ export default function CongTrinhpage() {
   const now = new Date();
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+
   // Gọi hook ngay dưới phần khai báo các State
 
   // Tại trang quản lý (Parent)
@@ -32,10 +35,7 @@ export default function CongTrinhpage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        setSelectedMonth(selectedMonth);
-        setSelectedYear(selectedYear);
         await loadData(selectedMonth, selectedYear);
-        setLoading(false);
       } catch (error) {
         console.error("Lỗi khi load danh sách công trình:", error);
       } finally {
@@ -52,45 +52,53 @@ export default function CongTrinhpage() {
   return (
     <div>
       <div className="flex-1 p-6 overflow-y-auto md:ml-10 flex flex-col gap-6">
-        <ProjectStatsBlock
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          onMonthChange={setSelectedMonth}
-          onYearChange={setSelectedYear}
-        />
-        <section className="content-2 table-list bg-white border border-gray-50 border-shadow flex flex-col gap-5">
-          <div className="flex items-center justify-between">
-            <h1 className="text-sm md:text-2xl font-semibold">
-              Danh sách công trình
-            </h1>
-
-            <Button
-              type="button"
-              variant="primary"
-              className="text-sm font-semibold"
-              onClick={() => setIsModalOpen(true)}
-            >
-              + Thêm công trình
-            </Button>
-          </div>
-          <CongTrinhTable
-            key={dsCongTrinh.length}
-            onSuccess={() => loadData(selectedMonth, selectedYear)}
+        <Guard requiredPermission={UserPermission.PROJECT_VIEW}>
+          <ProjectStatsBlock
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onMonthChange={setSelectedMonth}
+            onYearChange={setSelectedYear}
             data={dsCongTrinh}
-            rowsPerPage={20}
+            loading={loading}
           />
-        </section>
+          <section className="content-2 table-list bg-white border border-gray-50 border-shadow flex flex-col gap-5">
+            <div className="flex items-center justify-between">
+              <h1 className="text-sm md:text-2xl font-semibold">
+                Danh sách công trình
+              </h1>
+
+              <Guard requiredPermission={UserPermission.PROJECT_CREATE}>
+                <Button
+                  type="button"
+                  variant="primary"
+                  className="text-sm font-semibold"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  + Thêm công trình
+                </Button>
+              </Guard>
+            </div>
+            <CongTrinhTable
+              key={dsCongTrinh.length}
+              onSuccess={() => loadData(selectedMonth, selectedYear)}
+              data={dsCongTrinh}
+              rowsPerPage={20}
+            />
+          </section>
+        </Guard>
       </div>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Thêm công trình"
-      >
-        <ThemCongTrinhForm
-          onSuccess={() => loadData(selectedMonth, selectedYear)}
+      <Guard requiredPermission={UserPermission.PROJECT_CREATE}>
+        <Modal
+          isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-        />
-      </Modal>
+          title="Thêm công trình"
+        >
+          <ThemCongTrinhForm
+            onSuccess={() => loadData(selectedMonth, selectedYear)}
+            onClose={() => setIsModalOpen(false)}
+          />
+        </Modal>
+      </Guard>
     </div>
   );
 }

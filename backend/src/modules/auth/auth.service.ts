@@ -98,6 +98,7 @@ export class AuthService {
         userName: user.userName,
         fullName: user.fullName,
         role: user.role,
+        permissions: user.permissions,
       },
     };
   }

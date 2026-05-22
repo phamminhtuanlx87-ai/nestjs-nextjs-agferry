@@ -17,9 +17,10 @@ export const CongTrinhSiderbar: React.FC<CongTrinhSiderbarPros> = ({
   activeId,
   onStepClick,
 }) => {
+  
   return (
     <div className="w-64 shrink-0">
-      <div className="sticky top-24 flex flex-col bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
+      <div className="sticky top-30 flex flex-col bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
         <p className="text-[10px] font-bold text-slate-400 uppercase p-3 tracking-[2px]">
           Danh mục
         </p>

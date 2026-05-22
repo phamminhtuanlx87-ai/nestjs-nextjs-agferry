@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -15,6 +16,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
 import { CongTrinhDto } from './dto/create-congtrinh';
 import { CongtrinhService } from './congtrinh.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER)
@@ -24,12 +26,28 @@ export class CongtrinhController {
     console.log('Khởi tạo CongTrinhService');
   }
   // API này thừa hưởng toàn bộ Guard và Roles ở trên
+  @Public()
+  @SkipThrottle()
   @Get()
-  async getAll() {
-    // return await this.congTrinhService.getAll();
+  async getAll(@Query('month') month?: string, @Query('year') year?: string) {
+    // Kiểm tra nếu có month hoặc year thì gọi findAll, không thì gọi getAll (hoặc gộp chung)
+
+    if (month || year) {
+      const filter = {
+        month: month ? parseInt(month) : undefined,
+        year: year ? parseInt(year) : undefined,
+      };
+      const result = await this.congTrinhService.findAll(filter);
+      return {
+        statusCode: 201, // Thêm cái này để frontend dễ check
+        message: 'Lấy danh sách công trình thành công!',
+        data: result,
+      };
+    }
     const result = await this.congTrinhService.getAll();
     return {
-      message: 'Lấy dữ liệu Danh sách công trình đang isActive thành công!',
+      statusCode: 201, // Thêm cái này để frontend dễ check
+      message: 'Lấy danh sách công trình thành công!',
       data: result,
     };
   }
@@ -74,6 +92,8 @@ export class CongtrinhController {
     };
   }
 
+  @Public()
+  @SkipThrottle() //API GET này sẽ ĐƯỢC THẢ TỰ DO, không bị chặn nữa
   @Get(':id')
   async getCongtrinh(@Param('id') id: string) {
     const result = await this.congTrinhService.getCongtrinh(id);
@@ -86,6 +106,7 @@ export class CongtrinhController {
 
   // API ngoại lệ: Mở cửa hoàn toàn (Ví dụ: khách xem danh sách công trình công cộng)
   @Public()
+  @SkipThrottle() //API GET này sẽ ĐƯỢC THẢ TỰ DO, không bị chặn nữa
   @Get('dscongtrinh')
   getPublic() {
     return 'Ai cũng thấy, không cần token';

@@ -6,10 +6,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   // 2. Cấu hình mở CORS - Đây chính là chìa khóa!
+  // 2. Cấu hình mở CORS - Đã cập nhật để chạy cả Local và Production
   app.enableCors({
-    origin: 'http://localhost:3001', // Cho phép chính xác ông Frontend này vào
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Các phương thức được phép
-    credentials: true, // Cho phép gửi cookie/token nếu cần
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? [process.env.FRONTEND_URL, 'https://your-nextjs-app.vercel.app'] // Điền link Next.js production của bạn vào đây
+        : 'http://localhost:3001', // Khi chạy ở máy local
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
   });
   // Dòng này cực kỳ quan trọng để kích hoạt class-validator
   app.useGlobalPipes(

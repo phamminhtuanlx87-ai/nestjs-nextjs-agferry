@@ -1,12 +1,22 @@
 "use client";
 import DSCongTrinh from "@/components/modules/cong-trinh/DSCongTrinh";
 import ProjectStatsBlock from "@/components/modules/cong-trinh/ProjectStatsBlock";
-import React, { useState } from "react";
+import LoadingScreen from "@/components/ui/LoadingScreen";
+import { useCongTrinhData } from "@/hooks/useCongTrinhData";
 
 export default function TongQuanPage() {
-  const now = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
-  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  // Lấy toàn bộ "vũ khí" ra từ Custom Hook dùng chung
+  const {
+    selectedMonth,
+    setSelectedMonth,
+    selectedYear,
+    setSelectedYear,
+    dsCongTrinh,
+    loading,
+  } = useCongTrinhData();
+
+  if (loading) return <LoadingScreen />;
+  
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Tổng Quan</h1>
@@ -17,10 +27,13 @@ export default function TongQuanPage() {
           selectedYear={selectedYear}
           onMonthChange={setSelectedMonth}
           onYearChange={setSelectedYear}
+          data={dsCongTrinh}
+          loading={loading}
         />
         <DSCongTrinh
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
+          data={dsCongTrinh}
         />
       </div>
     </div>

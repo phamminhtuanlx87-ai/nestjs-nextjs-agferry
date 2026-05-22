@@ -58,12 +58,20 @@ export const useCongTrinhCard = ({
     const currentThiCong = dsCongTrinh.filter(
       (e) =>
         isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[3].ma_hieu,
+        e.giai_doan
+          ?.at(-1)
+          ?.ma_hieu.includes(
+            MA_HIEU_MAPPING[3].ma_hieu || MA_HIEU_MAPPING[4].ma_hieu,
+          ),
     ).length;
     const lastThiCong = dsCongTrinh.filter(
       (e) =>
         isProjectInTime(e.createdAt, prevMonth, prevYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[3].ma_hieu,
+        e.giai_doan
+          ?.at(-1)
+          ?.ma_hieu.includes(
+            MA_HIEU_MAPPING[3].ma_hieu || MA_HIEU_MAPPING[4].ma_hieu,
+          ),
     ).length;
 
     // --- CARD 3: ĐANG QUYẾT TOÁN (Mã hiệu cuối cùng là "QT") ---
@@ -71,12 +79,24 @@ export const useCongTrinhCard = ({
     const currentQuyetToan = dsCongTrinh.filter(
       (e) =>
         isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[7].ma_hieu,
+        e.giai_doan
+          ?.at(-1)
+          ?.ma_hieu.includes(
+            MA_HIEU_MAPPING[5].ma_hieu ||
+              MA_HIEU_MAPPING[6].ma_hieu ||
+              MA_HIEU_MAPPING[7].ma_hieu,
+          ),
     ).length;
     const lastQuyetToan = dsCongTrinh.filter(
       (e) =>
         isProjectInTime(e.createdAt, prevMonth, prevYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[7].ma_hieu,
+        e.giai_doan
+          ?.at(-1)
+          ?.ma_hieu.includes(
+            MA_HIEU_MAPPING[5].ma_hieu ||
+              MA_HIEU_MAPPING[6].ma_hieu ||
+              MA_HIEU_MAPPING[7].ma_hieu,
+          ),
     ).length;
 
     // --- CARD 4: HOÀN THÀNH (Mã hiệu cuối cùng là "HT") ---
@@ -134,21 +154,31 @@ export const useCongTrinhCard = ({
     const thiCongThangNay = dsCongTrinh.filter(
       (e) =>
         isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === "TC",
+        e.giai_doan
+          ?.at(-1)
+          ?.ma_hieu.includes(
+            MA_HIEU_MAPPING[3].ma_hieu || MA_HIEU_MAPPING[4].ma_hieu,
+          ),
     );
 
     // 3. Nhóm Đang quyết toán
     const quyetToanThangNay = dsCongTrinh.filter(
       (e) =>
         isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === "QT",
+        e.giai_doan
+          ?.at(-1)
+          ?.ma_hieu.includes(
+            MA_HIEU_MAPPING[5].ma_hieu ||
+              MA_HIEU_MAPPING[6].ma_hieu ||
+              MA_HIEU_MAPPING[7].ma_hieu,
+          ),
     );
 
     // 4. Nhóm Hoàn thành
     const hoanThanhThangNay = dsCongTrinh.filter(
       (e) =>
         isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === "HT",
+        e.giai_doan?.at(-1)?.ma_hieu ===  MA_HIEU_MAPPING[8].ma_hieu,
     );
     // 2. Trả về object chứa đầy đủ cấu trúc dữ liệu sạch cho UI sử dụng
     return {

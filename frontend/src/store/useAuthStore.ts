@@ -1,25 +1,44 @@
+"use client";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+
+// Định nghĩa chi tiết từng quyền (Permission)
+export enum UserPermission {
+  // Quyền với Dự án (Projects)
+  PROJECT_CREATE = "PROJECT_CREATE",
+  PROJECT_UPDATE = "PROJECT_UPDATE",
+  PROJECT_DELETE = "PROJECT_DELETE",
+  PROJECT_VIEW = "PROJECT_VIEW",
+
+  // Quyền với Người dùng (Users)
+  USER_CREATE = "USER_CREATE",
+  USER_UPDATE = "USER_UPDATE",
+  USER_DELETE = "USER_DELETE",
+  USER_VIEW = "USER_VIEW",
+}
 // Định nghĩa cấu trúc của User
-interface User {
-  id: string;
+export interface UserData {
+  userName: string;
+  fullName: string;
   email: string;
-  fullName?: string;
-  // Thêm các trường khác tùy vào API của bạn
+  role: string;
+  permissions: string[]; // Thêm trường này để đi kèm với thông tin User
 }
 
 interface AuthState {
-  user: User | null;
+  user: UserData | null;
   token: string | null; // Thêm trường token riêng
   refreshToken: string | null;
   isAuthenticated: boolean;
-  login: (userData: User, token: string, refreshToken: string) => void; // Nhận thêm tham số token và refreshToken
+  login: (userData: UserData, token: string, refreshToken: string) => void; // Nhận thêm tham số token và refreshToken
   logout: () => void;
+  setUser: (userData: UserData) => void;
+  hasPermission: (permissionValue: string) => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       refreshToken: null, // Khởi tạo giá trị null
@@ -34,6 +53,15 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: null,
           isAuthenticated: false,
         });
+      },
+      setUser: (user) => set({ user }),
+      hasPermission: (permissionValue) => {
+        // Log này giúp bạn nhìn thấy cấu trúc thực tế của user.permissions trên tab Console trình duyệt
+        const user = get().user;
+
+        if (!user || !user.permissions) return false;
+        const result = user.permissions.includes(permissionValue);
+        return result;
       },
     }),
     {

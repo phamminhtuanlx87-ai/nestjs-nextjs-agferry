@@ -1,48 +1,35 @@
 "use client";
 import SumIcon from "@/components/ui/SumIcon";
 import SummaryCard from "@/components/ui/SummaryCard";
-import { getAllCongTrinh, ICongTrinh } from "@/services/congTrinhService";
-import React, { useState, useEffect } from "react";
 import { useCongTrinhCard } from "./useCongTrinhCard";
 import DropDown from "@/components/ui/DropDown";
 import { MONTH_OPTIONS, YEAR_OPTIONS } from "@/constants/time";
 import { BiCalendar } from "react-icons/bi";
+import { ICongTrinh } from "@/services/congTrinhService";
 
 interface ProjectStatsBlockProps {
   selectedMonth: number;
   selectedYear: number;
   onMonthChange: (month: number) => void;
   onYearChange: (year: number) => void;
+  data: ICongTrinh[];
+  loading: boolean
 }
-
 
 export default function ProjectStatsBlock({
   selectedMonth,
   selectedYear,
   onMonthChange,
-  onYearChange
+  onYearChange,
+  data,
+  loading,
 }: ProjectStatsBlockProps) {
-
-  const [loading, setLoading] = useState(false);
-  const [dsCongTrinh, setDsCongTrinh] = useState<ICongTrinh[]>([]);
-  const stats = useCongTrinhCard({ dsCongTrinh, selectedMonth, selectedYear });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllCongTrinh(selectedMonth, selectedYear); // Sử dụng trực tiếp state tháng/năm ở đây
-        setDsCongTrinh(data);
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu thống kê:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedMonth, selectedYear]);
-
+  
+  const stats = useCongTrinhCard({
+    dsCongTrinh: data || [], // Fallback mảng rỗng phòng khi trang cha chưa load xong
+    selectedMonth,
+    selectedYear,
+  });
   return (
     <div className="relative w-full">
       <div className="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">

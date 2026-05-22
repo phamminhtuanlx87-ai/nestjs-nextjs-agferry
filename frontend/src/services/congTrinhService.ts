@@ -50,6 +50,7 @@ export interface IGiaiDoan {
   chenh_lech_cpxd?: string | number;
   tong_gia_tri?: string | number;
   chi_phi_xay_dung?: string | number;
+  dia_diem_tc?:string;
   ngay_thuc_hien?: string;
   ngay_hoan_thanh?: string;
   file_links?: ILinkFile[];

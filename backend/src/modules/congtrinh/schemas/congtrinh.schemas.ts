@@ -47,6 +47,9 @@ class GiaiDoan {
   so_ngay_tc_thuc_te?: number;
 
   @Prop()
+  dia_diem_tc?: string;
+
+  @Prop()
   ngay_thuc_hien?: Date;
 
   @Prop()

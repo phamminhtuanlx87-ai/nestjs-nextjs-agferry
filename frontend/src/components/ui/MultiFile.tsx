@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   useFieldArray,
   Control,
@@ -50,10 +50,11 @@ export const MultiFileControl = <T extends FieldValues>({
             type="button"
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onClick={() => append({ link_name: "", link_url: "" } as any)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-500 hover:text-blue-800 hover:bg-blue-100 cursor-pointer rounded-lg transition-all"
           >
             <FiPlus size={14} /> Thêm tài liệu
           </button>
+          
         </div>
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm">
           {/* List */}

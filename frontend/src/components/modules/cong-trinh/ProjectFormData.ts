@@ -16,6 +16,7 @@ export interface GiaiDoanDto {
   ngay_hoan_thanh?: string;
   so_ngay_tc_pgv?:string;
   so_ngay_tc_thuc_te?:string;
+  dia_diem_tc?:string;
   file_links?: FileLinkDto[];
 }
 

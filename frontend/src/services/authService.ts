@@ -22,3 +22,26 @@ export interface RegisterFormData {
 export async function authRegister(userData: RegisterFormData) {
   return await api.post("/auth/register", userData);
 };
+
+export interface Permission {
+  index: number;
+  value: string;
+}
+
+export interface GetMeData {
+  userName: string;
+  fullName: string;
+  email: string;
+  role: string;
+  permissions: Permission[];
+}
+
+interface BackendResponse<T> {
+  statusCode: number;
+  message: string;
+  data: T;
+}
+export async function getMe(): Promise<GetMeData> {
+  const response = await api.get<BackendResponse<GetMeData>>("/auth/me");
+  return response.data.data; // Trả thẳng object user chứa role và permissions
+}

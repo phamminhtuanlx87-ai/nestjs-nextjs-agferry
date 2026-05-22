@@ -11,6 +11,9 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { ConfigModule } from '@nestjs/config';
 import { CongtrinhModule } from './modules/congtrinh/congtrinh.module';
 
+// 1. IMPORT CÁC THÀNH PHẦN CỦA THROTTLER VÀO ĐÂY
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,6 +21,26 @@ import { CongtrinhModule } from './modules/congtrinh/congtrinh.module';
       isGlobal: true, // Giúp các module khác như Auth, Users không cần import lại
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI!),
+
+    // 2. CẤU HÌNH BỘ KHUNG CHẶN SPAM CHO TOÀN HỆ THỐNG
+    ThrottlerModule.forRoot([
+      {
+        name: 'short', // Quy tắc 1: Chống click đúp chuột liên tục phá hoại
+        ttl: 1000, // Trong vòng 1 giây (1000ms)
+        limit: 2, // Chỉ được phép bấm tối đa 1 lần
+      },
+      {
+        name: 'medium', // Quy tắc 2: Chống spam gửi form/gọi dữ liệu liên tục
+        ttl: 60000, // Trong vòng 1 phút (60000ms)
+        limit: 10, // Chỉ được phép gọi tối đa 10 lần
+      },
+      {
+        name: 'longTermSpam',
+        ttl: 300000, // 10 phút tính bằng miligiây (10 * 60 * 1000)
+        limit: 30, // Nếu chạm ngưỡng 15 request trong thời gian này, khóa luôn 10 phút
+      },
+    ]),
+
     ProductsModule,
     UsersModule,
     AuthModule,
@@ -25,14 +48,18 @@ import { CongtrinhModule } from './modules/congtrinh/congtrinh.module';
   ],
   controllers: [AppController],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard, // TỰ ĐỘNG CHẶN SPAM (Đứng cuối danh sách kiểm tra)
+    },
     AppService,
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard, // Tự động khóa tất cả API
+      useClass: JwtAuthGuard, // Tự động khóa tất cả API bằng JWT đầu tiên
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard, // Tự động kiểm tra Role
+      useClass: RolesGuard, // Tự động kiểm tra Quyền (Role) tiếp theo
     },
   ],
 })

@@ -1,5 +1,4 @@
 "use client";
-import Button from "@/components/ui/Button";
 import React, { useEffect, useState } from "react";
 import { TongQuanForm } from "./giai-doan/TongQuanForm";
 import { GiaiDoanDto, ProjectFormData } from "./ProjectFormData";
@@ -22,6 +21,10 @@ import DuToanPSForm from "./giai-doan/DuToanPSForm";
 import PDDuToanPSForm from "./giai-doan/PDDuToanPSForm";
 import QuyetToanForm from "./giai-doan/QuyetToanForm";
 import { CongTrinhSiderbar } from "./CongTrinhSiderbar";
+import axios from "axios";
+import TieuDeCongTrinh from "./TieuDeCongTrinh";
+import Link from "next/link";
+
 interface Props {
   congTrinh: ICongTrinh; // Sử dụng interface bạn đã định nghĩa
 }
@@ -55,6 +58,9 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
   // const [data, setData] = useState();
   // 1. Khởi tạo state từ props
   const [localCongTrinh, setLocalCongTrinh] = useState(congTrinh);
+
+  const [cooldownTime, setCooldownTime] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(false);
   // Khai báo công cụ quản lý form
   const methods = useForm<ProjectFormData>({
     defaultValues: {
@@ -83,6 +89,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
               chi_phi_xay_dung: "",
               ma_don_vi: "",
               so_ngay_tc_pgv: "",
+              dia_diem_tc: "",
             },
           ],
     },
@@ -108,7 +115,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
               : "",
         })),
       );
-       setLocalCongTrinh(congTrinh)
+      setLocalCongTrinh(congTrinh);
     }
   }, [congTrinh]);
 
@@ -148,6 +155,10 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
             gd.chenh_lech_cpxd !== undefined && gd.chenh_lech_cpxd !== null
               ? String(gd.chenh_lech_cpxd)
               : "",
+          dia_diem_tc:
+            gd.dia_diem_tc !== undefined && gd.dia_diem_tc !== null
+              ? String(gd.dia_diem_tc)
+              : "",
         })),
       });
     }
@@ -160,53 +171,64 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
       ten_cong_trinh: data.ten_cong_trinh || "",
       don_vi_chu_quan: data.don_vi_chu_quan || "Cty Cổ phần Phà An Giang",
       ngay_tao_du_an: data.ngay_tao_du_an,
-      giai_doan: data.giai_doan?.map((gd, index) => {
-        // Xác định mã hiệu của giai đoạn hiện tại
-        const currentMaHieu =
-          MA_HIEU_MAPPING[index]?.ma_hieu || gd.ma_hieu || "";
-        // Hàm helper để đảm bảo chuỗi ngày hợp lệ hoặc null
-        const formatDate = (dateStr: string | undefined) => {
-          if (!dateStr || dateStr.trim() === "") return null;
-          // Đảm bảo định dạng YYYY-MM-DD
-          return dateStr;
-        };
-        const donViTuOptions = OPTIONS_DU_TOAN.find(
-          (opt) => opt.value === gd.ma_don_vi,
-        );
-        return {
-          ma_hieu: currentMaHieu,
-          ten_giai_doan:
-            MA_HIEU_MAPPING[index]?.ten_giai_doan || gd.ten_giai_doan,
-          ngay_thuc_hien: formatDate(gd.ngay_thuc_hien) || undefined,
+      giai_doan: data.giai_doan
+        ?.filter((gd) => {
+          const hasName = gd.ten_giai_doan && gd.ten_giai_doan.trim() !== "";
+          const price = gd.tong_gia_tri ? Number(gd.tong_gia_tri) : 0;
+          const hasPrice = price > 0;
+          const hasDate = gd.ngay_thuc_hien && gd.ngay_thuc_hien.trim() !== "";
+          return hasName || hasPrice || hasDate;
+        })
+        .map((gd, index) => {
+          // Xác định mã hiệu của giai đoạn hiện tại
 
-          // CHỈ GỬI ngay_hoan_thanh nếu là giai đoạn Thi Công (TC)
-          // Nếu không phải TC, gán rỗng hoặc không gửi
-          ngay_hoan_thanh:
-            currentMaHieu === "TC"
-              ? formatDate(gd.ngay_hoan_thanh) || undefined
-              : undefined,
-          so_ngay_tc_pgv:
-            currentMaHieu === "TC" ? Number(gd.so_ngay_tc_pgv) || 0 : 0,
-          so_ngay_tc_thuc_te:
-            currentMaHieu === "NT" ? Number(gd.so_ngay_tc_thuc_te) || 0 : 0,
-          tong_gia_tri: parseToNumber(gd.tong_gia_tri as string),
-          chi_phi_xay_dung: parseToNumber(gd.chi_phi_xay_dung as string),
-          ma_don_vi: gd.ma_don_vi || "",
-          ten_don_vi: gd.ten_don_vi || donViTuOptions?.label || "",
-          file_links: gd.file_links?.map((link: ILinkFile) => {
-            return {
-              link_name: link.link_name,
-              link_url: link.link_url,
-            };
-          }),
-        };
-      }),
+          const currentMaHieu =
+            MA_HIEU_MAPPING[index]?.ma_hieu || gd.ma_hieu || "";
+          // Hàm helper để đảm bảo chuỗi ngày hợp lệ hoặc null
+          const formatDate = (dateStr: string | undefined) => {
+            if (!dateStr || dateStr.trim() === "") return null;
+            // Đảm bảo định dạng YYYY-MM-DD
+            return dateStr;
+          };
+          const donViTuOptions = OPTIONS_DU_TOAN.find(
+            (opt) => opt.value === gd.ma_don_vi,
+          );
+          return {
+            ma_hieu: currentMaHieu,
+            ten_giai_doan:
+              MA_HIEU_MAPPING[index]?.ten_giai_doan || gd.ten_giai_doan,
+            ngay_thuc_hien: formatDate(gd.ngay_thuc_hien) || undefined,
+
+            // CHỈ GỬI ngay_hoan_thanh nếu là giai đoạn Thi Công (TC)
+            // Nếu không phải TC, gán rỗng hoặc không gửi
+            ngay_hoan_thanh:
+              currentMaHieu === "TC"
+                ? formatDate(gd.ngay_hoan_thanh) || undefined
+                : undefined,
+            so_ngay_tc_pgv:
+              currentMaHieu === "TC" ? Number(gd.so_ngay_tc_pgv) || 0 : 0,
+            so_ngay_tc_thuc_te:
+              currentMaHieu === "NT" ? Number(gd.so_ngay_tc_thuc_te) || 0 : 0,
+            tong_gia_tri: parseToNumber(gd.tong_gia_tri as string),
+            chi_phi_xay_dung: parseToNumber(gd.chi_phi_xay_dung as string),
+            ma_don_vi: gd.ma_don_vi || "",
+            ten_don_vi: gd.ten_don_vi || donViTuOptions?.label || "",
+            dia_diem_tc: gd.dia_diem_tc || "",
+            file_links: gd.file_links?.map((link: ILinkFile) => {
+              return {
+                link_name: link.link_name,
+                link_url: link.link_url,
+              };
+            }),
+          };
+        }),
       isActive: true,
     };
     try {
       //   await addProject(payload);
       console.log("Payload gửi đi:", payload); // Kiểm tra payload trước khi gửi
       const response = await updateProject(congTrinh._id, payload);
+      setIsLoading(true);
       if (response) {
         alertService.success("Cập nhật công trình thành công!");
         const updatedData = Array.isArray(response) ? response[0] : response;
@@ -263,73 +285,117 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
           })) ?? [],
         );
         setLocalCongTrinh(updatedData);
-        router.refresh();
+        setIsLoading(false);
       }
+      router.refresh();
     } catch (error) {
       console.error("Lỗi:", error);
       alertService.error("Có lỗi xảy ra khi cập nhật công trình.");
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+        // 1. Bắn thông báo cảnh cáo nghiêm túc
+        alertService.error(
+          "Hệ thống phát hiện hành vi spam dữ liệu liên tục! Bạn bị tạm khóa nút gửi trong 5 phút.",
+        );
+
+        // 2. Kích hoạt trạng thái khóa nút bấm
+        setIsLoading(true);
+        setCooldownTime(300); // 300 giây = 5 phút
+
+        // 3. Chạy bộ đếm ngược hiển thị ra nút bấm
+        const interval = setInterval(() => {
+          setCooldownTime((prev) => {
+            if (prev <= 1) {
+              clearInterval(interval);
+              setIsLoading(false); // Mở khóa nút khi hết giờ
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+
+        return; // Thoát hàm, không chạy xuống finally
+      }
     }
   };
 
-  const [activeTab, setActiveTab] = useState("thong-tin-chung");
+  // const [activeTab, setActiveTab] = useState("thong-tin-chung");
 
-  const scrollToSection = (id: string) => {
-    setActiveTab(id);
+  // const scrollToSection = (id: string) => {
+  //   setActiveTab(id);
+  //   const element = document.getElementById(id);
+  //   if (element) {
+  //     element.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // };
+  const [activeId, setActiveId] = useState("thong-tin-chung");
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Khi khối form lọt vào tầm mắt (chiếm ưu thế trên màn hình)
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+          }
+        });
+      },
+      {
+        // rootMargin cấu hình vùng quét tập trung tầm mắt ở nửa trên màn hình (đỉnh -20% đến đáy -60%)
+        rootMargin: "-20% 0px -60% 0px",
+        threshold: 0.1, // Chỉ cần 10% diện tích khối form chạm vùng quét là kích hoạt
+      },
+    );
+    
+    // Bắt đầu theo dõi tất cả các ID khối form có trong mảng STEPS
+    GIAI_DOAN_SiDER.forEach((step) => {
+      const element = document.getElementById(step.id);
+      if (element) observer.observe(element);
+    });
+
+    // Dọn dẹp bộ lắng nghe khi rời trang
+    return () => {
+      GIAI_DOAN_SiDER.forEach((step) => {
+        const element = document.getElementById(step.id);
+        if (element) observer.unobserve(element);
+      });
+    };
+  }, []);
+
+  const handleStepClick = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+      setActiveId(id); // Ép trạng thái active cập nhật ngay lập tức
     }
   };
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <FormProvider {...methods}>
         <CongTrinhProvider data={congTrinh}>
-          <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-4">
-            <div className="w-full mx-auto flex justify-between items-center">
-              <div>
-                <nav className="text-xs text-slate-500 flex gap-2 mb-1">
-                  <span className="hover:text-primary cursor-pointer">
-                    Công trình
-                  </span>
-                  <span>/</span>
-                  <span className="font-medium text-slate-900">
-                    Chi tiết hồ sơ
-                  </span>
-                </nav>
-                <h1 className="text-xl font-bold text-slate-900 flex items-center gap-3">
-                  <div className="w-2 h-8 bg-indigo-600 rounded-full"></div>{" "}
-                  {/* Điểm nhấn side-bar nhỏ */}
-                  Hồ sơ:{" "}
-                  <span className="text-indigo-600 uppercase ml-1">
-                    {/* Tên công trình */} {congTrinh.ten_cong_trinh}
-                  </span>
-                </h1>
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  variant="secondary"
-                  className="px-6 border-slate-300"
-                  onClick={() => router.push("/cong-trinh")}
-                >
-                  Quay lại danh sách công trình
-                </Button>
-                <Button
-                  variant="primary"
-                  className="px-8 shadow-lg shadow-indigo-200"
-                  onClick={handleSubmit(onSubmit)}
-                >
-                  Lưu thay đổi
-                </Button>
-              </div>
-            </div>
-          </header>
+          <div className="px-8 py-2">
+            <nav className="text-xs text-slate-500 flex gap-2 mb-1">
+              <span className="hover:text-primary cursor-pointer">
+                <Link href={"/cong-trinh"}>Công trình</Link>
+              </span>
+              <span>/</span>
+              <span className="font-medium text-slate-900">Chi tiết hồ sơ</span>
+            </nav>
+          </div>
+          <div className="sticky top-0 z-50 bg-[#f8fafc] pt-2 pb-4">
+            <TieuDeCongTrinh
+              congTrinh={congTrinh}
+              mode="edit"
+              isLoading={isLoading}
+              onSave={handleSubmit(onSubmit)}
+              cooldownTime={cooldownTime}
+            />
+          </div>
           <main className="w-full mx-auto px-8 py-10 flex gap-8">
             {/* Thanh điều hướng nhanh bên trái (Sticky Menu) */}
             {/* Sidebar riêng */}
             <CongTrinhSiderbar
               steps={GIAI_DOAN_SiDER.slice(0, localCongTrinh.giai_doan?.length)}
-              activeId={activeTab}
-              onStepClick={scrollToSection}
+              activeId={activeId}
+              onStepClick={handleStepClick}
             />
 
             {/* Content chính - Gom vào một khối liền mạch hoặc các Card bo góc lớn */}
@@ -360,12 +426,13 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
                   <PDDuToanPSForm stage={giaiDoans || []} />
                 </section>
 
-                <section id="quyet-toan" className="scroll-mt-30">
+                <section id="quyet-toan" className="scroll-mt-30 pb-[30vh]">
                   <QuyetToanForm stage={giaiDoans || []} />
                 </section>
               </form>
             </div>
           </main>
+          <section className="min-h-10"></section>
         </CongTrinhProvider>
       </FormProvider>
     </div>

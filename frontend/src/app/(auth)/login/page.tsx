@@ -61,14 +61,14 @@ export default function LoginPage() {
         userName: data.userName,
         password: data.password,
       });
-      console.log("Login response:", response); // Kiểm tra phản hồi từ server
+     
       if (response.data) {
         const { user, accessToken, refreshToken } = response.data;
         login(user, accessToken, refreshToken); // Lưu vào Zustand
         alertService.success("Đăng nhập thành công!");
         setTimeout(() => {
           // Chuyển hướng sang trang quản lý phà
-          router.replace("/cong-trinh");
+          router.replace("/tong-quan");
         }, 1500);
       }
     } catch (error) {
@@ -131,6 +131,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   className="btn-login btn-primary min-w-60 mx-auto btn-elevated mt-3"
+                  disabled={isLoading}
                 >
                   {isLoading ? "Đang đăng nhập..." : "Đăng nhập hệ thống"}
                 </Button>

@@ -6,20 +6,22 @@ import Modal from "@/components/ui/Modal";
 import { getAllCongTrinh, ICongTrinh } from "@/services/congTrinhService";
 import ThemCongTrinhForm from "./ThemCongTrinhForm";
 import LoadingScreen from "@/components/ui/LoadingScreen";
-
+import { Guard } from "@/components/common/Guard";
+import { UserPermission } from "@/store/useAuthStore";
 
 interface DSCongTrinhProps {
   selectedMonth: number;
   selectedYear: number;
   rowsPerPage?: number;
+  data: ICongTrinh[];
 }
 
 export default function DSCongTrinh({
   selectedMonth,
   selectedYear,
   rowsPerPage = 5,
+  data,
 }: DSCongTrinhProps) {
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dsCongTrinh, setDsCongTrinh] = useState<ICongTrinh[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -27,7 +29,7 @@ export default function DSCongTrinh({
     try {
       // Giả định API của bạn hỗ trợ truyền params để lọc
       const data = await getAllCongTrinh(month, year);
-      setDsCongTrinh(data);
+      setDsCongTrinh(data || []);
     } catch (error) {
       console.error("Lỗi khi tải dữ liệu:", error);
     }
@@ -37,8 +39,7 @@ export default function DSCongTrinh({
     const fetchData = async () => {
       try {
         setLoading(true);
-        await loadData(selectedMonth, selectedYear);
-        setLoading(false);
+        setDsCongTrinh(data || []);
       } catch (error) {
         console.error("Lỗi khi load danh sách công trình:", error);
       } finally {
@@ -47,7 +48,7 @@ export default function DSCongTrinh({
     };
 
     fetchData();
-  }, [selectedMonth, selectedYear, loadData]);
+  }, [selectedMonth, selectedYear, data]);
 
   if (loading) return <LoadingScreen />;
   return (
@@ -57,15 +58,16 @@ export default function DSCongTrinh({
           <h1 className="text-sm md:text-2xl font-semibold">
             Danh sách công trình
           </h1>
-
-          <Button
-            type="button"
-            variant="primary"
-            className="text-sm font-semibold"
-            onClick={() => setIsModalOpen(true)}
-          >
-            + Thêm công trình
-          </Button>
+          <Guard requiredPermission={UserPermission.PROJECT_CREATE}>
+            <Button
+              type="button"
+              variant="primary"
+              className="text-sm font-semibold"
+              onClick={() => setIsModalOpen(true)}
+            >
+              + Thêm công trình
+            </Button>
+          </Guard>
         </div>
         <CongTrinhTable
           key={dsCongTrinh.length}

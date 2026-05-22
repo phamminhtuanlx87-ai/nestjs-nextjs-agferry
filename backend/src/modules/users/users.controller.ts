@@ -68,21 +68,4 @@ export class UsersController {
       data: { deletedUser },
     };
   }
-
-  //dùng chung cho tất cả user
-  // @Public()
-  // @Get('news')
-  // findAllNews() {
-  //   return 'Ai cũng xem được tin tức phà An Giang!';
-  // }
-  // Trường hợp 1: Chỉ cần đăng nhập là xem được (không quan trọng role nào):
-  // @Get('me')
-  // getProfile() {
-  //   return 'Thông tin cá nhân';
-  // } // JwtAuthGuard tự động gác cửa rồi
-
-  // Trường hợp 2: Cần đăng nhập VÀ phải đúng Role:
-  // @Roles(UserRole.AD) // Chỉ Admin mới được vào
-  // @Delete(':id')
-  // remove() {  }
 }

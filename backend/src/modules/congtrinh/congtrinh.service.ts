@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CongTrinh, CongTrinhDocument } from './schemas/congtrinh.schemas';
-import { Model } from 'mongoose';
+import { Model, QueryFilter } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CongTrinhDto } from './dto/create-congtrinh';
 
@@ -42,8 +42,35 @@ export class CongtrinhService {
   }
 
   async getAll(): Promise<CongTrinhDocument[]> {
+    console.log('Chay GetAll');
     return await this.congTrinhModel
       .find({ isActive: true })
+      .sort({ updatedAt: -1 })
+      .select('-permissions -__v')
+      .exec();
+  }
+
+  async findAll(filter: {
+    month?: number;
+    year?: number;
+  }): Promise<CongTrinhDocument[]> {
+    const query: QueryFilter<CongTrinhDocument> = { isActive: true };
+
+    if (filter.month && filter.year) {
+      // Ngày bắt đầu tháng (ví dụ: 2026-01-01 00:00:00)
+      const startDate = new Date(filter.year, 1, 1);
+
+      // Ngày đầu tiên của tháng sau (ví dụ: 2026-02-01 00:00:00)
+      const endDate = new Date(filter.year, filter.month, 1);
+
+      query.ngay_tao_du_an = {
+        $gte: startDate, // Lớn hơn hoặc bằng ngày đầu tháng
+        $lt: endDate, // Nhỏ hơn ngày đầu tháng sau
+      };
+    }
+    console.log('chay findAll', query);
+    return await this.congTrinhModel
+      .find(query)
       .sort({ updatedAt: -1 })
       .select('-permissions -__v')
       .exec();

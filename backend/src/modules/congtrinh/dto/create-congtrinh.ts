@@ -63,6 +63,10 @@ class GiaiDoanDto {
   @IsOptional()
   so_ngay_tc_thuc_te?: string;
 
+  @IsString()
+  @IsOptional()
+  dia_diem_tc?: string;
+
   @IsDateString()
   @IsOptional()
   ngay_thuc_hien?: string;

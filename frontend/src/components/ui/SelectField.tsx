@@ -26,7 +26,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             {...props}
             // 2. Nếu có lỗi thì viền đổi sang màu đỏ
-            className={`border appearance-none w-full h-11 px-3 pr-10 outline-none transition-all${
+            className={`border appearance-none w-full h-11 px-3 pr-10 outline-none transition-all cursor-pointer ${
               error ? "border-red-500" : "border-gray-300"
             } px-3 py-2 input-primary rounded`}
           >

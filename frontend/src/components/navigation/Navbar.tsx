@@ -1,11 +1,11 @@
-'use client';
+"use client";
 import React from "react";
 import NavbarLink from "./NavbarLink";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
 
 function Navbar() {
-   const { user } = useAuthStore();
+  const { user } = useAuthStore();
   const fullName = user ? `${user.fullName}` : "";
 
   // Logic lấy chữ cái đầu
