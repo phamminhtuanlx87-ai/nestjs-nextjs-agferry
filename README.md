@@ -127,46 +127,35 @@ Hệ thống áp dụng mô hình bảo mật nhiều lớp:
 - 📂 Upload & quản lý tài liệu công trình
 - 🔔 Notification realtime
 
---- 
-
+---
 # 📅 Tiến độ & Kế hoạch (Progress & Roadmap)
-## ✅ Đã hoàn thành (Completed - 12/05/2026)
-### 🇻🇳 Tự động hóa Logic Form: 
-Triển khai tính toán tự động Ngày hoàn thành (theo PGV) và Số ngày thi công thực tế bằng useEffect và watch.
+## 📅 Ngày cập nhật | Update Date: 22/05/2026
 
-### 🇺🇸 Form Logic Automation: 
-Implemented automatic calculation for Completion Date (PGV) and Actual Construction Days using useEffect and watch hooks.
+### 1. Đồng bộ danh mục và tối ưu bộ cuộn trang | Sidebar Scrollspy & Navigation Optimization
 
-### 🇻🇳 Chuẩn hóa dữ liệu (Sanitization): 
-Fix triệt để lỗi 400 Bad Request bằng cách ép kiểu Number và xử lý ngày tháng về dạng ISO 8601 (hoặc null khi trống).
+#### 🇻🇳 Tiếng Việt:
+* **Đồng bộ thanh danh mục tự động (Scrollspy):** Tích hợp `IntersectionObserver` giúp Sidebar tự động sáng đèn theo đúng phân đoạn hồ sơ đang hiển thị khi người dùng cuộn chuột.
+* **Sửa lỗi chính tả tọa độ:** Khắc phục lỗi viết thường thuộc tính `scrollY` thành `scrolly` khiến hàm điều hướng click bị khựng ngầm.
+* **Tối ưu hóa không gian cuộn đáy trang:** Chèn thêm khoảng trống vô hình `pb-[60vh]` hợp lý phía dưới khối "Quyết toán", giúp mục cuối cùng dễ dàng lọt vào vùng nhận diện để sáng đèn Sidebar khi chạm đáy trang mà không làm hỏng layout cấu trúc.
 
-#### 🇺🇸 Data Sanitization: 
-Resolved 400 Bad Request errors by enforcing Number types and formatting dates to ISO 8601 (or null for empty fields).
+#### 🇬🇧 English:
+* **Automated Sidebar Scrollspy:** Integrated `IntersectionObserver` to dynamically highlight the corresponding active form section in the Sidebar as the user scrolls.
+* **Fixed Navigation Syntax Error:** Resolved a typo where `scrollY` was miscoded as lowercase `scrolly`, which silently broke the click-to-scroll functionality.
+* **Optimized Bottom Scrolling Space:** Applied an invisible `pb-[60vh]` padding beneath the final "Settlement" section. This allows the last item to successfully enter the viewport triggers and light up the Sidebar cleanly without disrupting layout semantics.
 
-### 🇻🇳 Đồng bộ giao diện: 
-Sử dụng useState để quản lý danh sách giai đoạn, giúp UI cập nhật ngay lập tức sau khi cập nhật thành công mà không cần tải lại trang.
+---
 
-### 🇺🇸 UI Synchronization: 
-Leveraged useState to manage project phases, ensuring the UI reflects updates instantly without page reloads.
+### 2. Số hóa tiến độ động và nâng cấp hiệu ứng trạng thái | Dynamic Progress Tracking & Status Micro-interactions
 
-### 🇻🇳 Khắc phục lỗi TypeScript: 
-Xử lý lỗi Type Assignment trong hàm setValue bằng cách ép kiểu dữ liệu chặt chẽ.
+#### 🇻🇳 Tiếng Việt:
+* **Ánh xạ tiến độ thực tế (Dynamic Mapping):** Sử dụng `useMemo` để tính toán số lượng mảng `giai_doan` từ API, tự động phân phối 3 trạng thái (`success`, `active`, `pending`) cho luồng Timeline thay vì cấu hình cứng.
+* **Khắc phục lỗi thứ tự Hook:** Di chuyển `useMemo` lên phía trên câu lệnh điều kiện Early Return (`if (loading)`) để tuân thủ nghiêm ngặt quy tắc quản lý bộ nhớ của React Hooks.
+* **Thiết kế hiệu ứng trạng thái hoàn thành:** Thay thế ký hiệu text `✓` thô kệch thành biểu tượng tích ngọc bọc trong khung tròn `bg-emerald-100`, kết hợp hiệu ứng sóng âm mờ tỏa ra xung quanh (`animate-ping`) tạo cảm giác chuyên nghiệp khi hồ sơ "về đích".
 
-### 🇺🇸 TypeScript Fixes: 
-Resolved Type Assignment errors within setValue functions through strict type casting.
-
-## 🛠 Công việc tiếp theo (Next Steps)
-### 🇻🇳 Quản lý vật tư: 
-Xây dựng module quản lý vật tư và định mức cho từng hạng mục sửa chữa.
-
-#### 🇺🇸 Material Management: 
-Build modules for tracking materials and standards for each repair category.
-
-### 🇻🇳 Báo cáo & Thống kê: 
-Tối ưu hóa giao diện Dashboard và xuất báo cáo PDF cho Ban Giám đốc.
-
-### 🇺🇸 Reports & Analytics: 
-Optimize Dashboard UI and implement PDF report generation for the Board of Directors.
+#### 🇬🇧 English:
+* **Dynamic Progress Mapping:** Leveraged `useMemo` to evaluate the backend `giai_doan` array length reactively, automatically distributing progress statuses (`success`, `active`, `pending`) across the profile workflow.
+* **Fixed Hook Ordering Issue:** Relocated the `useMemo` hook above the conditional early return statement (`if (loading)`) to strictly comply with the Rules of Hooks.
+* **Enhanced Completion Micro-interactions:** Replaced the plain text `✓` with an elegant emerald badge inside a `bg-emerald-100` circular node, coupled with a subtle glowing radar pulse animation (`animate-ping`) to deliver high-end visual feedback for completed milestones. 
 
 ---
 
@@ -230,3 +219,43 @@ React Icons (Fi): Cải thiện trải nghiệm thị giác qua hệ thống ico
 [ ] Scroll Spy: Tự động cập nhật menu sidebar khi người dùng cuộn chuột thủ công qua các phần. | Automatically update the sidebar menu as the user manually scrolls through sections.
 
 [ ] Form Validation: Kiểm tra tính hợp lệ của đường dẫn URL trước khi lưu. | Validate URL format before data submission.
+
+---
+
+## ✅ Đã hoàn thành (Completed - 12/05/2026)
+### 🇻🇳 Tự động hóa Logic Form: 
+Triển khai tính toán tự động Ngày hoàn thành (theo PGV) và Số ngày thi công thực tế bằng useEffect và watch.
+
+### 🇺🇸 Form Logic Automation: 
+Implemented automatic calculation for Completion Date (PGV) and Actual Construction Days using useEffect and watch hooks.
+
+### 🇻🇳 Chuẩn hóa dữ liệu (Sanitization): 
+Fix triệt để lỗi 400 Bad Request bằng cách ép kiểu Number và xử lý ngày tháng về dạng ISO 8601 (hoặc null khi trống).
+
+#### 🇺🇸 Data Sanitization: 
+Resolved 400 Bad Request errors by enforcing Number types and formatting dates to ISO 8601 (or null for empty fields).
+
+### 🇻🇳 Đồng bộ giao diện: 
+Sử dụng useState để quản lý danh sách giai đoạn, giúp UI cập nhật ngay lập tức sau khi cập nhật thành công mà không cần tải lại trang.
+
+### 🇺🇸 UI Synchronization: 
+Leveraged useState to manage project phases, ensuring the UI reflects updates instantly without page reloads.
+
+### 🇻🇳 Khắc phục lỗi TypeScript: 
+Xử lý lỗi Type Assignment trong hàm setValue bằng cách ép kiểu dữ liệu chặt chẽ.
+
+### 🇺🇸 TypeScript Fixes: 
+Resolved Type Assignment errors within setValue functions through strict type casting.
+
+## 🛠 Công việc tiếp theo (Next Steps)
+### 🇻🇳 Quản lý vật tư: 
+Xây dựng module quản lý vật tư và định mức cho từng hạng mục sửa chữa.
+
+#### 🇺🇸 Material Management: 
+Build modules for tracking materials and standards for each repair category.
+
+### 🇻🇳 Báo cáo & Thống kê: 
+Tối ưu hóa giao diện Dashboard và xuất báo cáo PDF cho Ban Giám đốc.
+
+### 🇺🇸 Reports & Analytics: 
+Optimize Dashboard UI and implement PDF report generation for the Board of Directors.
