@@ -58,7 +58,7 @@ export class CongtrinhService {
 
     if (filter.month && filter.year) {
       // Ngày bắt đầu tháng (ví dụ: 2026-01-01 00:00:00)
-      const startDate = new Date(filter.year, 1, 1);
+      const startDate = new Date(filter.year, 0, 1);
 
       // Ngày đầu tiên của tháng sau (ví dụ: 2026-02-01 00:00:00)
       const endDate = new Date(filter.year, filter.month, 1);
