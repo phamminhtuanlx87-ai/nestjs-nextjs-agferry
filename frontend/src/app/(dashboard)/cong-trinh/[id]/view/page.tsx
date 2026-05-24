@@ -119,7 +119,8 @@ const ViewDetailCongTrinh = () => {
   const currentStageCount = congTrinh?.giai_doan?.length || 0;
 
   // Tính toán phần trăm và giới hạn tối đa 100% bằng Math.min để tránh tràn thanh tiến độ
-  const progressWidth = `${Math.min((currentStageCount + 1/ totalSteps) * 100, 100)}%`;
+ const progressWidth = `${Math.min(((currentStageCount + 1) / totalSteps) * 100, 100)}%`;
+ 
   if (loading) return <LoadingScreen />;
   return (
     <div className="bg-[#f8fafc] min-h-screen antialiased text-slate-800">
