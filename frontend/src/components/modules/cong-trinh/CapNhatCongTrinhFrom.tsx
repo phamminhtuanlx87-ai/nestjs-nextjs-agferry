@@ -41,6 +41,7 @@ const OPTIONS_DU_TOAN = [
   },
   { value: "TL", label: "Cty TNHH Thiết kế Công nghiệp Thắng Lợi" },
   { value: "PDT", label: "Phòng Đầu tư" },
+  { value: "IQ", label: "Cty TNHH Tư vấn Giao thông IQ" },
 ];
 
 const GIAI_DOAN_SiDER = [
@@ -193,6 +194,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
           const donViTuOptions = OPTIONS_DU_TOAN.find(
             (opt) => opt.value === gd.ma_don_vi,
           );
+
           return {
             ma_hieu: currentMaHieu,
             ten_giai_doan:
@@ -212,7 +214,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
             tong_gia_tri: parseToNumber(gd.tong_gia_tri as string),
             chi_phi_xay_dung: parseToNumber(gd.chi_phi_xay_dung as string),
             ma_don_vi: gd.ma_don_vi || "",
-            ten_don_vi: gd.ten_don_vi || donViTuOptions?.label || "",
+            ten_don_vi: donViTuOptions?.label  || "",
             dia_diem_tc: gd.dia_diem_tc || "",
             file_links: gd.file_links?.map((link: ILinkFile) => {
               return {
@@ -312,21 +314,11 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
             return prev - 1;
           });
         }, 1000);
-
         return; // Thoát hàm, không chạy xuống finally
       }
     }
   };
 
-  // const [activeTab, setActiveTab] = useState("thong-tin-chung");
-
-  // const scrollToSection = (id: string) => {
-  //   setActiveTab(id);
-  //   const element = document.getElementById(id);
-  //   if (element) {
-  //     element.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // };
   const [activeId, setActiveId] = useState("thong-tin-chung");
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -344,7 +336,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
         threshold: 0.1, // Chỉ cần 10% diện tích khối form chạm vùng quét là kích hoạt
       },
     );
-    
+
     // Bắt đầu theo dõi tất cả các ID khối form có trong mảng STEPS
     GIAI_DOAN_SiDER.forEach((step) => {
       const element = document.getElementById(step.id);

@@ -9,15 +9,20 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   BiCalendar,
-  BiMapPin,
-  BiTrendingUp,
-  BiFileBlank,
   BiUserCheck,
   BiCheckCircle,
   BiLoaderCircle,
   BiTimeFive,
 } from "react-icons/bi";
-import { FiDollarSign, FiLayers } from "react-icons/fi";
+import {
+  FiActivity,
+  FiBriefcase,
+  FiCheckSquare,
+  FiDollarSign,
+  FiExternalLink,
+  FiLayers,
+  FiMapPin,
+} from "react-icons/fi";
 
 const ViewDetailCongTrinh = () => {
   const params = useParams();
@@ -41,48 +46,10 @@ const ViewDetailCongTrinh = () => {
     if (id) loadData();
   }, [id]);
 
-  // Định nghĩa mảng các bước hồ sơ để ánh xạ động ra giao diện Trục dọc (Timeline)
-  // const quyTrinhHoSo = [
-  //   {
-  //     label: "I. Thông tin chung & Pháp lý ban đầu",
-  //     key: "giai_doan_1",
-  //     status: "success",
-  //   },
-  //   {
-  //     label: "II. Dự toán & Thẩm tra báo cáo",
-  //     key: "giai_doan_2",
-  //     status: "success",
-  //   },
-  //   {
-  //     label: "III. Phê duyệt Dự toán công trình",
-  //     key: "giai_doan_3",
-  //     status: "active",
-  //   },
-  //   {
-  //     label: "IV. Thi công & Nghiệm thu hiện trường",
-  //     key: "giai_doan_4",
-  //     status: "pending",
-  //   },
-  //   {
-  //     label: "V. Dự toán & Thẩm tra (Điều chỉnh nếu có)",
-  //     key: "giai_doan_5",
-  //     status: "pending",
-  //   },
-  //   {
-  //     label: "VI. Phê duyệt Dự toán (Điều chỉnh)",
-  //     key: "giai_doan_6",
-  //     status: "pending",
-  //   },
-  //   {
-  //     label: "VII. Quyết toán dự án hoàn thành",
-  //     key: "giai_doan_7",
-  //     status: "pending",
-  //   },
-  // ];
   // 🌟 ĐỔ DỮ LIỆU ĐỘNG TỪ API VÀO MẢNG BẰNG USEMEMO
   const quyTrinhHoSo = useMemo(() => {
     // Lấy số lượng giai đoạn hiện tại từ dữ liệu công trình (giống hook useStageLock)
-    const currentStageCount = congTrinh?.giai_doan?.length || 0;
+    const currentStageCount = Number(congTrinh?.giai_doan?.length) + 1 || 0;
 
     // Mảng gốc cấu trúc tĩnh của bạn
     const baseSteps = [
@@ -91,28 +58,40 @@ const ViewDetailCongTrinh = () => {
         key: "giai_doan_1",
       },
       {
-        label: "II. Dự toán & Thẩm tra",
+        label: "II. Khảo sát và lập Dự toán",
         key: "giai_doan_2",
       },
       {
-        label: "III. Phê duyệt Dự toán",
+        label: "III. Thẩm tra dự toán",
         key: "giai_doan_3",
       },
       {
-        label: "IV. Thi công & Nghiệm thu",
+        label: "IV. Phê duyệt Dự toán",
         key: "giai_doan_4",
       },
       {
-        label: "V. Dự toán & Thẩm tra (Điều chỉnh nếu có)",
+        label: "V. Thi công",
         key: "giai_doan_5",
       },
       {
-        label: "VI. Phê duyệt Dự toán (Điều chỉnh)",
+        label: "VI. Nghiệm thu",
         key: "giai_doan_6",
       },
       {
-        label: "VII. Quyết toán hồ sơ ", // Bổ sung thêm cho đủ 7 mục như sidebar của bạn
+        label: "VII. Dự toán (Điều chỉnh)",
         key: "giai_doan_7",
+      },
+      {
+        label: "VIII. Thẩm tra Dự toán (Điều chỉnh nếu có)",
+        key: "giai_doan_8",
+      },
+      {
+        label: "IX. Phê duyệt Dự toán (Điều chỉnh)",
+        key: "giai_doan_9",
+      },
+      {
+        label: "X. Quyết toán hồ sơ ", // Bổ sung thêm cho đủ 7 mục như sidebar của bạn
+        key: "giai_doan_10",
       },
     ];
 
@@ -135,6 +114,12 @@ const ViewDetailCongTrinh = () => {
     });
   }, [congTrinh]);
 
+  const lastGiaiDoan = congTrinh?.giai_doan?.at(-1);
+  const totalSteps = 10;
+  const currentStageCount = congTrinh?.giai_doan?.length || 0;
+
+  // Tính toán phần trăm và giới hạn tối đa 100% bằng Math.min để tránh tràn thanh tiến độ
+  const progressWidth = `${Math.min((currentStageCount + 1/ totalSteps) * 100, 100)}%`;
   if (loading) return <LoadingScreen />;
   return (
     <div className="bg-[#f8fafc] min-h-screen antialiased text-slate-800">
@@ -152,22 +137,55 @@ const ViewDetailCongTrinh = () => {
       </div>
 
       {/* 2. KHỐI THỐNG KÊ SỐ LIỆU TÀI CHÍNH NHANH */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
         {[
           {
             label: "Tổng giá trị dự toán",
             value: formatMoney(
-              (congTrinh?.giai_doan?.[0]?.tong_gia_tri as string) || "0",
+              (congTrinh?.giai_doan?.[2]?.tong_gia_tri as string) || "0",
             ),
             icon: <FiDollarSign size={20} className="text-emerald-500" />,
             bgColor: "bg-emerald-500/8",
           },
           {
-            label: "Giá trị quyết toán",
+            label: "Tổng dự toán (điều chỉnh)",
+            value: formatMoney(
+              (congTrinh?.giai_doan?.[7]?.tong_gia_tri as string) || "0",
+            ),
+            value_PST: "",
+            value_PSG: "",
+            icon: (
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-amber-50 text-amber-500 shrink-0">
+                <div className="relative">
+                  <FiDollarSign size={18} className="stroke-[2.5]" />
+                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  </span>
+                </div>
+              </div>
+            ),
+            bgColor: "bg-emerald-500/8",
+          },
+          {
+            label: "Tông hợp quyết toán",
             value: formatMoney(
               (congTrinh?.giai_doan?.[8]?.tong_gia_tri as string) || "0",
             ),
-            icon: <BiTrendingUp size={22} className="text-blue-500" />,
+            icon: (
+              <div className="relative flex items-center justify-center w-6 h-6 rounded-full bg-indigo-50 shadow-sm border border-indigo-200">
+                {/* Icon Đồng tiền chiến thắng */}
+                <FiDollarSign
+                  size={14}
+                  className="relative text-indigo-600 font-bold"
+                />
+
+                {/* Dấu tích nhỏ hoàn thành cam kết dính ở góc */}
+                <span className="absolute -top-1 -right-1 bg-emerald-500 text-white rounded-full p-px text-[8px] font-bold shadow-sm">
+                  ✓
+                </span>
+              </div>
+            ),
             bgColor: "bg-blue-500/8",
           },
           {
@@ -183,10 +201,6 @@ const ViewDetailCongTrinh = () => {
             value: (() => {
               if (!congTrinh?.giai_doan) return "Đang tải...";
 
-              // Tìm giai đoạn cuối cùng trong mảng dữ liệu trả về
-              const lastGiaiDoan =
-                congTrinh.giai_doan[congTrinh.giai_doan.length - 1];
-
               // Nếu giai đoạn cuối có trạng thái hoàn thành (ví dụ: 'success' hoặc 'done')
               return lastGiaiDoan?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu
                 ? "Hoàn thành"
@@ -197,22 +211,12 @@ const ViewDetailCongTrinh = () => {
               if (!congTrinh?.giai_doan || congTrinh.giai_doan.length === 0)
                 return null;
 
-              // 2. Tìm giai đoạn cuối cùng giống hệt dòng 188
-              const lastGiaiDoan =
-                congTrinh.giai_doan[congTrinh.giai_doan.length - 1];
-
               // 3. SO SÁNH LOGIC: Nếu giai đoạn cuối là Quyết toán (Hoàn thành)
               const isFinished =
                 lastGiaiDoan?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu; //
 
               // 4. TRẢ VỀ KÝ HIỆU ĐƯỢC CHỈ ĐỊNH
               if (isFinished) {
-                // 👉 ĐỔI THÀNH DẤU TÍCH HOÀN THÀNH (Checkmark màu xanh)
-                // Bạn có thể dùng Heroicons, Ant Design Icons,...
-                // Ví dụ dùng BiCheckCircle từ react-icons giống BiCalendar phía trên
-                // return <BiCheckCircle size={20} className="text-emerald-500" />;
-
-                // Nếu dùng icon có sẵn dạng text để nhanh:
                 return (
                   <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 shadow-sm animate-fade-in">
                     {/* Hiệu ứng sóng lan tỏa mờ phía sau */}
@@ -255,6 +259,27 @@ const ViewDetailCongTrinh = () => {
                 className={`text-lg font-black tracking-tight text-slate-900 ${stat.valueClass || ""}`}
               >
                 {stat.value}
+
+                {/* 3. Khu vực hiển thị biến động Tăng / Giảm tinh gọn */}
+                {stat.value_PSG && stat.value_PST && (
+                  <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                    {/* Badge Phát sinh TĂNG */}
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 text-[11px] font-semibold shadow-sm">
+                      <span className="text-[13px] font-bold leading-none">
+                        +
+                      </span>
+                      <span> {stat.value_PST ? stat.value_PST : ""}</span>
+                    </div>
+
+                    {/* Badge Phát sinh GIẢM */}
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-100 text-[11px] font-semibold shadow-sm">
+                      <span className="text-[13px] font-bold leading-none">
+                        -
+                      </span>
+                      <span> {stat.value_PSG ? stat.value_PSG : ""}</span>
+                    </div>
+                  </div>
+                )}
               </p>
             </div>
           </div>
@@ -266,47 +291,180 @@ const ViewDetailCongTrinh = () => {
         {/* CỘT TRÁI + GIỮA (Chiếm 2/3 không gian): Thông tin chung & Quy trình */}
         <div className="lg:col-span-2 space-y-6">
           {/* Thông tin chủ sở hữu / Đơn vị */}
-          <div className="bg-white rounded-2xl border border-slate-200/70 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.04)] overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2.5 font-bold text-slate-800 text-sm tracking-wide bg-slate-50/50">
-              <BiFileBlank size={18} className="text-slate-400" />
-              Thông tin thực hiện dự án
+          <div className="bg-white p-6 rounded-2xl border border-slate-200/70 shadow-[0_4px_12px_-5px_rgba(0,0,0,0.05)]">
+            {/* Tiêu đề Khối chính */}
+            <div className="flex items-center gap-2 pb-2 mb-2 border-b border-slate-100">
+              <FiLayers className="text-indigo-500 w-5 h-5" />
+              <h3 className="text-base font-bold text-slate-800">
+                Thông tin thực hiện dự án
+              </h3>
             </div>
-            <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="space-y-1">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+
+            {/* 🌟 PHẦN 1: TÁCH BIỆT ĐƠN VỊ CHỦ QUẢN (NẰM NGANG TRÊN CÙNG) */}
+            <div className="mb-6 p-4 rounded-xl bg-slate-50/70 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Đơn vị chủ quản / Chủ đầu tư
                 </span>
-                <p className="font-extrabold text-slate-800 text-base">
+                <span className="text-base font-bold text-indigo-900">
                   {congTrinh?.don_vi_chu_quan || "Công ty Cổ phần Phà An Giang"}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <span className="text-sm font-bold text-slate-400 tracking-wider">
-                  Đơn vị khảo sát lập dự toán
                 </span>
-                <p className="font-extrabold text-slate-800 text-base flex items-center gap-1.5">
-                  <BiMapPin className="text-rose-500 shrink-0" size={18} />
-                  {congTrinh?.giai_doan[3]?.dia_diem_tc || "Chưa xác định"}
-                </p>
+              </div>
+              {/* Có thể thêm một Badge trạng thái nhỏ ở góc này nếu cần */}
+              <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold">
+                Chủ đầu tư
+              </span>
+            </div>
+
+            {/* 🌟 PHẦN 2: CHỈNH 3 CỘT CÂN ĐỐI PHÍA DƯỚI */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-2">
+              {/* CỘT 1: KHẢO SÁT & LẬP DỰ TOÁN */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-1.5 pb-1 border-b border-slate-100">
+                  <FiBriefcase className="text-amber-500 w-4 h-4" />
+                  <h4 className="text-xs font-bold text-amber-600 uppercase tracking-wider">
+                    Lập Dự toán
+                  </h4>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-slate-400 font-medium">
+                    Đơn vị khảo sát lập dự toán
+                  </span>
+                  {congTrinh?.giai_doan[0]?.ten_don_vi ? (
+                    <span className="text-sm font-semibold text-slate-700">
+                      {congTrinh?.giai_doan[0]?.ten_don_vi}
+                    </span>
+                  ) : (
+                    <span className="inline-flex self-start px-2 py-0.5 rounded bg-slate-50 text-slate-400 text-xs border border-slate-200/60">
+                      Chưa xác định
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-slate-400 font-medium">
+                    Đơn vị lập dự toán (Điều chỉnh)
+                  </span>
+                  {congTrinh?.giai_doan[5]?.ten_don_vi ? (
+                    <span className="text-sm font-semibold text-slate-700">
+                      {congTrinh?.giai_doan[5]?.ten_don_vi}
+                    </span>
+                  ) : (
+                    <span className="inline-flex self-start px-2 py-0.5 rounded bg-slate-50 text-slate-400 text-xs border border-slate-200/60">
+                      Chưa xác định
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div className="space-y-1">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Đơn vị chủ quản / Chủ đầu tư
-                </span>
-                <p className="font-extrabold text-slate-800 text-base">
-                  {congTrinh?.don_vi_chu_quan || "Công ty Cổ phần Phà An Giang"}
-                </p>
+              {/* CỘT 2: THẨM TRA & PHÊ DUYỆT */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-1.5 pb-1 border-b border-slate-100">
+                  <FiCheckSquare className="text-indigo-500 w-4 h-4" />
+                  <h4 className="text-xs font-bold text-indigo-600 uppercase tracking-wider">
+                    Thẩm tra
+                  </h4>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-slate-400 font-medium">
+                    Đơn vị thẩm tra dự toán
+                  </span>
+                  {congTrinh?.giai_doan[1]?.ten_don_vi ? (
+                    <span className="text-sm font-semibold text-slate-700">
+                      {congTrinh?.giai_doan[1]?.ten_don_vi}
+                    </span>
+                  ) : (
+                    <span className="inline-flex self-start px-2 py-0.5 rounded bg-slate-50 text-slate-400 text-xs border border-slate-200/60">
+                      Chưa xác định
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-slate-400 font-medium">
+                    Đơn vị thẩm tra dự toán (Điều chỉnh)
+                  </span>
+                  {congTrinh?.giai_doan[6]?.ten_don_vi ? (
+                    <span className="text-sm font-semibold text-slate-700">
+                      {congTrinh?.giai_doan[6]?.ten_don_vi}
+                    </span>
+                  ) : (
+                    <span className="inline-flex self-start px-2 py-0.5 rounded bg-slate-50 text-slate-400 text-xs border border-slate-200/60">
+                      Chưa xác định
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="space-y-1">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Địa điểm triển khai thi công
-                </span>
-                <p className="font-extrabold text-slate-800 text-base flex items-center gap-1.5">
-                  <BiMapPin className="text-rose-500 shrink-0" size={18} />
-                  {congTrinh?.giai_doan[3]?.dia_diem_tc || "Chưa xác định"}
-                </p>
+
+              {/* CỘT 3: THI CÔNG & GIÁM SÁT THỰC ĐỊA */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-1.5 pb-1 border-b border-slate-100">
+                  <FiActivity className="text-emerald-500 w-4 h-4" />
+                  <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-wider">
+                    Thi công & Giám sát
+                  </h4>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-slate-400 font-medium">
+                    Đơn vị thi công
+                  </span>
+                  {congTrinh?.giai_doan[3]?.ten_don_vi ? (
+                    <span className="text-sm font-semibold text-slate-700">
+                      {congTrinh?.giai_doan[3]?.ten_don_vi}
+                    </span>
+                  ) : (
+                    <span className="inline-flex self-start px-2 py-0.5 rounded bg-slate-50 text-slate-400 text-xs border border-slate-200/60">
+                      Chưa xác định
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-slate-400 font-medium">
+                    Giám sát thi công
+                  </span>
+                  {congTrinh?.giai_doan[4]?.ten_don_vi ? (
+                    <span className="text-sm font-semibold text-slate-700 flex items-center gap-1">
+                      {congTrinh.giai_doan[4]?.ten_don_vi}
+                    </span>
+                  ) : (
+                    <span className="inline-flex self-start px-2 py-0.5 rounded  bg-slate-50 text-slate-400 text-xs font-medium border border-amber-100">
+                      Chưa xác định
+                    </span>
+                  )}
+                </div>
               </div>
+            </div>
+            {/* 🌟 PHẦN 3: ĐƯA ĐỊA ĐIỂM XUỐNG DƯỚI CÙNG & TÍCH HỢP GOOGLE MAPS LINK (BOTTOM) */}
+            <div className="pt-4 border-t rounded-xl bg-slate-50/70 border p-4 border-slate-100 flex flex-col gap-1.5">
+              <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
+                <FiMapPin className="text-slate-400 w-3.5 h-3.5" /> Địa điểm
+                triển khai thi công
+              </span>
+
+              {congTrinh?.giai_doan[3]?.dia_diem_tc ? (
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(congTrinh?.giai_doan[3]?.dia_diem_tc)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors w-fit"
+                >
+                  <span className="underline decoration-indigo-300 underline-offset-4 group-hover:decoration-indigo-600">
+                    {congTrinh?.giai_doan[3]?.dia_diem_tc}
+                  </span>
+                  <FiExternalLink
+                    size={14}
+                    className="text-indigo-400 group-hover:text-indigo-600 transition-colors shrink-0"
+                  />
+                </a>
+              ) : (
+                <span className="inline-flex self-start px-2.5 py-1 rounded bg-amber-50 text-amber-700 text-xs font-medium border border-amber-100/70">
+                  Chưa cập nhật vị trí thực địa
+                </span>
+              )}
             </div>
           </div>
 
@@ -320,7 +478,7 @@ const ViewDetailCongTrinh = () => {
                 </h2>
               </div>
               <span className="text-[11px] bg-indigo-50 text-indigo-600 border border-indigo-100 font-bold px-2.5 py-1 rounded-md">
-                Toàn trình: 7 Bước
+                Quy trình: 10 Bước
               </span>
             </div>
 
@@ -425,15 +583,19 @@ const ViewDetailCongTrinh = () => {
             <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
               <div
                 className="bg-indigo-600 h-2 rounded-full transition-all duration-500"
-                style={{ width: "35%" }}
+                style={{ width: progressWidth }}
               ></div>
             </div>
             <div className="flex justify-between items-center mt-2.5">
               <span className="text-[11px] font-bold text-slate-400">
-                Giai đoạn hiện tại: III
+                Giai đoạn hiện tại:{" "}
+                <span className="text-accent">
+                  {" "}
+                  {lastGiaiDoan?.ten_giai_doan}
+                </span>
               </span>
               <p className="text-xs font-black text-indigo-600">
-                35% Toàn dự án
+                {progressWidth} tiến độ công trình
               </p>
             </div>
           </div>

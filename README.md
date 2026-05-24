@@ -160,6 +160,29 @@ Hệ thống áp dụng mô hình bảo mật nhiều lớp:
 ---
 
 # 📝 Nhật ký cập nhật tiến độ | Progress Update Log
+
+### 🇻🇳 Tiếng Việt
+**Cập nhật tiến độ ngày 24/05/2026:**
+* **Sửa lỗi cốt lõi (Backend):** * Khắc phục lỗi logic lọc ngày tháng (`filter.month`) bằng cách đồng bộ định dạng tháng Zero-indexed (0-11) trong JavaScript, giúp bóc tách chính xác dữ liệu công trình tạo vào Tháng 1.
+* **Sửa lỗi Form (Frontend):**
+    * Xử lý dứt điểm lỗi lệch pha dữ liệu ở Giai đoạn VII (Quyết toán) do trùng lặp ký hiệu viết tắt `value: "TP"` giữa các mảng dữ liệu (`OPTIONS_DU_TOAN` và `OPTIONS_THAM_TRA`).
+* **Tái cấu trúc Giao diện (UI/UX):**
+    * **Thẻ dự toán điều chỉnh:** Phân tách trực quan dòng tiền phát sinh Tăng (`+`) dạng Badge xanh và Phát sinh Giảm (`-`) dạng Badge đỏ.
+    * **Khối thông tin dự án:** Gom nhóm dữ liệu theo 3 cột quy trình ngay ngắn, tách riêng dải Banner "Đơn vị chủ quản" lên trên cùng để tối ưu không gian, đưa mục "Địa điểm triển khai" xuống đáy tích hợp liên kết mở tab mới trực tiếp qua Google Maps.
+
+---
+
+### 🇺🇸 English
+**Progress Update - May 24, 2026:**
+* **Core Bug Fix (Backend):**
+    * Resolved the date filtering logic issue (`filter.month`) by synchronizing JavaScript's zero-indexed month structure (0-11), ensuring perfect data retrieval for projects created in January.
+* **Form Logic Fix (Frontend):**
+    * Completely fixed the data mismatch on Stage VII (Final Settlement) caused by the duplicated shorthand identifier `value: "TP"` between data arrays (`OPTIONS_DU_TOAN` and `OPTIONS_THAM_TRA`).
+* **UI/UX Modernization:**
+    * **Adjusted Budget Card:** Visually separated financial variances into emerald badges for Cost Increases (`+`) and rose badges for Cost Decreases (`-`).
+    * **Project Information Section:** Restructured data layouts into a clean 3-column operational grid, isolated the "Owner / Investor" banner at the top, and relocated the "Construction Location" to the bottom with an embedded direct link to Google Maps.
+
+---
 ## Ngày cập nhật | Update Date: 13/05/2026
 
 ### 1. Tối ưu hóa UI/UX cho MultiFileControl | UI/UX Optimization for MultiFileControl

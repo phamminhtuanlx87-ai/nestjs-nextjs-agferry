@@ -180,6 +180,7 @@ export default function ThiCongForm({ stage }: Props) {
                         ? "Vui lòng nhập Địa điểm thi công"
                         : false,
                     })}
+                    defaultValue={"944 Phà An Hòa, Hội An, An Giang, Việt Nam"}
                     disabled={thiccong.isDisabled}
                     error={errors.giai_doan?.[3]?.so_ngay_tc_pgv?.message}
                   />

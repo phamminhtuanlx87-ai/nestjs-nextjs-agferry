@@ -226,18 +226,19 @@ export default function DuToanPSForm({ stage }: Props) {
                         disabled={ttrdtps.isDisabled}
                         error={errors.giai_doan?.[6]?.chi_phi_xay_dung?.message}
                       />
-
+                      
                       <SelectField
-                        label="Đơn vị"
+                        label="Đơn vị lập Dự toán (Điều chỉnh)"
                         options={OPTIONS_THAM_TRA}
                         {...register(`giai_doan.6.ma_don_vi`, {
-                          required: !ttrdtps.isDisabled
-                            ? "Vui lòng nhập Đơn vị"
+                          required: !dtps.isDisabled
+                            ? "Vui lòng nhập Đơn vị lập Dự toán (Điều chỉnh)"
                             : false,
                         })}
-                        disabled={ttrdtps.isDisabled}
+                        disabled={dtps.isDisabled}
                         error={errors.giai_doan?.[6]?.ma_don_vi?.message}
                       ></SelectField>
+
                       {!ttrdtps.isDisabled && (
                         <MultiFileControl
                           control={control}
