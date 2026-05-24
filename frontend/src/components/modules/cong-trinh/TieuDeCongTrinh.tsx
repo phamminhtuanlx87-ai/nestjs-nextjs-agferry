@@ -77,9 +77,8 @@ export default function TieuDeCongTrinh({
             <Button
               onClick={() => router.push(`/cong-trinh/${congTrinh?._id}`)}
               className="flex items-center gap-2 bg-slate-900 hover:bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-[0_4px_12px_-3px_rgba(15,23,42,0.3)] hover:shadow-indigo-200 active:scale-95"
-              disabled={isLoading}
             >
-              {isLoading?` ...Đang lưu dữ liệu` : `${<FiEdit3 size={16} />} Đi tới Chỉnh sửa`}
+              <FiEdit3 size={16} /> Đi tới Chỉnh sửa
             </Button>
           )}
           {mode === "edit" && (
