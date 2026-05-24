@@ -214,7 +214,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
             tong_gia_tri: parseToNumber(gd.tong_gia_tri as string),
             chi_phi_xay_dung: parseToNumber(gd.chi_phi_xay_dung as string),
             ma_don_vi: gd.ma_don_vi || "",
-            ten_don_vi: donViTuOptions?.label  || "",
+            ten_don_vi: donViTuOptions?.label || "",
             dia_diem_tc: gd.dia_diem_tc || "",
             file_links: gd.file_links?.map((link: ILinkFile) => {
               return {
@@ -359,6 +359,19 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
       setActiveId(id); // Ép trạng thái active cập nhật ngay lập tức
     }
   };
+
+  const getStepSiderBar = () => {
+    const listGiaiDoan = localCongTrinh?.giai_doan;
+
+    if (!listGiaiDoan || listGiaiDoan.length === 0) return 1;
+
+    // Tìm index của giai đoạn cuối cùng có dữ liệu ngày thực hiện hoặc đang Active
+    let lastActiveIndex = listGiaiDoan?.length;
+    if (lastActiveIndex >= 5) lastActiveIndex = lastActiveIndex - 2;
+    // Số lượng item hiển thị sẽ bằng vị trí active cuối cùng cộng thêm 1
+    return Math.min(lastActiveIndex + 1, GIAI_DOAN_SiDER.length)
+  };
+
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <FormProvider {...methods}>
@@ -385,7 +398,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
             {/* Thanh điều hướng nhanh bên trái (Sticky Menu) */}
             {/* Sidebar riêng */}
             <CongTrinhSiderbar
-              steps={GIAI_DOAN_SiDER.slice(0, localCongTrinh.giai_doan?.length)}
+              steps={GIAI_DOAN_SiDER.slice(0, getStepSiderBar())}
               activeId={activeId}
               onStepClick={handleStepClick}
             />

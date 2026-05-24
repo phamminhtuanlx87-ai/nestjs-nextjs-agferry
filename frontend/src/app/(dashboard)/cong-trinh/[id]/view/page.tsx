@@ -119,8 +119,29 @@ const ViewDetailCongTrinh = () => {
   const currentStageCount = congTrinh?.giai_doan?.length || 0;
 
   // Tính toán phần trăm và giới hạn tối đa 100% bằng Math.min để tránh tràn thanh tiến độ
- const progressWidth = `${Math.min(((currentStageCount + 1) / totalSteps) * 100, 100)}%`;
- 
+  const progressWidth = `${Math.min(((currentStageCount + 1) / totalSteps) * 100, 100)}%`;
+  // Hàm lấy toàn bộ danh sách file đính kèm của một công trình
+  // 2. Viết lại hàm với dữ liệu định hình rõ ràng, xóa bỏ hoàn toàn chữ 'any'
+  const getAllFilesFromProject = (congTrinh: ICongTrinh | undefined) => {
+    if (!congTrinh?.giai_doan) return [];
+
+    // Định nghĩa mảng trả về là một mảng Object thông thường
+    return congTrinh.giai_doan.reduce<
+      { ten_giai_doan: string; file_name: string; file_url: string }[]
+    >((acc, gd) => {
+      if (gd?.file_links && gd.file_links.length > 0) {
+        // 🌟 Xóa bỏ hoàn toàn "Record<string, string>" tại đây để dùng Type gốc ILinkFile
+        const files = gd.file_links.map((file) => ({
+          ten_giai_doan: gd.ten_giai_doan || gd.ma_hieu || "",
+          file_name: file.link_name || "", // Khớp với thuộc tính của ILinkFile
+          file_url: file.link_url || "", // Khớp với thuộc tính của ILinkFile
+        }));
+
+        return [...acc, ...files];
+      }
+      return acc;
+    }, []); // Hết sạch lỗi đỏ, không dùng any
+  };
   if (loading) return <LoadingScreen />;
   return (
     <div className="bg-[#f8fafc] min-h-screen antialiased text-slate-800">
@@ -600,8 +621,79 @@ const ViewDetailCongTrinh = () => {
               </p>
             </div>
           </div>
+
+          {/* --- CARD DANH MỤC TÀI LIỆU (CỘT PHẢI) --- */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+            <div className="text-[11px] font-bold text-slate-500">
+              <div className=" bg-slate-200 border border-slate-50 rounded-2xl p-2 inline">
+                {"Để xem tài liệu vui lòng đăng nhập:  "}
+                <a
+                  href="https://angiang.vnptioffice.vn/vpdt/main?lang=vi"
+                  target="blank"
+                  className="text-blue-500 italic text-sm"
+                >
+                  angiang.vnptioffice.vn
+                </a>
+              </div>
+            </div>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <h3 className="font-semibold text-sm text-slate-800 flex items-center gap-2">
+                📂 Danh mục tài liệu đính kèm
+              </h3>
+              <span className="text-sm font-medium bg-slate-100 text-blue-500 px-2 py-0.5 rounded-full">
+                {getAllFilesFromProject(congTrinh).length} files
+              </span>
+            </div>
+
+            {getAllFilesFromProject(congTrinh).length === 0 ? (
+              <p className="text-xs text-slate-400 italic py-2">
+                Chưa có tệp tin nào.
+              </p>
+            ) : (
+              <div className="space-y-4 max-h-95 overflow-y-auto pr-1">
+                {/* Nhóm dữ liệu và hiển thị theo yêu cầu */}
+
+                {Object.entries(
+                  getAllFilesFromProject(congTrinh).reduce(
+                    (groups: Record<string, (typeof file)[]>, file) => {
+                      const groupName =
+                        file.ten_giai_doan || "Chưa rõ giai đoạn";
+                      if (!groups[groupName]) groups[groupName] = [];
+                      groups[groupName].push(file);
+                      return groups;
+                    },
+                    {},
+                  ),
+                ).map(([giaiDoan, files]) => (
+                  <div key={giaiDoan} className="space-y-1.5">
+                    {/* 1. Tên giai đoạn (Dòng trên) */}
+                    <h4 className="text-xs font-bold text-slate-700 block">
+                      {giaiDoan}
+                    </h4>
+
+                    {/* 2. Các file thuộc giai đoạn đó (Các dòng bên dưới) */}
+                    <div className="pl-2 space-y-1 border-l-2 border-slate-100">
+                      {files.map((file, idx) => (
+                        <a
+                          key={idx}
+                          href={file.file_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block text-xs text-indigo-600 hover:text-indigo-800 hover:underline py-0.5 truncate max-w-full"
+                          title={file.file_name}
+                        >
+                          📄 {file.file_name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
       <div className="pb-[10vh]"></div>
     </div>
   );

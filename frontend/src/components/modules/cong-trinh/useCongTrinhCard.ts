@@ -54,51 +54,107 @@ export const useCongTrinhCard = ({
       isProjectInTime(e.createdAt, prevMonth, prevYear),
     ).length;
 
-    // --- CARD 2: ĐANG THI CÔNG (Mã hiệu cuối cùng là "TC") ---
-    const currentThiCong = dsCongTrinh.filter(
-      (e) =>
-        isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-        e.giai_doan
-          ?.at(-1)
-          ?.ma_hieu.includes(
-            MA_HIEU_MAPPING[3].ma_hieu || MA_HIEU_MAPPING[4].ma_hieu,
-          ),
-    ).length;
-    const lastThiCong = dsCongTrinh.filter(
-      (e) =>
-        isProjectInTime(e.createdAt, prevMonth, prevYear) &&
-        e.giai_doan
-          ?.at(-1)
-          ?.ma_hieu.includes(
-            MA_HIEU_MAPPING[3].ma_hieu || MA_HIEU_MAPPING[4].ma_hieu,
-          ),
-    ).length;
+    // // --- CARD 2: ĐANG THI CÔNG (Mã hiệu cuối cùng là "TC") ---
+    //  const currentThiCong = dsCongTrinh.filter(
+    //   (e) =>
+    //     isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
+    //     e.giai_doan
+    //       ?.at(-1)
+    //       ?.ma_hieu.includes(
+    //         MA_HIEU_MAPPING[4].ma_hieu ||
+    //           MA_HIEU_MAPPING[3].ma_hieu,
+    //       ),
+    // ).length;
+    // const lastThiCong = dsCongTrinh.filter(
+    //   (e) =>
+    //     isProjectInTime(e.createdAt, prevMonth, prevYear) &&
+    //     e.giai_doan
+    //       ?.at(-1)
+    //       ?.ma_hieu.includes(
+    //         MA_HIEU_MAPPING[3].ma_hieu || MA_HIEU_MAPPING[4].ma_hieu,
+    //       ),
+    // ).length;
 
-    // --- CARD 3: ĐANG QUYẾT TOÁN (Mã hiệu cuối cùng là "QT") ---
-    // (Bạn hãy check lại mã hiệu viết tắt của Đang quyết toán trong DB của bạn xem có phải "QT" không nhé)
-    const currentQuyetToan = dsCongTrinh.filter(
-      (e) =>
-        isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-        e.giai_doan
-          ?.at(-1)
-          ?.ma_hieu.includes(
-            MA_HIEU_MAPPING[5].ma_hieu ||
-              MA_HIEU_MAPPING[6].ma_hieu ||
-              MA_HIEU_MAPPING[7].ma_hieu,
-          ),
-    ).length;
-    const lastQuyetToan = dsCongTrinh.filter(
-      (e) =>
-        isProjectInTime(e.createdAt, prevMonth, prevYear) &&
-        e.giai_doan
-          ?.at(-1)
-          ?.ma_hieu.includes(
-            MA_HIEU_MAPPING[5].ma_hieu ||
-              MA_HIEU_MAPPING[6].ma_hieu ||
-              MA_HIEU_MAPPING[7].ma_hieu,
-          ),
-    ).length;
+    // // --- CARD 3: ĐANG QUYẾT TOÁN (Mã hiệu cuối cùng là "QT") ---
+    // // (Bạn hãy check lại mã hiệu viết tắt của Đang quyết toán trong DB của bạn xem có phải "QT" không nhé)
+    // const currentQuyetToan = dsCongTrinh.filter(
+    //   (e) =>
+    //     isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
+    //     e.giai_doan
+    //       ?.at(-1)
+    //       ?.ma_hieu.includes(
+    //         MA_HIEU_MAPPING[5].ma_hieu ||
+    //           MA_HIEU_MAPPING[6].ma_hieu ||
+    //           MA_HIEU_MAPPING[7].ma_hieu,
+    //       ),
+    // ).length;
+    // const lastQuyetToan = dsCongTrinh.filter(
+    //   (e) =>
+    //     isProjectInTime(e.createdAt, prevMonth, prevYear) &&
+    //     e.giai_doan
+    //       ?.at(-1)
+    //       ?.ma_hieu.includes(
+    //         MA_HIEU_MAPPING[5].ma_hieu ||
+    //           MA_HIEU_MAPPING[6].ma_hieu ||
+    //           MA_HIEU_MAPPING[7].ma_hieu,
+    //       ),
+    // ).length;
+    // ==========================================
+    // ĐỊNH NGHĨA NHÓM MÃ HIỆU CHO TỪNG CARD (Dễ quản lý, tránh sai index)
+    // ==========================================
+    const MA_THI_CONG_NT = ["TC", "NT"]; // TC: Thi công, NT: Nghiệm thu
+    const MA_QUYET_TOAN = ["DT_PS", "TTR_DT_PS","PD_DT_PS"]; // PD_DT_PS: Phê duyệt điều chỉnh, 
 
+    // ==========================================
+    // --- CARD 2: ĐANG THI CÔNG ---
+    // ==========================================
+    const currentThiCong = dsCongTrinh.filter((e) => {
+      const isInTime = isProjectInTime(
+        e.createdAt,
+        selectedMonth,
+        selectedYear,
+      );
+      if (!isInTime || !e.giai_doan) return false;
+
+      // Lấy mã hiệu của giai đoạn cuối cùng (nếu không có thì mặc định chuỗi rỗng)
+      const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
+
+      // Kiểm tra mã hiệu cuối cùng có phải là "TC" hoặc "NT" không
+      return MA_THI_CONG_NT.includes(lastMaHieu);
+    }).length;
+
+    const lastThiCong = dsCongTrinh.filter((e) => {
+      const isInTime = isProjectInTime(e.createdAt, prevMonth, prevYear);
+      if (!isInTime || !e.giai_doan) return false;
+
+      const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
+      return MA_THI_CONG_NT.includes(lastMaHieu);
+    }).length;
+
+    // ==========================================
+    // --- CARD 3: ĐANG QUYẾT TOÁN ---
+    // ==========================================
+    const currentQuyetToan = dsCongTrinh.filter((e) => {
+      const isInTime = isProjectInTime(
+        e.createdAt,
+        selectedMonth,
+        selectedYear,
+      );
+      if (!isInTime || !e.giai_doan) return false;
+
+      const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
+
+      // Kiểm tra mã hiệu cuối cùng có phải là "PD_DT_PS" hoặc "QT" không
+      return MA_QUYET_TOAN.includes(lastMaHieu);
+    }).length;
+
+    const lastQuyetToan = dsCongTrinh.filter((e) => {
+      const isInTime = isProjectInTime(e.createdAt, prevMonth, prevYear);
+      if (!isInTime || !e.giai_doan) return false;
+
+      const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
+      return MA_QUYET_TOAN.includes(lastMaHieu);
+    }).length;
     // --- CARD 4: HOÀN THÀNH (Mã hiệu cuối cùng là "HT") ---
     // (Bạn hãy check lại mã hiệu viết tắt của Hoàn thành trong DB của bạn xem có phải "HT" không nhé)
     const currentHoanThanh = dsCongTrinh.filter(
@@ -178,7 +234,7 @@ export const useCongTrinhCard = ({
     const hoanThanhThangNay = dsCongTrinh.filter(
       (e) =>
         isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu ===  MA_HIEU_MAPPING[8].ma_hieu,
+        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu,
     );
     // 2. Trả về object chứa đầy đủ cấu trúc dữ liệu sạch cho UI sử dụng
     return {

@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 import { ICongTrinh } from "@/services/congTrinhService";
 import { UserPermission } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { FiArrowLeft, FiEdit3 } from "react-icons/fi";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
   mode: "view" | "edit";
   isLoading?: boolean;
   cooldownTime?: number;
-  onSave?: () => void;
+  onSave?: () => Promise<void>;
 }
 
 export default function TieuDeCongTrinh({
@@ -23,6 +23,20 @@ export default function TieuDeCongTrinh({
   onSave,
 }: Props) {
   const router = useRouter();
+  const [isDisabled, setIsDisabled] = useState<boolean>(isLoading || false);
+  const handelClick = async () => {
+    try {
+      setIsDisabled(true); // Khóa nút ngay lập tức khi click
+      
+      if (onSave) {
+        await onSave(); // 🌟 ĐỢI API Ở FORM CHA CHẠY XONG XUÔI
+      }
+    } catch (error) {
+      console.error("Lỗi khi lưu dữ liệu công trình:", error);
+    } finally {
+      setIsDisabled(false); // 🌟 DÙ THÀNH CÔNG HAY THẤT BẠI: Mở lại khóa nút
+    }
+  };
   return (
     <div>
       {/* 1. THANH TIÊU ĐỀ HỒ SƠ */}
@@ -86,10 +100,10 @@ export default function TieuDeCongTrinh({
               <Button
                 variant="primary"
                 className="px-8 shadow-lg shadow-indigo-200 min-w-20"
-                onClick={onSave}
-                disabled={isLoading}
+                onClick={handelClick}
+                disabled={isDisabled || cooldownTime > 0}
               >
-                {isLoading ? "Đang lưu dữ liệu..." : "Lưu thay đổi"}
+                {isDisabled ? "Đang lưu dữ liệu..." : "Lưu thay đổi"}
                 <br />
                 {cooldownTime > 0
                   ? `Vui lòng đợi (${Math.floor(cooldownTime / 60)}p:${cooldownTime % 60}s)`

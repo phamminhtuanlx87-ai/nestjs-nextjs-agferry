@@ -231,11 +231,11 @@ export default function DuToanPSForm({ stage }: Props) {
                         label="Đơn vị lập Dự toán (Điều chỉnh)"
                         options={OPTIONS_THAM_TRA}
                         {...register(`giai_doan.6.ma_don_vi`, {
-                          required: !dtps.isDisabled
+                         required: !ttrdtps.isDisabled
                             ? "Vui lòng nhập Đơn vị lập Dự toán (Điều chỉnh)"
                             : false,
                         })}
-                        disabled={dtps.isDisabled}
+                        disabled={ttrdtps.isDisabled}
                         error={errors.giai_doan?.[6]?.ma_don_vi?.message}
                       ></SelectField>
 
