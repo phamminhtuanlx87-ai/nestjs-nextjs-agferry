@@ -1,104 +1,43 @@
 "use client";
-import CongTrinhTable from "@/components/modules/cong-trinh/CongTrinhTable";
-import ThemCongTrinhForm from "@/components/modules/cong-trinh/ThemCongTrinhForm";
-import Button from "@/components/ui/Button";
 import LoadingScreen from "@/components/ui/LoadingScreen";
-import Modal from "@/components/ui/Modal";
-import { getAllCongTrinh, ICongTrinh } from "@/services/congTrinhService";
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import ProjectStatsBlock from "@/components/modules/cong-trinh/ProjectStatsBlock";
-import { Guard } from "@/components/common/Guard";
-import { UserPermission } from "@/store/useAuthStore";
+import DSCongTrinh from "@/components/modules/cong-trinh/DSCongTrinh";
+import { useCongTrinhData } from "@/hooks/useCongTrinhData";
 
 export default function CongTrinhpage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [dsCongTrinh, setDsCongTrinh] = useState<ICongTrinh[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const now = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
-  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
-
-  // Gọi hook ngay dưới phần khai báo các State
-
-  // Tại trang quản lý (Parent)
-  const loadData = useCallback(async (month: number, year: number) => {
-    try {
-      // Giả định API của bạn hỗ trợ truyền params để lọc
-      const data = await getAllCongTrinh(month, year);
-      setDsCongTrinh(data);
-    } catch (error) {
-      console.error("Lỗi khi tải dữ liệu:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        await loadData(selectedMonth, selectedYear);
-      } catch (error) {
-        console.error("Lỗi khi load danh sách công trình:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedMonth, selectedYear, loadData]);
+  const {
+    selectedMonth,
+    setSelectedMonth,
+    selectedYear,
+    setSelectedYear,
+    dsCongTrinh,
+    filteredTableData, // Mảng ĐÃ LỌC động truyền cho Bảng hiển thị
+    setFilterStatus,
+    loading,
+  } = useCongTrinhData();
 
   if (loading) return <LoadingScreen />;
-  // Kết quả trả về: "khoảng 15 phút trước" hoặc "vừa xong"
 
   return (
     <div>
-      <div className="flex-1 p-6 overflow-y-auto md:ml-10 flex flex-col gap-6">
-        <Guard requiredPermission={UserPermission.PROJECT_VIEW}>
-          <ProjectStatsBlock
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            onMonthChange={setSelectedMonth}
-            onYearChange={setSelectedYear}
-            data={dsCongTrinh}
-            loading={loading}
-          />
-          <section className="content-2 table-list bg-white border border-gray-50 border-shadow flex flex-col gap-5">
-            <div className="flex items-center justify-between">
-              <h1 className="text-sm md:text-2xl font-semibold">
-                Danh sách công trình
-              </h1>
-
-              <Guard requiredPermission={UserPermission.PROJECT_CREATE}>
-                <Button
-                  type="button"
-                  variant="primary"
-                  className="text-sm font-semibold"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  + Thêm công trình
-                </Button>
-              </Guard>
-            </div>
-            <CongTrinhTable
-              key={dsCongTrinh.length}
-              onSuccess={() => loadData(selectedMonth, selectedYear)}
-              data={dsCongTrinh}
-              rowsPerPage={20}
-            />
-          </section>
-        </Guard>
+      <div className="flex flex-col gap-6">
+        <ProjectStatsBlock
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onMonthChange={setSelectedMonth}
+          onYearChange={setSelectedYear}
+          data={dsCongTrinh}
+          loading={loading}
+          onCardClick={setFilterStatus}
+        />
+        <DSCongTrinh
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          data={filteredTableData}
+          rowsPerPage={20}
+        />
       </div>
-      <Guard requiredPermission={UserPermission.PROJECT_CREATE}>
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title="Thêm công trình"
-        >
-          <ThemCongTrinhForm
-            onSuccess={() => loadData(selectedMonth, selectedYear)}
-            onClose={() => setIsModalOpen(false)}
-          />
-        </Modal>
-      </Guard>
     </div>
   );
 }

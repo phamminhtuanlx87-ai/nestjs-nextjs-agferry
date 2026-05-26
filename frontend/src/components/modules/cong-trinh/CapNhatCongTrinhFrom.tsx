@@ -227,8 +227,6 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
       isActive: true,
     };
     try {
-      //   await addProject(payload);
-      console.log("Payload gửi đi:", payload); // Kiểm tra payload trước khi gửi
       const response = await updateProject(congTrinh._id, payload);
       setIsLoading(true);
       if (response) {

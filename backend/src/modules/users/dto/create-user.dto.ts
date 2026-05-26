@@ -40,10 +40,18 @@ export class CreateUserDto {
   })
   departmentId?: string; // Đổi tên từ department thành departmentId để phân biệt
 
+  @IsString()
+  @IsOptional()
+  departmentName?: string;
+
   @IsOptional()
   @IsEnum(Object.keys(UserPositions), {
     message:
       'Mã chức vụ không hợp lệ. Vui lòng sử dụng các mã như: CT, TGD, GD, NV...',
   })
   positionId?: string; // Đổi tên từ positions thành positionsId để phân biệt
+
+  @IsString()
+  @IsOptional()
+  positionName?: string;
 }

@@ -48,9 +48,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, UserPermission[]> = {
 // Định nghĩa chi tiết từng phòng ban (Department)
 export enum UserDepartment {
   PKT = 'Phòng Kỹ thuật - Vật tư',
-  PDU = 'Phòng Đầu tư',
+  PDT = 'Phòng Đầu tư',
   XNCK = 'Xí nghiệp Cơ khí Giao thông',
-  BGD = 'Ban Giám đốc',
+  BTGD = 'Ban Tổng Giám đốc',
+  PTV = 'Phòng Tài vụ',
   AD = 'Admin',
   CXD = 'Chưa xác định',
 }
@@ -61,6 +62,8 @@ export enum UserPositions {
   PTGD = 'Phó Tổng Giám đốc',
   TP = 'Trưởng phòng',
   PTP = 'Phó Trưởng phòng',
+  GD = 'Giám đốc',
+  PGD = 'Phó Giám đốc',
   NV = 'Nhân viên',
   AD = 'Admin',
   CXD = 'Chưa xác định',

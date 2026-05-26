@@ -6,12 +6,14 @@ import {
   UserPositions,
 } from './constants/user.constants';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './schemas/user.schema';
+import { User, UserDocument } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { _QueryFilter, Model } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { MeDTO } from '../auth/dto/MeDTO';
+import { adminDTO } from '../auth/dto/adminDTO';
 
 @Injectable()
 export class UsersService {
@@ -131,6 +133,77 @@ export class UsersService {
     return updatedUser;
   }
 
+  async updateMe(id: string, meDto: MeDTO): Promise<User> {
+    const userData = {
+      fullName: meDto.fullName,
+      email: meDto.email,
+      department: {
+        id: meDto.department.id ?? 'CXD',
+        name: meDto.department.name ?? 'Chưa xác định',
+      },
+      positions: {
+        id: meDto.positions.id ?? 'CXD',
+        name: meDto.positions.name ?? 'Chưa xác định',
+      },
+    };
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(
+        id,
+        { $set: userData }, // Sử dụng $set để đảm bảo chỉ cập nhật các field được gửi lên
+        {
+          returnDocument: 'after', // Trả về bản ghi SAU KHI đã cập nhật (mặc định là trả về bản ghi cũ)
+          runValidators: true, // Đảm bảo các quy tắc Validate trong Schema vẫn được áp dụng
+        },
+      )
+      .exec();
+
+    // 2. Kiểm tra nếu không tìm thấy
+    if (!updatedUser) {
+      throw new NotFoundException(`Không tồn tại user với id: ${id}`);
+    }
+
+    return updatedUser;
+  }
+
+  async updateAdmin(id: string, adminDTO: adminDTO): Promise<User> {
+    const deptID = adminDTO.department?.id ?? 'CXD';
+    const posId = adminDTO.positions?.id ?? 'CXD';
+    const userData = {
+      fullName: adminDTO.fullName,
+      email: adminDTO.email,
+      role: adminDTO.role ?? 'GUEST',
+      permissions: ROLE_PERMISSIONS[adminDTO.role ?? 'GUEST'] || [],
+      department: {
+        id: deptID ?? 'CXD',
+        name:
+          UserDepartment[deptID as keyof typeof UserDepartment] ||
+          'Chưa xác định',
+      },
+      positions: {
+        id: adminDTO.positions?.id ?? 'CXD',
+        name:
+          UserPositions[posId as keyof typeof UserPositions] || 'Chưa xác định',
+      },
+    };
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(
+        id,
+        { $set: userData }, // Sử dụng $set để đảm bảo chỉ cập nhật các field được gửi lên
+        {
+          returnDocument: 'after', // Trả về bản ghi SAU KHI đã cập nhật (mặc định là trả về bản ghi cũ)
+          runValidators: true, // Đảm bảo các quy tắc Validate trong Schema vẫn được áp dụng
+        },
+      )
+      .exec();
+
+    // 2. Kiểm tra nếu không tìm thấy
+    if (!updatedUser) {
+      throw new NotFoundException(`Không tồn tại user với id: ${id}`);
+    }
+
+    return updatedUser;
+  }
+
   async toggleActive(id: string) {
     const user = await this.userModel.findById(id);
     if (!user) throw new NotFoundException('Người dùng không tồn tại');
@@ -143,6 +216,31 @@ export class UsersService {
       )
       .exec();
   }
+
+  async getAllUser(
+    mode: 'all' | 'active' | 'inactive' = 'all',
+  ): Promise<UserDocument[]> {
+    console.log(`Chay GetAllUser với chế độ: ${mode}`);
+
+    // 1. Khởi tạo query object mặc định trống (tương đương với 'all')
+    const filter: _QueryFilter<UserDocument> = {};
+
+    // 2. Thay đổi filter dựa theo mode
+    if (mode === 'active') {
+      filter.isActive = true;
+    } else if (mode === 'inactive') {
+      filter.isActive = false;
+    }
+    // Nếu mode === 'all', filter giữ nguyên là {} (lấy hết cả true và false)
+
+    // 3. Thực thi query DB
+    return await this.userModel
+      .find(filter) // Truyền filter động vào đây
+      .sort({ updatedAt: -1 })
+      .select('-permissions -__v')
+      .exec();
+  }
+
   async remove(id: string): Promise<any> {
     // BẮT BUỘC phải có dòng này để xóa trong MongoDB
     const deletedUser = await this.userModel.findByIdAndDelete(id).exec();

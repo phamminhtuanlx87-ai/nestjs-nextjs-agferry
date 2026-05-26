@@ -129,6 +129,55 @@ Hệ thống áp dụng mô hình bảo mật nhiều lớp:
 
 ---
 # 📅 Tiến độ & Kế hoạch (Progress & Roadmap)
+
+## 🇻🇳 Tiếng Việt
+### 🛠️ Các thay đổi và chỉnh sửa hôm nay:
+Cấu trúc lại danh mục Đơn vị & Chức vụ:
+
+Thiết lập danh sách phòng ban mới bao gồm: Phòng Kỹ thuật - Vật tư, Phòng Đầu tư, Xí nghiệp Cơ khí Giao thông, Ban Tổng Giám đốc, Phòng Tài vụ.
+
+Ràng buộc chức vụ động (Cascading Dropdown) theo từng đơn vị cụ thể (Ví dụ: Ban Tổng Giám đốc chỉ hiển thị Chủ tịch, Tổng GD, Phó Tổng GD; các phòng ban khác hiển thị Trưởng/Phó phòng, Nhân viên).
+
+Sửa lỗi cảnh báo React Hook (ESLint):
+
+Khắc phục hoàn toàn cảnh báo react-hooks/exhaustive-deps tại hàm useEffect tự động đồng bộ chức vụ bằng cách bổ sung đầy đủ mảng dependencies (watch, setValue).
+
+Tối ưu hóa giao diện cột trái (Hồ sơ cá nhân):
+
+Sửa lỗi chữ nhỏ và hiển thị nhầm trạng thái tải dữ liệu (...Đang lấy dữ liệu) khi đã tải xong.
+
+Tăng độ tương phản, sử dụng mã màu chữ đậm rõ ràng, giúp thông tin dễ đọc hơn.
+
+Xử lý triệt để lỗi tràn chữ và vỡ bố cục (Responsive & Layout Overflow):
+
+Thêm các thuộc tính chống tràn chữ (truncate, break-words, break-all) cho phần hiển thị Họ tên và Email ở cột bên trái.
+
+Đảm bảo giao diện không bao giờ bị đè chữ hoặc chọc thủng layout kể cả khi người dùng cố tình nhập chuỗi ký tự siêu dài không có khoảng trắng.
+
+## 🇬🇧 English
+### 🛠️ Today's Changes & Fixes:
+Restructured Departments & Positions:
+
+Set up the new organizational list: Technical & Materials Department, Investment Department, Traffic Mechanical Enterprise, Board of General Directors, Finance Department.
+
+Implemented dynamic position filtering (Cascading Dropdown) per unit (e.g., Board of Directors only shows Chairman, General Director, Deputy GD; other departments show Head/Deputy Head, Staff).
+
+Fixed React Hook Warning (ESLint):
+
+Resolved the react-hooks/exhaustive-deps warning within the auto-sync position useEffect by providing the complete dependencies array (watch, setValue).
+
+Optimized Left Sidebar Profile UI:
+
+Fixed micro-text size and wrong loading-text fallback issues (...Loading data) after API fetched successfully.
+
+Increased text contrast and applied clearer, bolder slate colors for enhanced readability.
+
+Resolved Layout Overflow & Text Wrapping Issues:
+
+Applied CSS truncation and breaking properties (truncate, break-words, break-all) to the Full Name and Email fields in the left sidebar.
+
+Ensured the layout remains perfectly intact and never breaks, even when processing extremely long, continuous strings with no spaces.
+---
 ## 📅 Ngày cập nhật | Update Date: 22/05/2026
 
 ### 1. Đồng bộ danh mục và tối ưu bộ cuộn trang | Sidebar Scrollspy & Navigation Optimization

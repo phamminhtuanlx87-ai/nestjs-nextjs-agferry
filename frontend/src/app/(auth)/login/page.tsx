@@ -17,9 +17,8 @@ import { alertService } from "@/utils/swal";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuthStore();
+  const { login , user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Khai báo hook form

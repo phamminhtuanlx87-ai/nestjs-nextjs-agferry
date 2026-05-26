@@ -3,7 +3,7 @@ import SumIcon from "@/components/ui/SumIcon";
 import SummaryCard from "@/components/ui/SummaryCard";
 import { useCongTrinhCard } from "./useCongTrinhCard";
 import DropDown from "@/components/ui/DropDown";
-import { MONTH_OPTIONS, YEAR_OPTIONS } from "@/constants/time";
+import { getMonthOptions, YEAR_OPTIONS } from "@/constants/time";
 import { BiCalendar } from "react-icons/bi";
 import { ICongTrinh } from "@/services/congTrinhService";
 
@@ -13,7 +13,9 @@ interface ProjectStatsBlockProps {
   onMonthChange: (month: number) => void;
   onYearChange: (year: number) => void;
   data: ICongTrinh[];
-  loading: boolean
+  loading: boolean;
+  filterStatus?: string;
+  onCardClick?: (status: string) => void;
 }
 
 export default function ProjectStatsBlock({
@@ -23,13 +25,14 @@ export default function ProjectStatsBlock({
   onYearChange,
   data,
   loading,
+  onCardClick,
 }: ProjectStatsBlockProps) {
-  
   const stats = useCongTrinhCard({
     dsCongTrinh: data || [], // Fallback mảng rỗng phòng khi trang cha chưa load xong
     selectedMonth,
     selectedYear,
   });
+
   return (
     <div className="relative w-full">
       <div className="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
@@ -57,7 +60,7 @@ export default function ProjectStatsBlock({
           <div className="relative inline-block text-left">
             <DropDown
               label="Tháng"
-              items={MONTH_OPTIONS}
+              items={getMonthOptions(selectedYear)}
               value={selectedMonth}
               icon={<BiCalendar className="w-4 h-4" />}
               onChange={(val) => onMonthChange(Number(val))}
@@ -83,9 +86,10 @@ export default function ProjectStatsBlock({
           title="Tổng công trình"
           value={stats.total.current}
           change={stats.total.change}
-          subtile={`Tháng trước: ${stats.total.last} công trình`}
+          subtile={`${stats.total.change} so với tháng trước`}
           description={stats.total.timeAgo}
           icon={<SumIcon variant="projects" />}
+          onClick={() => onCardClick?.("ALL")}
         />
 
         <SummaryCard
@@ -94,9 +98,10 @@ export default function ProjectStatsBlock({
           value={stats.thiCong.current}
           change={stats.thiCong.change}
           progressbar={stats.thiCong.thiCongRatio}
-          subtile={`Tháng trước: ${stats.thiCong.last} công trình`}
+          subtile={`Chiếm ${stats.thiCong.percent}`}
           description={stats.thiCong.timeAgo}
           icon={<SumIcon variant="progress" />}
+          onClick={() => onCardClick?.("THI_CONG")}
         />
 
         <SummaryCard
@@ -105,9 +110,10 @@ export default function ProjectStatsBlock({
           value={stats.quyetToan.current}
           change={stats.quyetToan.change}
           progressbar={stats.quyetToan.quyetToanRatio}
-          subtile={`Tháng trước: ${stats.quyetToan.last} công trình`}
+          subtile={`Chiếm ${stats.quyetToan.percent}`}
           description={stats.quyetToan.timeAgo}
           icon={<SumIcon variant="done" />}
+          onClick={() => onCardClick?.("QUYET_TOAN")}
         />
 
         <SummaryCard
@@ -116,9 +122,10 @@ export default function ProjectStatsBlock({
           value={stats.hoanThanh.current}
           change={stats.hoanThanh.change}
           progressbar={stats.hoanThanh.hoanThanhRatio}
-          subtile={`Tháng trước: ${stats.hoanThanh.last} công trình`}
-          description={stats.hoanThanh.timeAgo}
+          subtile={`Đã hoàn thành ${stats.hoanThanh.percent}`}
+          description={stats.hoanThanh?.timeAgo}
           icon={<SumIcon variant="warning" />}
+          onClick={() => onCardClick?.("HOAN_THANH")}
         />
       </section>
 

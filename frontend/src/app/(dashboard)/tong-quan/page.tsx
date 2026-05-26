@@ -12,11 +12,13 @@ export default function TongQuanPage() {
     selectedYear,
     setSelectedYear,
     dsCongTrinh,
+    filteredTableData, // Mảng ĐÃ LỌC động truyền cho Bảng hiển thị
+    setFilterStatus,
     loading,
   } = useCongTrinhData();
 
   if (loading) return <LoadingScreen />;
-  
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Tổng Quan</h1>
@@ -29,11 +31,12 @@ export default function TongQuanPage() {
           onYearChange={setSelectedYear}
           data={dsCongTrinh}
           loading={loading}
+          onCardClick={setFilterStatus}
         />
         <DSCongTrinh
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
-          data={dsCongTrinh}
+          data={filteredTableData}
         />
       </div>
     </div>

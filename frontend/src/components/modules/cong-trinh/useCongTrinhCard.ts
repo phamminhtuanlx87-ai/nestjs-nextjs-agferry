@@ -15,6 +15,7 @@ export const useCongTrinhCard = ({
   selectedMonth,
   selectedYear,
 }: UseProjectStatsParams) => {
+  // 2. Thêm state lưu Trạng thái Card đang được click lọc
   return useMemo(() => {
     // Trả về giá trị mặc định nếu dữ liệu chưa hợp lệ
     if (!dsCongTrinh || !Array.isArray(dsCongTrinh)) {
@@ -46,6 +47,11 @@ export const useCongTrinhCard = ({
       return diff >= 0 ? `+ ${diff} công trình` : `${diff} công trình`;
     };
 
+    const getPercentText = (total: number, last: number) => {
+      const diff = Math.round((last / total) * 100);
+      return diff >= 0 ? `${diff}% công trình` : `Chưa xác định`;
+    };
+
     // --- CARD 1: TỔNG CÔNG TRÌNH ---
     const currentTotal = dsCongTrinh.filter((e) =>
       isProjectInTime(e.createdAt, selectedMonth, selectedYear),
@@ -54,63 +60,18 @@ export const useCongTrinhCard = ({
       isProjectInTime(e.createdAt, prevMonth, prevYear),
     ).length;
 
-    // // --- CARD 2: ĐANG THI CÔNG (Mã hiệu cuối cùng là "TC") ---
-    //  const currentThiCong = dsCongTrinh.filter(
-    //   (e) =>
-    //     isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-    //     e.giai_doan
-    //       ?.at(-1)
-    //       ?.ma_hieu.includes(
-    //         MA_HIEU_MAPPING[4].ma_hieu ||
-    //           MA_HIEU_MAPPING[3].ma_hieu,
-    //       ),
-    // ).length;
-    // const lastThiCong = dsCongTrinh.filter(
-    //   (e) =>
-    //     isProjectInTime(e.createdAt, prevMonth, prevYear) &&
-    //     e.giai_doan
-    //       ?.at(-1)
-    //       ?.ma_hieu.includes(
-    //         MA_HIEU_MAPPING[3].ma_hieu || MA_HIEU_MAPPING[4].ma_hieu,
-    //       ),
-    // ).length;
-
-    // // --- CARD 3: ĐANG QUYẾT TOÁN (Mã hiệu cuối cùng là "QT") ---
-    // // (Bạn hãy check lại mã hiệu viết tắt của Đang quyết toán trong DB của bạn xem có phải "QT" không nhé)
-    // const currentQuyetToan = dsCongTrinh.filter(
-    //   (e) =>
-    //     isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
-    //     e.giai_doan
-    //       ?.at(-1)
-    //       ?.ma_hieu.includes(
-    //         MA_HIEU_MAPPING[5].ma_hieu ||
-    //           MA_HIEU_MAPPING[6].ma_hieu ||
-    //           MA_HIEU_MAPPING[7].ma_hieu,
-    //       ),
-    // ).length;
-    // const lastQuyetToan = dsCongTrinh.filter(
-    //   (e) =>
-    //     isProjectInTime(e.createdAt, prevMonth, prevYear) &&
-    //     e.giai_doan
-    //       ?.at(-1)
-    //       ?.ma_hieu.includes(
-    //         MA_HIEU_MAPPING[5].ma_hieu ||
-    //           MA_HIEU_MAPPING[6].ma_hieu ||
-    //           MA_HIEU_MAPPING[7].ma_hieu,
-    //       ),
-    // ).length;
     // ==========================================
     // ĐỊNH NGHĨA NHÓM MÃ HIỆU CHO TỪNG CARD (Dễ quản lý, tránh sai index)
     // ==========================================
     const MA_THI_CONG_NT = ["TC", "NT"]; // TC: Thi công, NT: Nghiệm thu
-    const MA_QUYET_TOAN = ["DT_PS", "TTR_DT_PS","PD_DT_PS"]; // PD_DT_PS: Phê duyệt điều chỉnh, 
+    const MA_QUYET_TOAN = ["DT_PS", "TTR_DT_PS", "PD_DT_PS"]; // PD_DT_PS: Phê duyệt điều chỉnh,
 
     // ==========================================
     // --- CARD 2: ĐANG THI CÔNG ---
     // ==========================================
     const currentThiCong = dsCongTrinh.filter((e) => {
       const isInTime = isProjectInTime(
-        e.createdAt,
+        e.ngay_tao_du_an,
         selectedMonth,
         selectedYear,
       );
@@ -124,7 +85,7 @@ export const useCongTrinhCard = ({
     }).length;
 
     const lastThiCong = dsCongTrinh.filter((e) => {
-      const isInTime = isProjectInTime(e.createdAt, prevMonth, prevYear);
+      const isInTime = isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear);
       if (!isInTime || !e.giai_doan) return false;
 
       const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
@@ -250,6 +211,7 @@ export const useCongTrinhCard = ({
         thiCongRatio: thiCongRatio,
         change: getChangeText(currentThiCong, lastThiCong),
         timeAgo: getTimeAgo(thiCongThangNay),
+        percent: getPercentText(currentTotal, currentThiCong),
       },
       quyetToan: {
         current: currentQuyetToan,
@@ -257,6 +219,7 @@ export const useCongTrinhCard = ({
         quyetToanRatio: quyetToanRatio,
         change: getChangeText(currentQuyetToan, lastQuyetToan),
         timeAgo: getTimeAgo(quyetToanThangNay),
+        percent: getPercentText(currentTotal, currentQuyetToan),
       },
       hoanThanh: {
         current: currentHoanThanh,
@@ -264,6 +227,7 @@ export const useCongTrinhCard = ({
         hoanThanhRatio: hoanThanhRatio,
         change: getChangeText(currentHoanThanh, lastHoanThanh),
         timeAgo: getTimeAgo(hoanThanhThangNay),
+        percent: getPercentText(currentTotal, currentHoanThanh),
       },
     };
   }, [dsCongTrinh, selectedMonth, selectedYear]);

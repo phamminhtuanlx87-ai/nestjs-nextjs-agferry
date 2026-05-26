@@ -27,13 +27,23 @@ export interface Permission {
   index: number;
   value: string;
 }
-
-export interface GetMeData {
+export interface Department {
+  id: string;
+  name: string;
+}
+export interface Positions {
+  id: string;
+  name: string;
+}
+export interface MeData {
   userName: string;
   fullName: string;
   email: string;
   role: string;
+  isActive: boolean;
   permissions: Permission[];
+  department:Department;
+  positions:Positions;
 }
 
 interface BackendResponse<T> {
@@ -41,7 +51,14 @@ interface BackendResponse<T> {
   message: string;
   data: T;
 }
-export async function getMe(): Promise<GetMeData> {
-  const response = await api.get<BackendResponse<GetMeData>>("/auth/me");
+export async function getMe(): Promise<MeData> {
+  const response = await api.get<BackendResponse<MeData>>("/auth/me");
   return response.data.data; // Trả thẳng object user chứa role và permissions
+}
+
+export interface MeUpdateFormData {
+  fullName: string;
+}
+export async function meUpdata(userData: RegisterFormData) {
+  return await api.post("/auth/register", userData);
 }

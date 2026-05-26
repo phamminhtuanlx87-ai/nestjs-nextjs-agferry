@@ -3,6 +3,7 @@ import React from "react";
 import NavbarLink from "./NavbarLink";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
 
 function Navbar() {
   const { user } = useAuthStore();
@@ -14,6 +15,7 @@ function Navbar() {
     const displayLetter = nameParts[nameParts.length - 1].charAt(0);
     return displayLetter;
   };
+  const router = useRouter();
   return (
     <div>
       <nav className="flex items-center justify-between bg-neutral-bg-header p-4">
@@ -23,7 +25,7 @@ function Navbar() {
           <NavbarLink href="/tien-luong">Tiền lương</NavbarLink>
         </div>
         <nav className="hidden md:flex gap-3 text justify-start items-center">
-          <div className="relative w-10 h-10">
+          <div className="relative w-10 h-10 cursor-pointer hover:scale-110 transition-all duration-300" onClick={()=> router.push("/me")}>
             <div className="w-full h-full rounded-full bg-indigo-200 flex items-center justify-center text-4xl font-bold text-indigo-700">
               {getInitials(fullName)}
             </div>
@@ -33,25 +35,12 @@ function Navbar() {
           </div>
           <div className="flex gap-1">
             <Link
-              href="#"
-              className="hover:text-accent text-white transition"
+              href="/me"
+              className="hover:text-accent text-white transition-all duration-300"
             >
               {fullName}
             </Link>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              className="size-5 text-white hover:text-accent cursor-pointer"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m19.5 8.25-7.5 7.5-7.5-7.5"
-              />
-            </svg>
+           
           </div>
         </nav>
       </nav>

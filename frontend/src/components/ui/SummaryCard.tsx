@@ -9,6 +9,7 @@ type SummaryCardProps = {
   description?: string; // so với tháng trước
   color: string;
   progressbar?: number;
+  onClick?: () => void;
   icon?: ReactNode;
 };
 
@@ -21,14 +22,16 @@ export default function SummaryCard({
   color,
   progressbar = 0,
   icon,
+  onClick,
 }: SummaryCardProps) {
   return (
     <div>
       <div>
         <div
           className={`text-white p-6 rounded-2xl shadow-lg hover:scale-[1.02] 
-            transition-all duration-300 flex flex-col justify-between h-48
+            transition-all duration-300 flex flex-col justify-between h-48 cursor-pointer
             ${color}`}
+            onClick={onClick}
         >
           {/* <!-- Top --> */}
           <div className="flex justify-between items-start">

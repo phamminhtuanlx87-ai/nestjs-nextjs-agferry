@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   Request,
   UseGuards,
@@ -13,6 +15,10 @@ import { UsersService } from '../users/users.service';
 import { Public } from 'src/common/decorators/public.decorator';
 import { RegisterUserDto } from '../users/dto/register-user.dto';
 import { Throttle } from '@nestjs/throttler';
+import { MeDTO } from './dto/MeDTO';
+import { adminDTO } from './dto/adminDTO';
+import { UserRole } from '../users/constants/user.constants';
+import { Roles } from 'src/common/decorators/roles.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -64,6 +70,54 @@ export class AuthController {
       data: result,
     };
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/me')
+  async updateMe(@Param('id') id: string, @Body() updateMeDto: MeDTO) {
+    const result = await this.usersService.updateMe(id, updateMeDto);
+    return {
+      statusCode: 200, // Thêm cái này để frontend dễ check
+      message: 'Cập nhật công trình thành công!',
+      data: result,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch(':id/admin')
+  async updateAdmin(@Param('id') id: string, @Body() updateMeDto: adminDTO) {
+    const result = await this.usersService.updateAdmin(id, updateMeDto);
+    return {
+      statusCode: 200, // Thêm cái này để frontend dễ check
+      message: 'Cập nhật thành công!',
+      data: result,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch(':id/admin/toggle')
+  async toggleActive(@Param('id') id: string) {
+    const result = await this.usersService.toggleActive(id);
+    return {
+      statusCode: 200, // Thêm cái này để frontend dễ check
+      message: 'Cập nhật thành công!',
+      data: result,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('/admin/:mode')
+  async getAllUser(@Param('mode') mode: 'all' | 'active' | 'inactive') {
+    const result = await this.usersService.getAllUser(mode);
+    return {
+      statusCode: 200,
+      message: 'Lấy danh sách thành viên thành công!', // Sửa lại message
+      data: result,
+    };
+  }
+
   // Hàm này tạo ra cả Access Token và Refresh Token
   @Public() // Cho phép gọi mà không cần token vì đây là hàm tạo token
   @Post('refresh')
