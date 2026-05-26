@@ -12,8 +12,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { _QueryFilter, Model } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import { MeDTO } from '../auth/dto/MeDTO';
 import { adminDTO } from '../auth/dto/adminDTO';
+import { getMeDTO } from '../auth/dto/getMeDTO';
 
 @Injectable()
 export class UsersService {
@@ -133,7 +133,7 @@ export class UsersService {
     return updatedUser;
   }
 
-  async updateMe(id: string, meDto: MeDTO): Promise<User> {
+  async updateMe(id: string, meDto: getMeDTO): Promise<User> {
     const userData = {
       fullName: meDto.fullName,
       email: meDto.email,

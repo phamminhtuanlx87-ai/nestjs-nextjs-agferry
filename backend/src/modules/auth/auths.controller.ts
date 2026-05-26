@@ -15,10 +15,10 @@ import { UsersService } from '../users/users.service';
 import { Public } from 'src/common/decorators/public.decorator';
 import { RegisterUserDto } from '../users/dto/register-user.dto';
 import { Throttle } from '@nestjs/throttler';
-import { MeDTO } from './dto/MeDTO';
 import { adminDTO } from './dto/adminDTO';
 import { UserRole } from '../users/constants/user.constants';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { getMeDTO } from './dto/getMeDTO';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -73,7 +73,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id/me')
-  async updateMe(@Param('id') id: string, @Body() updateMeDto: MeDTO) {
+  async updateMe(@Param('id') id: string, @Body() updateMeDto: getMeDTO) {
     const result = await this.usersService.updateMe(id, updateMeDto);
     return {
       statusCode: 200, // Thêm cái này để frontend dễ check

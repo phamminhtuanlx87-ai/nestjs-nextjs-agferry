@@ -20,7 +20,7 @@ class DepartmentDto {
 // DTO nhỏ cho File đính kèm
 class PositionsDto extends DepartmentDto {}
 
-export class MeDTO {
+export class getMeDTO {
   @IsString()
   @IsNotEmpty()
   fullName: string;
