@@ -10,8 +10,7 @@ export async function authLogin({ userName, password }: LoginFormData) {
     userName: userName,
     password: password,
   });
-};
-
+}
 
 export interface RegisterFormData {
   userName: string;
@@ -21,7 +20,7 @@ export interface RegisterFormData {
 }
 export async function authRegister(userData: RegisterFormData) {
   return await api.post("/auth/register", userData);
-};
+}
 
 export interface Permission {
   index: number;
@@ -36,14 +35,15 @@ export interface Positions {
   name: string;
 }
 export interface MeData {
+  id: string;
   userName: string;
   fullName: string;
   email: string;
   role: string;
   isActive: boolean;
   permissions: Permission[];
-  department:Department;
-  positions:Positions;
+  department: Department;
+  positions: Positions;
 }
 
 interface BackendResponse<T> {
@@ -59,6 +59,42 @@ export async function getMe(): Promise<MeData> {
 export interface MeUpdateFormData {
   fullName: string;
 }
-export async function meUpdata(userData: RegisterFormData) {
-  return await api.post("/auth/register", userData);
+
+export interface MeFormValues {
+  fullName: string;
+  userName: string;
+  email: string;
+  department: string;
+  positions: string;
+  isActive?: boolean;
+}
+
+export interface MeRequest {
+  fullName: string;
+  email: string;
+  department: {
+    id: string;
+    name: string;
+  };
+  positions: {
+    id: string;
+    name: string;
+  };
+}
+
+export async function meUpdate(userData: MeRequest) {
+  return await api.patch<BackendResponse<MeRequest>>("/auth/me", userData);
+}
+
+export interface ResetPasswordValues {
+  currentPassword?: string; // Dùng nếu đổi mật khẩu khi đang đăng nhập
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export async function changePasswordService(userData: ResetPasswordValues) {
+  return await api.patch<BackendResponse<ResetPasswordValues>>(
+    "/auth/me/reset",
+    userData,
+  );
 }

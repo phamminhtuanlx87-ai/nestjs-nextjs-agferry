@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -14,11 +15,12 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UsersService } from '../users/users.service';
 import { Public } from 'src/common/decorators/public.decorator';
 import { RegisterUserDto } from '../users/dto/register-user.dto';
-import { Throttle } from '@nestjs/throttler';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { adminDTO } from './dto/adminDTO';
 import { UserRole } from '../users/constants/user.constants';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { getMeDTO } from './dto/getMeDTO';
+import { ResetPasswordDTO } from './dto/ResetPasswordDTO';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -57,6 +59,7 @@ export class AuthController {
   // -------------------------------------
 
   @UseGuards(JwtAuthGuard)
+  @SkipThrottle()
   @Get('me')
   async getProfile(@Request() req: any) {
     // 1. Lấy userId đã được Passport giải mã và đặt vào req.user
@@ -72,12 +75,34 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id/me')
-  async updateMe(@Param('id') id: string, @Body() updateMeDto: getMeDTO) {
-    const result = await this.usersService.updateMe(id, updateMeDto);
+  @Patch('me')
+  async updateMe(@Req() req: any, @Body() updateMeDto: getMeDTO) {
+    const userId = req.user?.userId as string;
+    const result = await this.usersService.updateMe(userId, updateMeDto);
     return {
       statusCode: 200, // Thêm cái này để frontend dễ check
       message: 'Cập nhật công trình thành công!',
+      data: result,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/reset')
+  async updateMeReset(
+    @Req() req: any,
+    @Body() resetPasswordDto: ResetPasswordDTO, // Đổi từ getMeDTO sang ResetPasswordDTO
+  ) {
+    const userId = req.user.userId as string; // Lấy userId an toàn từ Token mã hóa
+
+    // Gọi sang tầng Service xử lý logic kiểm tra & cập nhật
+    const result = await this.usersService.updateMeReset(
+      userId,
+      resetPasswordDto,
+    );
+
+    return {
+      statusCode: 200,
+      message: 'Thay đổi mật khẩu bảo mật thành công!',
       data: result,
     };
   }

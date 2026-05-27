@@ -77,53 +77,24 @@ PORT=3000
 ```
 ---
 # 📅 Tiến độ & Roadmap
-# 📅 Tiến độ & Kế hoạch (Progress & Roadmap)
-# ✅ Đã hoàn thành (22/05/2026)
-## 🇻🇳 Tiếng Việt
-### 🛠️ Các thay đổi và chỉnh sửa hôm nay:
-Cấu trúc lại danh mục Đơn vị & Chức vụ:
+# 🛠️ Nhật Ký Debug & Hoàn Thiện Tính Năng Đổi Mật Khẩu (27/05/2026)
 
-Thiết lập danh sách phòng ban mới bao gồm: Phòng Kỹ thuật - Vật tư, Phòng Đầu tư, Xí nghiệp Cơ khí Giao thông, Ban Tổng Giám đốc, Phòng Tài vụ.
+Tài liệu này ghi lại toàn bộ quá trình xử lý logic, đồng bộ giữa Frontend và Backend, cũng như các lỗi "xương máu" đã được giải quyết trong ngày hôm nay cho tính năng **Cập nhật bảo mật (Đổi mật khẩu)**.
 
-Ràng buộc chức vụ động (Cascading Dropdown) theo từng đơn vị cụ thể (Ví dụ: Ban Tổng Giám đốc chỉ hiển thị Chủ tịch, Tổng GD, Phó Tổng GD; các phòng ban khác hiển thị Trưởng/Phó phòng, Nhân viên).
+---
 
-Sửa lỗi cảnh báo React Hook (ESLint):
+## 🎯 Tính Năng Đã Hoàn Thành
+* [x] Xây dựng hàm `updateMeReset` trọn gói tại tầng `UsersService` (Backend) để tự động tìm kiếm, xác thực mật khẩu cũ và băm mật khẩu mới.
+* [x] Đồng bộ hóa cấu trúc DTO ở Backend và Interface ở Frontend sang kiểu `camelCase` chuẩn (`currentPassword`, `newPassword`, `confirmPassword`).
+* [x] Kết nối thành công luồng gọi API `PATCH /api/auth/me/reset` từ giao diện Web xuống Database.
 
-Khắc phục hoàn toàn cảnh báo react-hooks/exhaustive-deps tại hàm useEffect tự động đồng bộ chức vụ bằng cách bổ sung đầy đủ mảng dependencies (watch, setValue).
+---
 
-Tối ưu hóa giao diện cột trái (Hồ sơ cá nhân):
+## 🚨 Các Lỗi "Kinh Điển" Đã Fix (Kinh Nghiệm Thực Chiến)
 
-Sửa lỗi chữ nhỏ và hiển thị nhầm trạng thái tải dữ liệu (...Đang lấy dữ liệu) khi đã tải xong.
-
-Tăng độ tương phản, sử dụng mã màu chữ đậm rõ ràng, giúp thông tin dễ đọc hơn.
-
-Xử lý triệt để lỗi tràn chữ và vỡ bố cục (Responsive & Layout Overflow):
-
-Thêm các thuộc tính chống tràn chữ (truncate, break-words, break-all) cho phần hiển thị Họ tên và Email ở cột bên trái.
-
-Đảm bảo giao diện không bao giờ bị đè chữ hoặc chọc thủng layout kể cả khi người dùng cố tình nhập chuỗi ký tự siêu dài không có khoảng trắng.
-
-## 🇬🇧 English
-### 🛠️ Today's Changes & Fixes:
-Restructured Departments & Positions:
-
-Set up the new organizational list: Technical & Materials Department, Investment Department, Traffic Mechanical Enterprise, Board of General Directors, Finance Department.
-
-Implemented dynamic position filtering (Cascading Dropdown) per unit (e.g., Board of Directors only shows Chairman, General Director, Deputy GD; other departments show Head/Deputy Head, Staff).
-
-Fixed React Hook Warning (ESLint):
-
-Resolved the react-hooks/exhaustive-deps warning within the auto-sync position useEffect by providing the complete dependencies array (watch, setValue).
-
-Optimized Left Sidebar Profile UI:
-
-Fixed micro-text size and wrong loading-text fallback issues (...Loading data) after API fetched successfully.
-
-Increased text contrast and applied clearer, bolder slate colors for enhanced readability.
-
-Resolved Layout Overflow & Text Wrapping Issues:
-
-Applied CSS truncation and breaking properties (truncate, break-words, break-all) to the Full Name and Email fields in the left sidebar.
-
-Ensured the layout remains perfectly intact and never breaks, even when processing extremely long, continuous strings with no spaces.
-----
+### 1. Lỗi Cú Pháp Database (Mongoose vs SQL)
+* **Triệu chứng:** Code chạy đến bước tìm User thì đứng im, không log ra các bước tiếp theo.
+* **Nguyên nhân:** Viết nhầm cú pháp `{ where: { id: userId } }` của TypeORM/Sequelize vào dự án đang chạy **Mongoose (MongoDB)**.
+* **Giải quyết:** Sửa lại thành cú pháp chuẩn của Mongoose để tìm đúng bản ghi:
+  ```typescript
+  const user = await this.userModel.findById(userId).select('+passwordHash');

@@ -8,12 +8,17 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { _QueryFilter, Model } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { adminDTO } from '../auth/dto/adminDTO';
 import { getMeDTO } from '../auth/dto/getMeDTO';
+import { ResetPasswordDTO } from '../auth/dto/ResetPasswordDTO';
 
 @Injectable()
 export class UsersService {
@@ -133,7 +138,7 @@ export class UsersService {
     return updatedUser;
   }
 
-  async updateMe(id: string, meDto: getMeDTO): Promise<User> {
+  async updateMe(userId: string, meDto: getMeDTO): Promise<User> {
     const userData = {
       fullName: meDto.fullName,
       email: meDto.email,
@@ -148,7 +153,7 @@ export class UsersService {
     };
     const updatedUser = await this.userModel
       .findByIdAndUpdate(
-        id,
+        userId,
         { $set: userData }, // Sử dụng $set để đảm bảo chỉ cập nhật các field được gửi lên
         {
           returnDocument: 'after', // Trả về bản ghi SAU KHI đã cập nhật (mặc định là trả về bản ghi cũ)
@@ -159,7 +164,72 @@ export class UsersService {
 
     // 2. Kiểm tra nếu không tìm thấy
     if (!updatedUser) {
-      throw new NotFoundException(`Không tồn tại user với id: ${id}`);
+      throw new NotFoundException(`Không tồn tại user với id: ${userId}`);
+    }
+
+    return updatedUser;
+  }
+
+  async updateMeReset(userId: string, meDto: ResetPasswordDTO): Promise<User> {
+    // 1. Kiểm tra mật khẩu mới và mật khẩu xác nhận
+    if (meDto.newPassword !== meDto.confirmPassword) {
+      throw new BadRequestException('Mật khẩu xác nhận không trùng khớp!');
+    }
+
+    // 2. Tìm User trong DB bằng userId
+
+    const user = await this.userModel.findById(userId).select('+passwordHash');
+    if (!user) {
+      throw new NotFoundException('Không tìm thấy tài khoản người dùng!');
+    }
+    // 3. Lấy chuỗi mật khẩu băm
+
+    const currentPasswordHash = user.passwordHash || '';
+    // 4. Kiểm tra tính chính xác của mật khẩu hiện tại
+    const isMatch = await bcrypt.compare(
+      meDto.currentPassword,
+      currentPasswordHash,
+    );
+
+    if (!isMatch) {
+      throw new BadRequestException('Mật khẩu hiện tại không chính xác!');
+    }
+
+    // 5. Kiểm tra mật khẩu mới không được giống mật khẩu cũ
+    const isSameAsOld = await bcrypt.compare(
+      meDto.newPassword,
+      currentPasswordHash,
+    );
+
+    if (isSameAsOld) {
+      throw new BadRequestException(
+        'Mật khẩu mới không được trùng với mật khẩu hiện tại!',
+      );
+    }
+    // 6. Mã hóa mật khẩu mới
+
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(meDto.newPassword, saltRounds);
+
+    // 7. Cập nhật thẳng vào SQL Database
+    const userData = {
+      passwordHash: hashedNewPassword,
+    };
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(
+        userId,
+        { $set: userData }, // Sử dụng $set để đảm bảo chỉ cập nhật các field được gửi lên
+        {
+          returnDocument: 'after', // Trả về bản ghi SAU KHI đã cập nhật (mặc định là trả về bản ghi cũ)
+          runValidators: true, // Đảm bảo các quy tắc Validate trong Schema vẫn được áp dụng
+        },
+      )
+      .exec();
+    console.log('------------7777-----------------');
+    console.log('------------7777-----------------');
+    // 2. Kiểm tra nếu không tìm thấy
+    if (!updatedUser) {
+      throw new NotFoundException(`Không tồn tại user với id: ${userId}`);
     }
 
     return updatedUser;

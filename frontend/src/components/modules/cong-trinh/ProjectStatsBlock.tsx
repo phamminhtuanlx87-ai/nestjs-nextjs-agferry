@@ -94,7 +94,7 @@ export default function ProjectStatsBlock({
 
         <SummaryCard
           color="bg-slate-700"
-          title="Đang thi công"
+          title="Đang thi công và nghiệm thu"
           value={stats.thiCong.current}
           change={stats.thiCong.change}
           progressbar={stats.thiCong.thiCongRatio}

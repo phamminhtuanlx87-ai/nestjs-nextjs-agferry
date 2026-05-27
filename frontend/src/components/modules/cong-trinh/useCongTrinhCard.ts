@@ -34,11 +34,20 @@ export const useCongTrinhCard = ({
     // Hàm helper dùng chung để kiểm tra xem một công trình có thuộc tháng/năm cụ thể hay không
     const isProjectInTime = (
       createdAt: string | Date,
-      month: number,
-      year: number,
+      month: number | string,
+      year: number | string,
     ) => {
+      if (!createdAt) return false;
+
       const date = new Date(createdAt);
-      return date.getMonth() + 1 === month && date.getFullYear() === year;
+      if (isNaN(date.getTime())) return false;
+
+      // Ép kiểu về Number để tránh lỗi so sánh khác kiểu dữ liệu
+      const projectMonth = date.getMonth() + 1;
+      const projectYear = date.getFullYear();
+
+      // Kiểm tra: Thuộc cùng năm VÀ tháng phải từ Tháng 1 đến Tháng được chọn
+      return projectYear === +year && projectMonth <= +month;
     };
 
     // Hàm helper tính toán phần trăm/số lượng chênh lệch dạng hiển thị (+1, -2, 0)
@@ -54,10 +63,10 @@ export const useCongTrinhCard = ({
 
     // --- CARD 1: TỔNG CÔNG TRÌNH ---
     const currentTotal = dsCongTrinh.filter((e) =>
-      isProjectInTime(e.createdAt, selectedMonth, selectedYear),
+      isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear),
     ).length;
     const lastTotal = dsCongTrinh.filter((e) =>
-      isProjectInTime(e.createdAt, prevMonth, prevYear),
+      isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear),
     ).length;
 
     // ==========================================
@@ -81,6 +90,7 @@ export const useCongTrinhCard = ({
       const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
 
       // Kiểm tra mã hiệu cuối cùng có phải là "TC" hoặc "NT" không
+
       return MA_THI_CONG_NT.includes(lastMaHieu);
     }).length;
 
@@ -97,7 +107,7 @@ export const useCongTrinhCard = ({
     // ==========================================
     const currentQuyetToan = dsCongTrinh.filter((e) => {
       const isInTime = isProjectInTime(
-        e.createdAt,
+        e.ngay_tao_du_an,
         selectedMonth,
         selectedYear,
       );
@@ -110,7 +120,7 @@ export const useCongTrinhCard = ({
     }).length;
 
     const lastQuyetToan = dsCongTrinh.filter((e) => {
-      const isInTime = isProjectInTime(e.createdAt, prevMonth, prevYear);
+      const isInTime = isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear);
       if (!isInTime || !e.giai_doan) return false;
 
       const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
@@ -120,12 +130,12 @@ export const useCongTrinhCard = ({
     // (Bạn hãy check lại mã hiệu viết tắt của Hoàn thành trong DB của bạn xem có phải "HT" không nhé)
     const currentHoanThanh = dsCongTrinh.filter(
       (e) =>
-        isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
+        isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear) &&
         e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu,
     ).length;
     const lastHoanThanh = dsCongTrinh.filter(
       (e) =>
-        isProjectInTime(e.createdAt, prevMonth, prevYear) &&
+        isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear) &&
         e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu,
     ).length;
     // --- Tìm đến phần return ở cuối useMemo của file useProjectStats.ts ---
@@ -148,7 +158,7 @@ export const useCongTrinhCard = ({
 
       // Lấy danh sách các mốc timestamp updatedAt
       const timestamps = filteredProjects.map((e) =>
-        new Date(e.updatedAt || e.createdAt).getTime(),
+        new Date(e.updatedAt || e.ngay_tao_du_an).getTime(),
       );
 
       // Tìm timestamp lớn nhất (gần nhất với hiện tại)
@@ -164,13 +174,13 @@ export const useCongTrinhCard = ({
 
     // 1. Nhóm Tổng công trình
     const totalProjectsThangNay = dsCongTrinh.filter((e) =>
-      isProjectInTime(e.createdAt, selectedMonth, selectedYear),
+      isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear),
     );
 
     // 2. Nhóm Đang thi công
     const thiCongThangNay = dsCongTrinh.filter(
       (e) =>
-        isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
+        isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear) &&
         e.giai_doan
           ?.at(-1)
           ?.ma_hieu.includes(
@@ -181,7 +191,7 @@ export const useCongTrinhCard = ({
     // 3. Nhóm Đang quyết toán
     const quyetToanThangNay = dsCongTrinh.filter(
       (e) =>
-        isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
+        isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear) &&
         e.giai_doan
           ?.at(-1)
           ?.ma_hieu.includes(
@@ -194,7 +204,7 @@ export const useCongTrinhCard = ({
     // 4. Nhóm Hoàn thành
     const hoanThanhThangNay = dsCongTrinh.filter(
       (e) =>
-        isProjectInTime(e.createdAt, selectedMonth, selectedYear) &&
+        isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear) &&
         e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu,
     );
     // 2. Trả về object chứa đầy đủ cấu trúc dữ liệu sạch cho UI sử dụng

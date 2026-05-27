@@ -1,10 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 // DTO nhỏ cho File đính kèm
 class DepartmentDto {
@@ -28,10 +23,6 @@ export class getMeDTO {
   @IsString()
   @IsNotEmpty()
   email: string;
-
-  @IsBoolean()
-  @ValidateNested()
-  isActive: boolean;
 
   @IsNotEmpty()
   @ValidateNested()
