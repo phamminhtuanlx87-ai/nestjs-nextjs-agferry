@@ -43,7 +43,7 @@ export default function ProjectStatsBlock({
             Hệ thống quản lý Công trình/Dự án
           </div>
           <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
-            Tổng quan dự án năm{" "}
+           Công trình và dự án năm{" "}
             <span className="text-blue-600">{selectedYear}</span>
           </h1>
           <p className="text-slate-500 text-sm mt-1">

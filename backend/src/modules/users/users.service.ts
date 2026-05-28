@@ -225,8 +225,6 @@ export class UsersService {
         },
       )
       .exec();
-    console.log('------------7777-----------------');
-    console.log('------------7777-----------------');
     // 2. Kiểm tra nếu không tìm thấy
     if (!updatedUser) {
       throw new NotFoundException(`Không tồn tại user với id: ${userId}`);
@@ -307,6 +305,22 @@ export class UsersService {
     return await this.userModel
       .find(filter) // Truyền filter động vào đây
       .sort({ updatedAt: -1 })
+      .select('-permissions -__v')
+      .exec();
+  }
+
+  async getUser(username: string): Promise<UserDocument[]> {
+    console.log(`Chay GetAllUser với chế độ: ${username}`);
+
+    // 1. Khởi tạo query object mặc định trống (tương đương với 'all')
+    const filter: _QueryFilter<UserDocument> = {};
+    filter.userName = username;
+
+    // Nếu mode === 'all', filter giữ nguyên là {} (lấy hết cả true và false)
+
+    // 3. Thực thi query DB
+    return await this.userModel
+      .find(filter) // Truyền filter động vào đây
       .select('-permissions -__v')
       .exec();
   }

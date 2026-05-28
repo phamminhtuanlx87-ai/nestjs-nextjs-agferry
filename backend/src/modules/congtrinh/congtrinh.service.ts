@@ -68,7 +68,6 @@ export class CongtrinhService {
         $lt: endDate, // Nhỏ hơn ngày đầu tháng sau
       };
     }
-    console.log('chay findAll', query);
     return await this.congTrinhModel
       .find(query)
       .sort({ updatedAt: -1 })

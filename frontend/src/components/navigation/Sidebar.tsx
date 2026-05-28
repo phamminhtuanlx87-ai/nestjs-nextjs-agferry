@@ -13,14 +13,14 @@ const menuItems = [
   { name: "Quản lý vật tư", href: "/vat-tu", icon: "📦" },
   { name: "Tua chuyến", href: "/tua-chuyen", icon: "⛴️" },
   { name: "Doanh thu / Lợi nhuận", href: "/doanh-thu", icon: "💰" },
-  { name: "Nhân viên", href: "/nhan-vien", icon: "👥" },
+  { name: "Người dùng", href: "/nhan-vien", icon: "👥", requiredRole: "ADMIN" },
   // { name: "Báo cáo", href: "/bao-cao", icon: "📊" },
   // { name: "Cài đặt", href: "/cai-dat", icon: "⚙️" },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
   const onClickHandler = () => {
     logout();
   };
@@ -39,19 +39,28 @@ export default function Sidebar() {
           </div>
           <h1 className="text-lg font-bold">An Giang Ferry JSC</h1>
         </div>
-        <h2 className="h-14 flex items-center justify-between px-4 border-b border-white/20 text-lg font-semibold cursor-pointer hover:text-accent transition">
+        {/* <h2 className="h-14 flex items-center justify-between px-4 border-b border-white/20 text-lg font-semibold cursor-pointer hover:text-accent transition">
           Bảng điều khiển
-        </h2>
+        </h2> */}
       </div>
 
       <nav className="flex-1 p-2 space-y-2">
-        {menuItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`
+        {menuItems
+          .filter((item) => {
+            // Nếu mục menu yêu cầu quyền ADMIN, kiểm tra xem user.role có phải ADMIN không
+            if (item.requiredRole === "ADMIN") {
+              return user?.role === "ADMIN";
+            }
+            // Các mục khác không yêu cầu quyền thì luôn hiển thị
+            return true;
+          })
+          .map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`
                 flex items-center space-x-3 p-3 rounded-lg transition-all
                 ${
                   isActive
@@ -59,12 +68,12 @@ export default function Sidebar() {
                     : " text-white dark:text-gray-400 hover:bg-accent dark:hover:bg-gray-800"
                 }
               `}
-            >
-              <span>{item.icon}</span>
-              <span>{item.name}</span>
-            </Link>
-          );
-        })}
+              >
+                <span>{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
         <hr className="border-0 h-px bg-gray-300 opacity-30 shadow-md my-6" />
         <Link
           className="px-3 py-2 rounded hover:bg-accent flex gap-2 items-center justify-start cursor-pointer"

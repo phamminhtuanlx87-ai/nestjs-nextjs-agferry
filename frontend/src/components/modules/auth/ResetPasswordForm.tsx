@@ -6,14 +6,20 @@ import { useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { alertService } from "@/utils/swal";
-import { changePasswordService, ResetPasswordValues } from "@/services/authService";
+import {
+  changePasswordService,
+  ResetPasswordValues,
+} from "@/services/authService";
 
 interface ResetPasswordFormProps {
-  isModal?: boolean;          // Sử dụng như một Modal hoặc một trang độc lập
-  onSuccess?: () => void;     // Callback xử lý sau khi đổi thành công
+  isModal?: boolean; // Sử dụng như một Modal hoặc một trang độc lập
+  onSuccess?: () => void; // Callback xử lý sau khi đổi thành công
 }
 
-export default function ResetPasswordForm({ isModal = false, onSuccess }: ResetPasswordFormProps) {
+export default function ResetPasswordForm({
+  isModal = false,
+  onSuccess,
+}: ResetPasswordFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -38,31 +44,42 @@ export default function ResetPasswordForm({ isModal = false, onSuccess }: ResetP
   const onSubmit = async (data: ResetPasswordValues) => {
     try {
       setIsSubmitting(true);
-      console.log(data);
+      const payload = {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+        confirmPassword: data.confirmPassword,
+      };
+      console.log(payload);
       // Giả lập gọi API đổi mật khẩu (Thay thế bằng hàm dịch vụ thực tế của bạn)
-      await changePasswordService(data);
-      
+      await changePasswordService(payload);
+
       alertService.success("Thay đổi mật khẩu bảo mật thành công!");
       reset(); // Xóa sạch dữ liệu form sau khi thành công
-      
+
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error("Lỗi đổi mật khẩu:", error);
-      alertService.error("Có lỗi xảy ra, vui lòng kiểm tra lại mật khẩu hiện tại.");
+      alertService.error(
+        "Có lỗi xảy ra, vui lòng kiểm tra lại mật khẩu hiện tại.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form 
-      onSubmit={handleSubmit(onSubmit)} 
+    <form
+      onSubmit={handleSubmit(onSubmit)}
       className={`space-y-4 w-full ${isModal ? "" : "max-w-md mx-auto p-6 bg-white border border-slate-200/80 rounded-xl shadow-sm"}`}
     >
       {!isModal && (
         <div className="pb-2 border-b border-slate-100">
-          <h2 className="text-base font-bold text-slate-900 tracking-tight">Cập nhật bảo mật</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Vui lòng nhập mật khẩu hiện tại và mật khẩu mới để thay đổi.</p>
+          <h2 className="text-base font-bold text-slate-900 tracking-tight">
+            Cập nhật bảo mật
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Vui lòng nhập mật khẩu hiện tại và mật khẩu mới để thay đổi.
+          </p>
         </div>
       )}
 
@@ -112,7 +129,8 @@ export default function ResetPasswordForm({ isModal = false, onSuccess }: ResetP
           {...register("confirmPassword", {
             required: "Vui lòng nhập lại mật khẩu mới",
             validate: (value) =>
-              value === watchedNewPassword || "Mật khẩu xác nhận không trùng khớp!",
+              value === watchedNewPassword ||
+              "Mật khẩu xác nhận không trùng khớp!",
           })}
           error={errors.confirmPassword?.message}
         />

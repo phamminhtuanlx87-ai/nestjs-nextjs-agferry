@@ -21,6 +21,11 @@ export const Guard: React.FC<GuardProps> = ({ requiredPermission, children, fall
 
   // Ghi nhớ quyền để tránh re-render liên tục gây lag
   const hasPermission = useMemo(() => {
+    if (!user) return false;
+
+    // 1. KIỂM TRA TRẠNG THÁI HOẠT ĐỘNG TRƯỚC (Ưu tiên số 1)
+    if (user.isActive === false) return false;
+    
     if (!user || !user.permissions) return false;
     return user.permissions.includes(requiredPermission);
   }, [user, requiredPermission]);

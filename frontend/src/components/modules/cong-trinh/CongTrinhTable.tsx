@@ -30,11 +30,10 @@ export default function CongTrinhTable({
   const end = start + rowsPerPage;
   const totalItems = dsCongTrinh?.length;
   const totalPages = Math.ceil(Number(totalItems) / rowsPerPage);
+
   function renderStatus(statusId: string) {
     const status = projectStatusMap[statusId];
-
     if (!status) return null;
-
     return (
       <span
         className={`inline-flex items-center justify-center min-w-28 px-3 py-1 text-xs font-medium rounded-full ${status.color}`}
@@ -156,7 +155,7 @@ export default function CongTrinhTable({
                   <Button
                     type="button"
                     className="p-2 rounded-lg text-indigo-600 bg-white hover:bg-indigo-300 transition-colors"
-                      onClick={() => {
+                    onClick={() => {
                       const targetId = project._id;
                       router.push(`/cong-trinh/${targetId}/view`);
                     }}

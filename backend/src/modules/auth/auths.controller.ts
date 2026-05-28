@@ -21,6 +21,7 @@ import { UserRole } from '../users/constants/user.constants';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { getMeDTO } from './dto/getMeDTO';
 import { ResetPasswordDTO } from './dto/ResetPasswordDTO';
+import { RolesGuard } from './guards/roles.guard';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -107,9 +108,9 @@ export class AuthController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Patch(':id/admin')
+  @Patch(':id/update')
   async updateAdmin(@Param('id') id: string, @Body() updateMeDto: adminDTO) {
     const result = await this.usersService.updateAdmin(id, updateMeDto);
     return {
@@ -119,9 +120,9 @@ export class AuthController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Patch(':id/admin/toggle')
+  @Patch(':id/toggle')
   async toggleActive(@Param('id') id: string) {
     const result = await this.usersService.toggleActive(id);
     return {
@@ -131,11 +132,23 @@ export class AuthController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Get('/admin/:mode')
+  @Get('/:mode')
   async getAllUser(@Param('mode') mode: 'all' | 'active' | 'inactive') {
     const result = await this.usersService.getAllUser(mode);
+    return {
+      statusCode: 200,
+      message: 'Lấy danh sách thành viên thành công!', // Sửa lại message
+      data: result,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('/:username')
+  async getSser(@Param('username') username: string) {
+    const result = await this.usersService.getUser(username);
     return {
       statusCode: 200,
       message: 'Lấy danh sách thành viên thành công!', // Sửa lại message

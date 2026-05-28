@@ -76,6 +76,58 @@ JWT_EXPIRE=1d
 PORT=3000
 ```
 ---
+# Đọc bản Tiếng Việt 🇻🇳
+## 📝 Nhật ký cập nhật - Ngày 28/05/2026
+Hôm nay, dự án đã được tập trung tối ưu hóa hiệu năng React Hooks, chuẩn hóa kiểu dữ liệu TypeScript và dọn dẹp các cảnh báo từ ESLint để đảm bảo mã nguồn sạch sẽ, mượt mà.
+
+## 🛠️ Các hạng mục đã thực hiện:
+Tối ưu hóa useMeForm Hook (/me page):
+
+Sửa lỗi vòng lặp re-render vô hạn (Infinite Loop) ở logic tự động cập nhật Chức vụ (Position) theo Đơn vị (Department).
+
+Thay thế biến theo dõi trạng thái watchedPositions bằng hàm getValues("positions") của thư viện react-hook-form nhằm ngắt kết nối subscribe state không cần thiết, giúp component chạy mượt mà đúng 1 chu kỳ.
+
+Sử dụng useRef (isInitialLoaded) để chặn việc ghi đè dữ liệu gốc của User ngay khi vừa tải dữ liệu từ API thành công.
+
+Giải quyết triệt để cảnh báo nghiêm ngặt của ESLint đối với quy tắc react-hooks/exhaustive-deps.
+
+Chuẩn hóa Trang Quản lý Nhân viên (app/(dashboard)/nhan-vien/page.tsx):
+
+Sửa lỗi gạch chân đỏ TypeScript (Type 'IUsers' is not assignable to type 'SetStateAction<IUsers[]>'). Chuyển đổi linh hoạt dữ liệu trả về từ API thành dạng mảng an toàn trước khi gán vào State.
+
+Khởi tạo State với một mảng rỗng ([]) thay vì bỏ trống, giải quyết hoàn toàn lỗi undefined truyền vào component bảng.
+
+Khắc phục lỗi ép kiểu bắt buộc thuộc tính hệ thống key tại thẻ <UserTable />.
+
+Gộp các hàm fetch data lồng nhau thừa thãi thành một useEffect duy nhất chạy khi mount trang. Dọn dẹp hoàn toàn các biến không sử dụng (useCallback, loading).
+
+# Read in English 🇺🇸
+## 📝 Update Log - May 28, 2026
+Today's focus was on optimizing React Hooks performance, strict TypeScript type checking, and resolving critical ESLint warnings to guarantee a clean and efficient codebase.
+
+## 🛠️ Key Accomplishments:
+Optimized useMeForm Hook (/me page):
+
+Fixed the infinite re-rendering loop caused by the automatic Position update logic when the Department changes.
+
+Replaced the dynamic state subscription watchedPositions with getValues("positions") from react-hook-form to read data instantly without subscribing, cutting down redundant re-renders.
+
+Implemented useRef (isInitialLoaded) to prevent the form from overriding the user's fetched profile data during the initial hydration.
+
+Completely resolved the strict react-hooks/exhaustive-deps ESLint rule.
+
+Standardized Employee Management Page (app/(dashboard)/nhan-vien/page.tsx):
+
+Resolved the TypeScript compiler error (Type 'IUsers' is not assignable to type 'SetStateAction<IUsers[]>') by safely structuring the incoming single/paginated API response into a validated array block.
+
+Initialized the users state with an empty array ([]) to prevent downstream undefined type errors inside the table card.
+
+Fixed the constraint conflict caused by the required system attribute key prop mismatch in the <UserTable /> component interface.
+
+Cleaned up redundant nested fetch functions into a single mounted useEffect, wiping out all unused definitions (useCallback, loading).
+
+
+---
 # 📅 Tiến độ & Roadmap
 # 🛠️ Nhật Ký Debug & Hoàn Thiện Tính Năng Đổi Mật Khẩu (27/05/2026)
 

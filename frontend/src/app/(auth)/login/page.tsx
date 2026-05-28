@@ -38,7 +38,7 @@ export default function LoginPage() {
   // 2. Nếu đã nạp xong và có user, đẩy đi ngay
   useEffect(() => {
     if (isHydrated && user) {
-      router.replace("/cong-trinh");
+      router.replace("/tong-quan");
     }
   }, [isHydrated, user, router]);
 

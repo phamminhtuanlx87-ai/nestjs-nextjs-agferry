@@ -47,9 +47,26 @@ export class AuthService {
           this.configService.get<string>('JWT_REFRESH_SECRET') ||
           this.configService.get<string>('JWT_SECRET'),
       });
+      // ==================== BƯỚC CHÈN THÊM ĐỂ CẬP NHẬT TRẠNG THÁI ====================
+      const userId = payload.sub;
+      const user = await this.usersService.findOne(userId as string);
+      // CHỐT CHẶN BẢO MẬT: Nếu tài khoản bị xóa hoặc Admin đã đổi isActive thành false
+      if (!user || user.isActive === false) {
+        throw new UnauthorizedException(
+          'Tài khoản của bạn đã bị khóa hoặc ngừng hoạt động!',
+        );
+      }
+      // Chuẩn bị một cái Payload MỚI, cập nhật chính xác trạng thái từ DB vừa lấy được
+      const newPayload = {
+        sub: (user as any)._id,
+        userName: user.userName,
+        role: user.role,
+        isActive: user.isActive, // Luôn luôn là true mới được đi tiếp
+      };
+      // =============================================================================
 
       // 2. Nếu ok, tạo cặp Token mới
-      return this.generateTokens(payload);
+      return this.generateTokens(newPayload);
     } catch {
       throw new UnauthorizedException(
         'Phiên làm việc đã kết thúc, vui lòng đăng nhập lại',
@@ -88,6 +105,7 @@ export class AuthService {
       sub: user._id,
       userName: user.userName,
       role: user.role,
+      isActive: user.isActive,
     };
     const tokens = await this.generateTokens(payload);
     return {
@@ -99,6 +117,7 @@ export class AuthService {
         fullName: user.fullName,
         role: user.role,
         permissions: user.permissions,
+        isActive: user.isActive,
       },
     };
   }

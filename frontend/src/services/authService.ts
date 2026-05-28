@@ -1,3 +1,4 @@
+import { IUser } from "@/components/modules/nhan-vien/UserTable";
 import api from "@/lib/axios";
 
 export interface LoginFormData {
@@ -97,4 +98,9 @@ export async function changePasswordService(userData: ResetPasswordValues) {
     "/auth/me/reset",
     userData,
   );
+}
+
+export async function getAllUsers(): Promise<IUser[]> {
+  const response = await api.get<BackendResponse<IUser[]>>("/auth/all");
+  return response.data.data; // Trả thẳng object user chứa role và permissions
 }

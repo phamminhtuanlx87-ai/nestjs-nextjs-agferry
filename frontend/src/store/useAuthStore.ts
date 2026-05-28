@@ -23,6 +23,7 @@ export interface UserData {
   email: string;
   role: string;
   permissions: string[]; // Thêm trường này để đi kèm với thông tin User
+  isActive: boolean;
 }
 
 interface AuthState {
@@ -58,7 +59,11 @@ export const useAuthStore = create<AuthState>()(
       hasPermission: (permissionValue) => {
         // Log này giúp bạn nhìn thấy cấu trúc thực tế của user.permissions trên tab Console trình duyệt
         const user = get().user;
+        if (!user) return false;
 
+        // 1. KIỂM TRA TRẠNG THÁI HOẠT ĐỘNG TRƯỚC (Ưu tiên số 1)
+        if (user.isActive === false) return false;
+        
         if (!user || !user.permissions) return false;
         const result = user.permissions.includes(permissionValue);
         return result;
