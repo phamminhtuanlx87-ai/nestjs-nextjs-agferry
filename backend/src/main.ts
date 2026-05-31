@@ -10,7 +10,7 @@ async function bootstrap() {
   app.enableCors({
     origin:
       process.env.NODE_ENV === 'production'
-        ? [process.env.FRONTEND_URL, 'https://nestjs-nextjs-agferry.vercel.app'] // Điền link Next.js production của bạn vào đây
+        ? [process.env.FRONTEND_URL, 'https://phaangiang.vercel.app/'] // Điền link Next.js production của bạn vào đây
         : 'http://localhost:3001', // Khi chạy ở máy local
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,

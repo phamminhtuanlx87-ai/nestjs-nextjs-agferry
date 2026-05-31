@@ -100,7 +100,16 @@ export async function changePasswordService(userData: ResetPasswordValues) {
   );
 }
 
-export async function getAllUsers(): Promise<IUser[]> {
-  const response = await api.get<BackendResponse<IUser[]>>("/auth/all");
+export async function getAllUsers(
+  mode: "all" | "active" | "inactive",
+): Promise<IUser[]> {
+  const response = await api.get<BackendResponse<IUser[]>>(`/auth/${mode}`);
+  return response.data.data; // Trả thẳng object user chứa role và permissions
+}
+
+export async function toggleActive(id: string): Promise<IUser[]> {
+  const response = await api.patch<BackendResponse<IUser[]>>(
+    `/auth/${id}/toggle`,
+  );
   return response.data.data; // Trả thẳng object user chứa role và permissions
 }

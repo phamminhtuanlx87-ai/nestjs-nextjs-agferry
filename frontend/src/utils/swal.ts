@@ -40,7 +40,11 @@ export const alertService = {
   },
 
   // Hộp thoại xác nhận xóa (Custom cho đẹp như yêu cầu trước của bạn)
-  confirmDelete: async ({ title = "Cảnh báo", itemCode = "", itemName = "" }) => {
+  confirmDelete: async ({
+    title = "Cảnh báo",
+    itemCode = "",
+    itemName = "",
+  }) => {
     return Swal.fire({
       title: `<span style="font-size: 20px; font-weight: 600; color: #1a202c;">${title}</span>`,
       html: `
@@ -63,6 +67,61 @@ export const alertService = {
       reverseButtons: true,
       customClass: {
         popup: "rounded-2xl", // Bo góc xịn xò
+      },
+    });
+  },
+
+  confirmToggleActive: async ({
+    title = "Xác nhận thao tác",
+    itemCode = "",
+    itemName = "",
+  }) => {
+    // 1. Kiểm tra xem hành động hiện tại có phải là khóa/ngừng hoạt động hay không
+    const isDeactivating =
+      itemCode.toLowerCase().includes("ngừng") ||
+      title.toLowerCase().includes("ngừng");
+
+    // 2. Cấu hình màu sắc mạnh mẽ, độ tương phản cực cao
+    const themeColor = isDeactivating ? "#dc2626" : "#059669"; // Đỏ rực rỡ (Red 600) hoặc Xanh lá đậm (Green 600)
+    const bgColor = isDeactivating ? "#fef2f2" : "#f0fdf4"; // Nền hồng nhạt hoặc Nền xanh khóa nhạt
+    const borderColor = isDeactivating ? "#fca5a5" : "#86efac"; // Viền đỏ hồng hoặc Viền xanh lá
+
+    // 3. Tách chữ "người dùng..." ra khỏi tiêu đề gốc để làm sạch giao diện dòng trên cùng
+    const cleanTitle = title.split("người dùng")[0].trim();
+
+    return Swal.fire({
+      // Tiêu đề ngắn gọn, chữ to rõ ràng
+      title: `<div style="font-size: 24px; font-weight: 800; color: ${themeColor}; line-height: 1.3; letter-spacing: -0.5px;">${cleanTitle}</div>`,
+      html: `
+      <div style="text-align: center; font-family: system-ui, -apple-system, sans-serif; padding: 10px 5px 0 5px;">
+        <p style="color: #475569; font-size: 15px; margin-bottom: 20px; font-weight: 500;">
+          Bạn có chắc chắn muốn thực hiện hành động này hệ thống?
+        </p>
+        
+        <div style="background-color: ${bgColor}; border: 2px solid ${borderColor}; border-radius: 16px; padding: 18px 14px; display: inline-block; width: 90%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <div style="font-size: 12px; color: ${isDeactivating ? "#b91c1c" : "#047857"}; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">
+            TÀI KHOẢN CHỊU THAO TÁC
+          </div>
+          <div style="color: #0f172a; font-size: 22px; font-weight: 800; line-height: 1.2;">
+            ${itemName}
+          </div>
+        </div>
+
+        <p style="font-size: 13px; color: #64748b; margin-top: 20px; font-weight: 500;">
+          ⚠️ Trạng thái làm việc của nhân sự sẽ thay đổi ngay lập tức.
+        </p>
+      </div>
+    `,
+      // 🌟 THAY ĐỔI BIỂU TƯỢNG: Ngừng hoạt động hiện dấu X đỏ (error), Kích hoạt hiện dấu (success/info)
+      icon: isDeactivating ? "error" : "success",
+      showCancelButton: true,
+      confirmButtonColor: themeColor,
+      cancelButtonColor: "#64748b",
+      confirmButtonText: "Xác nhận ngay",
+      cancelButtonText: "Quay lại",
+      reverseButtons: true,
+      customClass: {
+        popup: "rounded-3xl shadow-2xl border border-slate-100", // Tăng độ bo góc mềm mại và đổ bóng sâu
       },
     });
   },

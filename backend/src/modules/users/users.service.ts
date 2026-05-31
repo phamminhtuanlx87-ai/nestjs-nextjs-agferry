@@ -291,8 +291,7 @@ export class UsersService {
     console.log(`Chay GetAllUser với chế độ: ${mode}`);
 
     // 1. Khởi tạo query object mặc định trống (tương đương với 'all')
-    const filter: _QueryFilter<UserDocument> = {};
-
+    const filter: _QueryFilter<UserDocument> = { userName: { $ne: 'admin' } };
     // 2. Thay đổi filter dựa theo mode
     if (mode === 'active') {
       filter.isActive = true;
