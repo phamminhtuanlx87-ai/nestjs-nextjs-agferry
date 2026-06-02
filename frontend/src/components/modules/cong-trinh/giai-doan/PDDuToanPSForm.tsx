@@ -112,6 +112,7 @@ export default function PDDuToanPSForm({ stage }: Props) {
 
                   <SelectField
                     label="Đơn vị"
+                    defaultValue={OPTIONS_DU_TOAN[0].value}
                     options={OPTIONS_DU_TOAN}
                     {...register(`giai_doan.7.ma_don_vi`, {
                       required: !pddtps.isDisabled

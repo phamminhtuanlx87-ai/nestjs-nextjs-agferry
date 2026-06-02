@@ -37,6 +37,7 @@ export class UsersController {
   // Chỉ Admin mới được dùng API này
   @Post()
   adminCreate(@Body() createUserDto: CreateUserDto) {
+    console.log('Admin đang tạo người dùng mới:', createUserDto);
     return this.userService.create(createUserDto, false);
   }
 
@@ -51,7 +52,13 @@ export class UsersController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.userService.update(id, updateUserDto);
+    console.log(`Cập nhật người dùng ID ${id} với dữ liệu:`, updateUserDto);
+    const updatedUser = await this.userService.update(id, updateUserDto);
+    return {
+      statusCode: 200,
+      message: `Cập nhật người dùng thành công, UrerID${id}`,
+      data: { updatedUser },
+    };
   }
 
   @Patch(':id/toggle')

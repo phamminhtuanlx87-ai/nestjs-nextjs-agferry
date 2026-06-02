@@ -29,6 +29,14 @@ export class UsersService {
     isPublicRegister: boolean = false,
   ): Promise<User> {
     // 1. Ép Role nếu là đăng ký công khai
+
+    const existingUser = await this.userModel
+      .findOne({ userName: createUserDto.userName })
+      .exec();
+    if (existingUser) {
+      throw new BadRequestException('Tên người dùng đã tồn tại');
+    }
+
     if (isPublicRegister) {
       createUserDto.role = UserRole.GUEST;
       // Xóa permissions nếu khách cố tình gửi lên để đảm bảo an toàn
@@ -104,8 +112,7 @@ export class UsersService {
 
     // 5. Gộp dữ liệu - SỬ DỤNG DESTRUCTURING ĐỂ LOẠI BỎ TRƯỜNG THỪA
     // Cách này giúp bạn không cần dùng lệnh delete (userData as any).departmentId;
-    const { departmentId, positionId, ...rest } = updateUserDto;
-    console.log(departmentId, positionId, rest);
+    const { ...rest } = updateUserDto;
     const userData = {
       ...rest, // Chứa các trường còn lại (userName, fullName, role, permissions...)
       role,

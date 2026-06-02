@@ -76,77 +76,43 @@ JWT_EXPIRE=1d
 PORT=3000
 ```
 ---
-# Đọc bản Tiếng Việt 🇻🇳
-## 📝 Nhật ký cập nhật - Ngày 28/05/2026
-Hôm nay, dự án đã được tập trung tối ưu hóa hiệu năng React Hooks, chuẩn hóa kiểu dữ liệu TypeScript và dọn dẹp các cảnh báo từ ESLint để đảm bảo mã nguồn sạch sẽ, mượt mà.
+# 🚀 Nhật Ký Cập Nhật Dự Án - Quản Lý Cấp Tài Khoản Nhân Viên
 
-## 🛠️ Các hạng mục đã thực hiện:
-Tối ưu hóa useMeForm Hook (/me page):
-
-Sửa lỗi vòng lặp re-render vô hạn (Infinite Loop) ở logic tự động cập nhật Chức vụ (Position) theo Đơn vị (Department).
-
-Thay thế biến theo dõi trạng thái watchedPositions bằng hàm getValues("positions") của thư viện react-hook-form nhằm ngắt kết nối subscribe state không cần thiết, giúp component chạy mượt mà đúng 1 chu kỳ.
-
-Sử dụng useRef (isInitialLoaded) để chặn việc ghi đè dữ liệu gốc của User ngay khi vừa tải dữ liệu từ API thành công.
-
-Giải quyết triệt để cảnh báo nghiêm ngặt của ESLint đối với quy tắc react-hooks/exhaustive-deps.
-
-Chuẩn hóa Trang Quản lý Nhân viên (app/(dashboard)/nhan-vien/page.tsx):
-
-Sửa lỗi gạch chân đỏ TypeScript (Type 'IUsers' is not assignable to type 'SetStateAction<IUsers[]>'). Chuyển đổi linh hoạt dữ liệu trả về từ API thành dạng mảng an toàn trước khi gán vào State.
-
-Khởi tạo State với một mảng rỗng ([]) thay vì bỏ trống, giải quyết hoàn toàn lỗi undefined truyền vào component bảng.
-
-Khắc phục lỗi ép kiểu bắt buộc thuộc tính hệ thống key tại thẻ <UserTable />.
-
-Gộp các hàm fetch data lồng nhau thừa thãi thành một useEffect duy nhất chạy khi mount trang. Dọn dẹp hoàn toàn các biến không sử dụng (useCallback, loading).
-
-# Read in English 🇺🇸
-## 📝 Update Log - May 28, 2026
-Today's focus was on optimizing React Hooks performance, strict TypeScript type checking, and resolving critical ESLint warnings to guarantee a clean and efficient codebase.
-
-## 🛠️ Key Accomplishments:
-Optimized useMeForm Hook (/me page):
-
-Fixed the infinite re-rendering loop caused by the automatic Position update logic when the Department changes.
-
-Replaced the dynamic state subscription watchedPositions with getValues("positions") from react-hook-form to read data instantly without subscribing, cutting down redundant re-renders.
-
-Implemented useRef (isInitialLoaded) to prevent the form from overriding the user's fetched profile data during the initial hydration.
-
-Completely resolved the strict react-hooks/exhaustive-deps ESLint rule.
-
-Standardized Employee Management Page (app/(dashboard)/nhan-vien/page.tsx):
-
-Resolved the TypeScript compiler error (Type 'IUsers' is not assignable to type 'SetStateAction<IUsers[]>') by safely structuring the incoming single/paginated API response into a validated array block.
-
-Initialized the users state with an empty array ([]) to prevent downstream undefined type errors inside the table card.
-
-Fixed the constraint conflict caused by the required system attribute key prop mismatch in the <UserTable /> component interface.
-
-Cleaned up redundant nested fetch functions into a single mounted useEffect, wiping out all unused definitions (useCallback, loading).
-
-
----
-# 📅 Tiến độ & Roadmap
-# 🛠️ Nhật Ký Debug & Hoàn Thiện Tính Năng Đổi Mật Khẩu (27/05/2026)
-
-Tài liệu này ghi lại toàn bộ quá trình xử lý logic, đồng bộ giữa Frontend và Backend, cũng như các lỗi "xương máu" đã được giải quyết trong ngày hôm nay cho tính năng **Cập nhật bảo mật (Đổi mật khẩu)**.
+Tệp này ghi lại toàn bộ các tính năng đã được tối ưu, sửa lỗi (debug) và hoàn thiện trong ngày hôm nay liên quan đến luồng dữ liệu Admin, Form nhập liệu và hệ thống xuất báo cáo Excel.
 
 ---
 
-## 🎯 Tính Năng Đã Hoàn Thành
-* [x] Xây dựng hàm `updateMeReset` trọn gói tại tầng `UsersService` (Backend) để tự động tìm kiếm, xác thực mật khẩu cũ và băm mật khẩu mới.
-* [x] Đồng bộ hóa cấu trúc DTO ở Backend và Interface ở Frontend sang kiểu `camelCase` chuẩn (`currentPassword`, `newPassword`, `confirmPassword`).
-* [x] Kết nối thành công luồng gọi API `PATCH /api/auth/me/reset` từ giao diện Web xuống Database.
+## 🛠️ Các Công Việc Đã Hoàn Thành Hôm Nay
+
+### 1. Sửa lỗi xuất Excel bị mất định dạng (Style & Border)
+- **Vấn đề:** File Excel xuất ra bị trắng xóa, mất hết khung viền đen và font chữ tiêu đề dù file template gốc có đầy đủ.
+- **Nguyên nhân:** Thư viện `xlsx` (SheetJS bản miễn phí) tự động phớt lờ và tước bỏ thuộc tính `.s` (Style) khi đọc/ghi file.
+- **Giải pháp:** - Chuyển đổi toàn bộ logic sang thư viện **`xlsx-js-style`** (Bản cộng đồng hỗ trợ mở khóa Style).
+  - Bật cấu hình `{ cellStyles: true }` ở cả hàm `XLSX.read` và `XLSX.write`.
+  - Viết hàm bổ sung định dạng tự động (`border` mỏng, font chữ `Times New Roman`) ép vào từng dòng dữ liệu mới từ hàng số 4 trở đi.
+
+### 2. Sửa lỗi ô Select không tự động chọn đúng dữ liệu khi sửa (Sync Form)
+- **Vấn đề:** Khi bấm nút "Chỉnh sửa nhân viên", log dữ liệu ra đúng ID nhưng ô Chọn Phòng ban/Chức vụ trên giao diện vẫn hiện giá trị mặc định.
+- **Nguyên nhân:** - API trả về dữ liệu dạng Object lồng nhau (`department: { id, name }`), nhưng form và component `<SelectField>` chỉ hiểu giá trị phẳng (Chuỗi ID `"PKH"`).
+  - Thiếu thuộc tính `value` để ép component cập nhật theo trạng thái của form.
+- **Giải pháp:** - Sửa hàm `handleUpdateClick`, trích xuất đúng chuỗi ID phẳng: `setValue("department", userData.department?.id)` trước khi đẩy vào form.
+  - Bổ sung thuộc tính kiểm soát giao diện `value={watch("positions")}` và sự kiện `onChange` tương minh cho các Custom Select.
+
+### 3. Tích hợp nút Tự động tạo Mật khẩu mới (Random Password Generator)
+- **Tính năng:** Thêm nút "🔑 Đổi mã" giúp admin tự sinh mật khẩu ngẫu nhiên có độ bảo mật cao (10 ký tự gồm chữ hoa, chữ thường, số, ký tự đặc biệt) ngay lập tức.
+- **Tối ưu giao diện (UI/UX):**
+  - Đặt nút nằm gọn gàng ở phía bên phải, ngay bên trong thanh Input thông qua thuộc tính `absolute` để không làm vỡ bố cục Form.
+  - Thêm hiệu ứng click thu nhỏ nút sinh động (`active:scale-95`), hiệu ứng hover (`hover:scale-105`), và hiệu ứng nhấp nháy icon chìa khóa (`animate-pulse`) để thu hút tương tác.
+
+### 4. Dọn dẹp và tối ưu hóa file Service (`auth.service.ts`)
+- Gom nhóm và tái sử dụng các Interface cốt lõi (`UserBaseData`, `Department`, `Positions`) bằng từ khóa `extends` giúp giảm 30% dung lượng code thừa.
+- Xóa bỏ các Interface rác không dùng đến và chuẩn hóa lại các đoạn comment copy-paste sai ngữ cảnh.
 
 ---
 
-## 🚨 Các Lỗi "Kinh Điển" Đã Fix (Kinh Nghiệm Thực Chiến)
+## 📦 Hướng Dẫn Cài Đặt Các Gói Đã Dùng Hôm Nay
 
-### 1. Lỗi Cú Pháp Database (Mongoose vs SQL)
-* **Triệu chứng:** Code chạy đến bước tìm User thì đứng im, không log ra các bước tiếp theo.
-* **Nguyên nhân:** Viết nhầm cú pháp `{ where: { id: userId } }` của TypeORM/Sequelize vào dự án đang chạy **Mongoose (MongoDB)**.
-* **Giải quyết:** Sửa lại thành cú pháp chuẩn của Mongoose để tìm đúng bản ghi:
-  ```typescript
-  const user = await this.userModel.findById(userId).select('+passwordHash');
+Nếu chạy dự án ở máy khác, bắt buộc phải cài đặt các gói hỗ trợ xử lý Style này:
+```bash
+npm install xlsx-js-style file-saver
+npm install --save-dev @types/file-saver

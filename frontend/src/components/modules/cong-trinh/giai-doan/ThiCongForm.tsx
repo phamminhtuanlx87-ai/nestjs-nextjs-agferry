@@ -162,6 +162,7 @@ export default function ThiCongForm({ stage }: Props) {
 
                   <SelectField
                     label="Đơn vị Thi công"
+                    defaultValue={OPTIONS_DU_TOAN[0].value}
                     options={OPTIONS_DU_TOAN}
                     {...register(`giai_doan.3.ma_don_vi`, {
                       required: !thiccong.isDisabled

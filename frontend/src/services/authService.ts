@@ -113,3 +113,79 @@ export async function toggleActive(id: string): Promise<IUser[]> {
   );
   return response.data.data; // Trả thẳng object user chứa role và permissions
 }
+
+export interface AdminCreateFormValues {
+  fullName: string;
+  userName: string;
+  password: string;
+  email: string;
+  role: string;
+  department: string;
+  positions: string;
+  isActive?: boolean;
+}
+
+export interface AdminCreateRequest {
+  id?: string;
+  fullName: string;
+  userName: string;
+  password: string;
+  email: string;
+  role: string;
+
+  departmentId: string;
+  departmentName: string;
+
+  positionId: string;
+  positionName: string;
+
+  isActive?: boolean;
+}
+
+export async function adminCreateUser(
+  userData: AdminCreateRequest,
+): Promise<AdminCreateRequest[]> {
+  const response = await api.post<BackendResponse<AdminCreateRequest[]>>(
+    `/users`,
+    userData,
+  );
+  return response.data.data; // Trả thẳng object user chứa role và permissions
+}
+
+export async function adminUpdateUser(
+  userData: AdminCreateRequest,
+): Promise<AdminCreateRequest[]> {
+  const response = await api.patch<BackendResponse<AdminCreateRequest[]>>(
+    `/users/${userData.id}`,
+    userData,
+  );
+  return response.data.data; // Trả thẳng object user chứa role và permissions
+}
+
+export interface AdminGetUserValues {
+  id: string;
+  fullName: string;
+  userName: string;
+  password: string;
+  email: string;
+  role: string;
+  department: {
+    id: string;
+    name: string;
+  };
+  positions: {
+    id: string;
+    name: string;
+  };
+  isActive?: boolean;
+}
+
+export async function adminGetUserByID(
+  id: string,
+): Promise<AdminGetUserValues> {
+  const response = await api.get<BackendResponse<AdminGetUserValues>>(
+    `/users/${id}`
+  );
+  return response.data.data; // Trả thẳng object user chứa role và permissions
+}
+

@@ -81,16 +81,16 @@ export default function CongTrinhTable({
     },
     { label: "Ngày khởi tạo", key: "ngay_tao_du_an", align: "center" as const },
     {
-      label: "Dự toán",
+      label: "Dự toán\nđược duyệt",
       key: "du_toan",
-      className: "min-w-[150px]",
-      align: "right" as const,
+      className: "max-w-28 whitespace-pre-line leading-snug ",
+      align: "center" as const,
     }, // Căn phải cho số tiền
     {
-      label: "Dự toán (Điều chỉnh)",
+      label: "Dự toán (Điều chỉnh)\nđược duyệt",
       key: "du_toan_dc",
-      className: "min-w-[150px]",
-      align: "right" as const,
+      className: "max-w-28 whitespace-pre-line leading-snug",
+      align: "center" as const,
     }, // Căn phải cho số tiền
     {
       label: "Quyết toán",
@@ -107,7 +107,7 @@ export default function CongTrinhTable({
         {dsCongTrinh?.slice(start, end).map((project) => (
           <tr
             key={project._id}
-            className="hover:bg-indigo-100 transition-colors"
+            className="hover:bg-indigo-100 transition-colors "
           >
             <td className="px-6 py-4 hidden md:table-cell font-medium">
               {project.ma_cong_trinh}
