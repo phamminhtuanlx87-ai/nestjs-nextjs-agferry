@@ -28,7 +28,7 @@ export default function Sidebar() {
     <aside
       className="w-64 h-screen bg-primary text-white flex flex-col transition-transform duration-300 shrink-0
              fixed top-0 left-0 z-50 -translate-x-full 
-             lg:static lg:translate-x-0"
+             xl:static xl:translate-x-0"
     >
       <div>
         {/* Logo */}
