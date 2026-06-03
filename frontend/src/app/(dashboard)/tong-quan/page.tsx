@@ -51,6 +51,7 @@ export default function TongQuanPage() {
           <div className="h-64 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 text-sm">
             {/* Sau này anh ném Biểu đồ đường/cột hoặc Thống kê tiền vé phà vào đây */}
             [Nơi vẽ Biểu đồ Doanh thu phà]
+            ... Đang phát triển thêm tính năng này nên tạm thời chưa có dữ liệu để hiển thị
           </div>
         </div>
 
@@ -65,6 +66,7 @@ export default function TongQuanPage() {
           <div className="h-64 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 text-sm">
             {/* Sau này anh ném danh sách các phà đang chạy, số chuyến trong ngày vào đây */}
             [Nơi hiển thị Lịch chạy phà / Tua chuyến]
+             ... Đang phát triển thêm tính năng này nên tạm thời chưa có dữ liệu để hiển thị
           </div>
         </div>
       </div>
@@ -81,6 +83,7 @@ export default function TongQuanPage() {
         </div>
         <div className="p-4 text-center text-slate-400 text-sm">
           [Số lượng thuyền viên đang làm việc / Tổng quân số ca trực]
+           ... Đang phát triển thêm tính năng này nên tạm thời chưa có dữ liệu để hiển thị
         </div>
       </div>
     </div>

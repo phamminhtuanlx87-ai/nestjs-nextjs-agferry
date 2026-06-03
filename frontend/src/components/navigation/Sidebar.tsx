@@ -25,7 +25,11 @@ export default function Sidebar() {
     logout();
   };
   return (
-    <aside className="w-64 h-screen flex flex-col fixed md:static top-0 left-0 z-50 bg-primary text-white transform -translate-x-full md:translate-x-0 transition-transform duration-300 shrink-0">
+    <aside
+      className="w-64 h-screen bg-primary text-white flex flex-col transition-transform duration-300 shrink-0
+             fixed top-0 left-0 z-50 -translate-x-full 
+             lg:static lg:translate-x-0"
+    >
       <div>
         {/* Logo */}
         <div className="flex items-center gap-2 font-bold text-white hover:text-accent transition cursor-pointer p-4 border-b border-white/20">

@@ -9,18 +9,26 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard>
-      <div className="flex h-screen overflow-hidden">
-        {/* 1. Sidebar cố định bên trái */}
-        <Sidebar />
+      {/* Thẻ cha ngoài cùng chia layout thành 2 phần: Trái (Sidebar) và Phải (Nội dung) */}
+    <div className="flex h-screen w-screen overflow-hidden bg-neutral-100">
+      
+      {/* 1. Sidebar cố định bên trái */}
+      <Sidebar />
 
-        <div className="flex flex-col flex-1 overflow-y-auto">
-          {/* 2. Navbar nằm trên cùng của nội dung chính */}
-          <Navbar />
+      {/* 2. Vùng nội dung bên phải: Phải có min-w-0 để các phần tử grid/table bên trong không bị phình to vỡ khung */}
+      <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden">
+        
+        {/* Thanh điều hướng Navbar nằm trên cùng */}
+        <Navbar />
 
-          {/* 3. Nội dung trang Quản lý phà */}
-          <main className="p-6 bg-neutral-bg min-h-full">{children}</main>
-        </div>
+        {/* Nội dung trang quản lý chạy scroll độc lập ở đây */}
+        <main className="flex-1 overflow-y-auto p-6">
+          {children}
+        </main>
+
       </div>
+
+    </div>
     </AuthGuard>
   );
 }

@@ -73,33 +73,50 @@ export default function CongTrinhTable({
   };
 
   const TABLE_HEADERS = [
-    { label: "Mã CT", key: "ma_cong_trinh", className: "min-w-[125px]" },
+    { label: "Mã CT", key: "ma_cong_trinh", className: "hidden md:table-cell text-center min-w-20" },
     {
       label: "Tên công trình",
       key: "ten_cong_trinh",
-      className: "min-w-[300px] ",
+      className: "min-w-50 wrap-break-word",
     },
-    { label: "Ngày khởi tạo", key: "ngay_tao_du_an", align: "center" as const },
+    {
+      label: "Ngày khởi tạo",
+      key: "ngay_tao_du_an",
+      className: "hidden md:table-cell",
+      align: "center" as const,
+    },
     {
       label: "Dự toán\nđược duyệt",
       key: "du_toan",
-      className: "max-w-22 whitespace-pre-line leading-snug ",
+      className:
+        "max-w-22 whitespace-pre-line leading-snug  hidden lg:table-cell",
       align: "center" as const,
     }, // Căn phải cho số tiền
     {
       label: "Dự toán (Điều chỉnh)\nđược duyệt",
       key: "du_toan_dc",
-      className: "max-w-22 whitespace-pre-line leading-snug",
+      className:
+        "max-w-22 whitespace-pre-line leading-snug hidden lg:table-cell",
       align: "center" as const,
     }, // Căn phải cho số tiền
     {
       label: "Quyết toán",
       key: "quyet_toan",
-      className: "min-w-[150px]",
+      className: "min-w-20 hidden md:table-cell",
       align: "right" as const,
     }, // Căn phải
-    { label: "Trạng thái", key: "trang_thai", align: "center" as const },
-    { label: "Hành động", key: "actions", align: "center" as const },
+    {
+      label: "Trạng thái",
+      key: "trang_thai",
+      className: "text-center max-w-16",
+      align: "center" as const,
+    },
+    {
+      label: "Hành động",
+      key: "actions",
+      className: "min-w-20",
+      align: "center" as const,
+    },
   ];
   return (
     <div>
@@ -107,13 +124,13 @@ export default function CongTrinhTable({
         {dsCongTrinh?.slice(start, end).map((project) => (
           <tr
             key={project._id}
-            className="hover:bg-indigo-100 transition-colors"
+            className="hover:bg-indigo-100 transition-colors "
           >
-            <td className="px-6 py-4 hidden md:table-cell font-medium">
+            <td className="px-6 py-4 font-medium hidden md:table-cell ">
               {project.ma_cong_trinh}
             </td>
 
-            <td className="px-6 py-4  text-gray-800 font-bold">
+            <td className="px-6 py-4 text-gray-800 font-bold min-w-50 max-w-40 wrap-break-word">
               {project.ten_cong_trinh}
             </td>
             <td className="px-6 py-4 hidden md:table-cell text-center">
@@ -122,7 +139,7 @@ export default function CongTrinhTable({
                 : "---"}
             </td>
 
-            <td className="px-6 py-4 text-right tabular-nums">
+            <td className="px-6 py-4 text-right tabular-nums hidden lg:table-cell">
               {/* Dùng Number() để ép kiểu về số trước khi format, mặc định là 0 nếu null */}
               {Number(
                 project.giai_doan?.find((gd) => gd.ma_hieu === "PD_DT")
@@ -131,25 +148,25 @@ export default function CongTrinhTable({
               <span className="text-gray-400 text-xs"> ₫</span>
             </td>
 
-            <td className="px-6 py-4 hidden md:table-cell text-right tabular-nums">
+            <td className="px-6 py-4 hidden lg:table-cell text-right tabular-nums">
               {Number(
                 project.giai_doan?.find((gd) => gd.ma_hieu === "PD_DT_PS")
                   ?.tong_gia_tri || 0,
               ).toLocaleString("vi-VN")}
               <span className="text-gray-400 text-xs"> ₫</span>
             </td>
-            <td className="px-6 py-4 hidden md:table-cell text-right tabular-nums font-semibold">
+            <td className="px-6 py-4 hidden md:table-cell lg:table-cell text-right tabular-nums font-semibold">
               {Number(
                 project.giai_doan?.find((gd) => gd.ma_hieu === "QT")
                   ?.tong_gia_tri || 0,
               ).toLocaleString("vi-VN")}
               <span className="text-gray-400 text-xs"> ₫</span>
             </td>
-            <td className="px-6 py-4 text-center">
+            <td className="text-center max-w-16">
               {renderStatus(project.giai_doan?.at(-1)?.ma_hieu || "")}
             </td>
 
-            <td className="px-6 py-4">
+            <td className="px-6 py-4" >
               <div className="flex items-center justify-end gap-1">
                 <Guard requiredPermission={UserPermission.PROJECT_VIEW}>
                   <Button

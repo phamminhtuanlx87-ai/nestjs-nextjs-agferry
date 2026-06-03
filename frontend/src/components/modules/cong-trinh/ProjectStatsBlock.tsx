@@ -80,7 +80,7 @@ export default function ProjectStatsBlock({
       </div>
 
       {/* 2. Grid hiển thị 4 Card thống kê */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
         <SummaryCard
           color="bg-indigo-800"
           title="Tổng công trình"
