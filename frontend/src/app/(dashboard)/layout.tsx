@@ -1,33 +1,36 @@
+"use client";
+import React from "react";
 import Sidebar from "@/components/navigation/Sidebar";
 import Navbar from "@/components/navigation/Navbar";
 import { AuthGuard } from "@/components/common/AuthGuard";
+import { useState } from "react";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   return (
     <AuthGuard>
-      {/* Thẻ cha ngoài cùng chia layout thành 2 phần: Trái (Sidebar) và Phải (Nội dung) */}
-    <div className="flex h-screen w-screen overflow-hidden bg-neutral-100">
+     <div className="flex h-screen w-screen overflow-hidden bg-neutral-100">
       
-      {/* 1. Sidebar cố định bên trái */}
-      <Sidebar />
+      {/* 1. Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      {/* 2. Vùng nội dung bên phải: Phải có min-w-0 để các phần tử grid/table bên trong không bị phình to vỡ khung */}
-      <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden">
+      {/* 2. Vùng nội dung bên phải */}
+      <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden transition-all duration-300">
         
-        {/* Thanh điều hướng Navbar nằm trên cùng */}
-        <Navbar />
+        {/* TRUYỀN THÊM isOpen vào Navbar để tính toán icon mũi tên */}
+        <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
-        {/* Nội dung trang quản lý chạy scroll độc lập ở đây */}
         <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
 
       </div>
-
     </div>
     </AuthGuard>
   );

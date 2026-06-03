@@ -17,54 +17,70 @@ const menuItems = [
   // { name: "Báo cáo", href: "/bao-cao", icon: "📊" },
   // { name: "Cài đặt", href: "/cai-dat", icon: "⚙️" },
 ];
-
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { logout, user } = useAuthStore();
   const onClickHandler = () => {
     logout();
   };
   return (
-    <aside
-      className="w-64 h-screen bg-primary text-white flex flex-col transition-transform duration-300 shrink-0
-             fixed top-0 left-0 z-50 -translate-x-full 
-             xl:static xl:translate-x-0"
-    >
-      <div>
-        {/* Logo */}
-        <div className="flex items-center gap-2 font-bold text-white hover:text-accent transition cursor-pointer p-4 border-b border-white/20">
-          <div className="bg-neutral-bg rounded-full">
-            <Image
-              src={banner_left}
-              alt="Cty Cổ phần Phà An Giang"
-              className="object-cover w-10 h-10"
-              loading="eager"
-            />
+    <>
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 xl:hidden transition-opacity duration-300"
+          onClick={onClose}
+        />
+      )}
+
+      {/* THANH SIDEBAR CHÍNH */}
+      <aside
+        className={`h-screen bg-primary text-white flex flex-col transition-all duration-300 shrink-0 z-50
+          fixed top-0 left-0 
+          ${
+            isOpen
+              ? "w-64 translate-x-0"
+              : "w-0 -translate-x-full xl:w-0 xl:-translate-x-full"
+          }`}
+      >
+        <div>
+          {/* Logo */}
+          <div className="flex items-center gap-2 font-bold text-white hover:text-accent transition cursor-pointer p-4 border-b border-white/20">
+            <div className="bg-neutral-bg rounded-full">
+              <Image
+                src={banner_left}
+                alt="Cty Cổ phần Phà An Giang"
+                className="object-cover w-10 h-10"
+                loading="eager"
+              />
+            </div>
+            <h1 className="text-lg font-bold">An Giang Ferry JSC</h1>
           </div>
-          <h1 className="text-lg font-bold">An Giang Ferry JSC</h1>
-        </div>
-        {/* <h2 className="h-14 flex items-center justify-between px-4 border-b border-white/20 text-lg font-semibold cursor-pointer hover:text-accent transition">
+          {/* <h2 className="h-14 flex items-center justify-between px-4 border-b border-white/20 text-lg font-semibold cursor-pointer hover:text-accent transition">
           Bảng điều khiển
         </h2> */}
-      </div>
+        </div>
 
-      <nav className="flex-1 p-2 space-y-2">
-        {menuItems
-          .filter((item) => {
-            // Nếu mục menu yêu cầu quyền ADMIN, kiểm tra xem user.role có phải ADMIN không
-            if (item.requiredRole === "ADMIN") {
-              return user?.role === "ADMIN";
-            }
-            // Các mục khác không yêu cầu quyền thì luôn hiển thị
-            return true;
-          })
-          .map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`
+        <nav className="flex-1 p-2 space-y-2">
+          {menuItems
+            .filter((item) => {
+              // Nếu mục menu yêu cầu quyền ADMIN, kiểm tra xem user.role có phải ADMIN không
+              if (item.requiredRole === "ADMIN") {
+                return user?.role === "ADMIN";
+              }
+              // Các mục khác không yêu cầu quyền thì luôn hiển thị
+              return true;
+            })
+            .map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`
                 flex items-center space-x-3 p-3 rounded-lg transition-all
                 ${
                   isActive
@@ -72,33 +88,34 @@ export default function Sidebar() {
                     : " text-white dark:text-gray-400 hover:bg-accent dark:hover:bg-gray-800"
                 }
               `}
-              >
-                <span>{item.icon}</span>
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-        <hr className="border-0 h-px bg-gray-300 opacity-30 shadow-md my-6" />
-        <Link
-          className="px-3 py-2 rounded hover:bg-accent flex gap-2 items-center justify-start cursor-pointer"
-          href="/me"
-        >
-          <span>👤</span>
-          <span>Thông tin cá nhân</span>
-        </Link>
-        <hr className="border-0 h-px bg-gray-300 opacity-30 shadow-md my-6" />
-        <Button
-          className="px-3 py-2 rounded hover:bg-accent flex gap-2 items-center justify-start cursor-pointer w-full"
-          onClick={onClickHandler}
-        >
-          <span>🚪</span>
-          <span>Đăng xuất</span>
-        </Button>
-      </nav>
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          <hr className="border-0 h-px bg-gray-300 opacity-30 shadow-md my-6" />
+          <Link
+            className="px-3 py-2 rounded hover:bg-accent flex gap-2 items-center justify-start cursor-pointer"
+            href="/me"
+          >
+            <span>👤</span>
+            <span>Thông tin cá nhân</span>
+          </Link>
+          <hr className="border-0 h-px bg-gray-300 opacity-30 shadow-md my-6" />
+          <Button
+            className="px-3 py-2 rounded hover:bg-accent flex gap-2 items-center justify-start cursor-pointer w-full"
+            onClick={onClickHandler}
+          >
+            <span>🚪</span>
+            <span>Đăng xuất</span>
+          </Button>
+        </nav>
 
-      <div className="p-4 border-t border-[(--border)] text-xs text-gray-400 text-center">
-        © 2026 Phà An Giang
-      </div>
-    </aside>
+        <div className="p-4 border-t border-[(--border)] text-xs text-gray-400 text-center">
+          © 2026 Phà An Giang
+        </div>
+      </aside>
+    </>
   );
 }

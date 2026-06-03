@@ -4,8 +4,13 @@ import NavbarLink from "./NavbarLink";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
+import { RiMenuFoldLine, RiMenuLine, RiMenuUnfoldLine } from "@remixicon/react";
 
-function Navbar() {
+interface NavbarProps {
+  onToggleSidebar: () => void;
+  isSidebarOpen: boolean;
+}
+function Navbar({ onToggleSidebar, isSidebarOpen }: NavbarProps) {
   const { user } = useAuthStore();
   const fullName = user ? `${user.fullName}` : "";
 
@@ -19,13 +24,41 @@ function Navbar() {
   return (
     <div>
       <nav className="flex items-center justify-between bg-neutral-bg-header p-4">
-        <div className="flex gap-4">
-          <NavbarLink href="/tong-quan">Trang chủ</NavbarLink>
-          <NavbarLink href="/pha">Phương tiện</NavbarLink>
-          <NavbarLink href="/tien-luong">Tiền lương</NavbarLink>
+        <div className="flex items-center gap-6">
+          {/* NÚT BẤM MENU: Bây giờ LUÔN HIỆN ở mọi màn hình để bấm ẩn/hiện Sidebar */}
+         {/* NÚT BẤM ĐIỀU KHIỂN ICON ĐỘNG */}
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          className="p-2 rounded-lg text-white hover:bg-white/20 transition-colors flex items-center justify-center"
+          aria-label="Toggle Sidebar"
+        >
+          {/* Vùng xử lý Icon thông minh */}
+          <div className="xl:hidden">
+            {/* 1. Dưới mốc 1280px: LUÔN HIỆN icon 3 gạch */}
+            <RiMenuLine size={24} />
+          </div>
+          <div className="hidden xl:block">
+            {/* 2. Từ mốc 1280px trở lên: Đổi icon theo trạng thái Đóng/Mở */}
+            {isSidebarOpen ? (
+              <RiMenuFoldLine size={24} /> // Icon dấu < (Thu gọn)
+            ) : (
+              <RiMenuUnfoldLine size={24} /> // Icon dấu > (Mở rộng)
+            )}
+          </div>
+        </button>
+
+          <div className="flex items-center gap-4">
+            <NavbarLink href="/long-quan">Trang chủ</NavbarLink>
+            <NavbarLink href="/pha">Phương tiện</NavbarLink>
+            <NavbarLink href="/tien-luong">Tiền lương</NavbarLink>
+          </div>
         </div>
         <nav className="hidden md:flex gap-3 text justify-start items-center">
-          <div className="relative w-10 h-10 cursor-pointer hover:scale-110 transition-all duration-300" onClick={()=> router.push("/me")}>
+          <div
+            className="relative w-10 h-10 cursor-pointer hover:scale-110 transition-all duration-300"
+            onClick={() => router.push("/me")}
+          >
             <div className="w-full h-full rounded-full bg-indigo-200 flex items-center justify-center text-4xl font-bold text-indigo-700">
               {getInitials(fullName)}
             </div>
@@ -40,7 +73,6 @@ function Navbar() {
             >
               {fullName}
             </Link>
-           
           </div>
         </nav>
       </nav>
