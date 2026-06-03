@@ -73,7 +73,7 @@ export default function CongTrinhTable({
   };
 
   const TABLE_HEADERS = [
-    { label: "Mã CT", key: "ma_cong_trinh", className: "hidden md:table-cell text-center min-w-20" },
+    { label: "Mã CT", key: "ma_cong_trinh", className: "hidden lg:table-cell text-center min-w-20" },
     {
       label: "Tên công trình",
       key: "ten_cong_trinh",
@@ -89,14 +89,14 @@ export default function CongTrinhTable({
       label: "Dự toán\nđược duyệt",
       key: "du_toan",
       className:
-        "max-w-22 whitespace-pre-line leading-snug  hidden lg:table-cell",
+        "max-w-22 whitespace-pre-line leading-snug  hidden xl:table-cell",
       align: "center" as const,
     }, // Căn phải cho số tiền
     {
       label: "Dự toán (Điều chỉnh)\nđược duyệt",
       key: "du_toan_dc",
       className:
-        "max-w-22 whitespace-pre-line leading-snug hidden lg:table-cell",
+        "max-w-22 whitespace-pre-line leading-snug hidden xl:table-cell",
       align: "center" as const,
     }, // Căn phải cho số tiền
     {
@@ -126,7 +126,7 @@ export default function CongTrinhTable({
             key={project._id}
             className="hover:bg-indigo-100 transition-colors "
           >
-            <td className="px-6 py-4 font-medium hidden md:table-cell ">
+            <td className="px-6 py-4 font-medium hidden lg:table-cell ">
               {project.ma_cong_trinh}
             </td>
 
@@ -139,7 +139,7 @@ export default function CongTrinhTable({
                 : "---"}
             </td>
 
-            <td className="px-6 py-4 text-right tabular-nums hidden lg:table-cell">
+            <td className="px-6 py-4 text-right tabular-nums hidden xl:table-cell">
               {/* Dùng Number() để ép kiểu về số trước khi format, mặc định là 0 nếu null */}
               {Number(
                 project.giai_doan?.find((gd) => gd.ma_hieu === "PD_DT")
@@ -148,14 +148,14 @@ export default function CongTrinhTable({
               <span className="text-gray-400 text-xs"> ₫</span>
             </td>
 
-            <td className="px-6 py-4 hidden lg:table-cell text-right tabular-nums">
+            <td className="px-6 py-4 hidden xl:table-cell text-right tabular-nums">
               {Number(
                 project.giai_doan?.find((gd) => gd.ma_hieu === "PD_DT_PS")
                   ?.tong_gia_tri || 0,
               ).toLocaleString("vi-VN")}
               <span className="text-gray-400 text-xs"> ₫</span>
             </td>
-            <td className="px-6 py-4 hidden md:table-cell lg:table-cell text-right tabular-nums font-semibold">
+            <td className="px-6 py-4 hidden md:table-cell text-right tabular-nums font-semibold">
               {Number(
                 project.giai_doan?.find((gd) => gd.ma_hieu === "QT")
                   ?.tong_gia_tri || 0,
