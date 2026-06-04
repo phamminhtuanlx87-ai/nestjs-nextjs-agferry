@@ -15,21 +15,20 @@ export default function DashboardLayout({
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   return (
     <AuthGuard>
-     <div className="flex h-screen w-screen overflow-hidden bg-neutral-100">
-      
-      {/* 1. Sidebar */}
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+     <div className="flex h-screen w-full overflow-hidden bg-neutral-100">
+      {/* 1. Đảm bảo truyền đúng state đóng mở xuống cho Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
 
-      {/* 2. Vùng nội dung bên phải */}
-      <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden transition-all duration-300">
-        
-        {/* TRUYỀN THÊM isOpen vào Navbar để tính toán icon mũi tên */}
-        <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+      <div className="flex flex-col flex-1 h-full overflow-hidden min-w-0">
+        {/* 2. Đảm bảo truyền hàm ĐẢO TRẠNG THÁI xuống cho Navbar */}
+        <Navbar 
+          isSidebarOpen={isSidebarOpen} 
+          onToggleSidebar={toggleSidebar} 
+        />
 
-        <main className="flex-1 overflow-y-auto p-6">
+       <main className="flex-1 overflow-y-auto p-6 min-w-0">
           {children}
         </main>
-
       </div>
     </div>
     </AuthGuard>

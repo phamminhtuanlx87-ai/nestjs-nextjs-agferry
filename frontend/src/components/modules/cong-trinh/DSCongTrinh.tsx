@@ -69,12 +69,14 @@ export default function DSCongTrinh({
             </Button>
           </Guard>
         </div>
-        <CongTrinhTable
-          key={dsCongTrinh.length}
-          onSuccess={() => loadData(selectedMonth, selectedYear)}
-          data={dsCongTrinh}
-          rowsPerPage={rowsPerPage}
-        />
+        <div className="w-full overflow-x-auto rounded-xl">
+          <CongTrinhTable
+            key={dsCongTrinh.length}
+            onSuccess={() => loadData(selectedMonth, selectedYear)}
+            data={dsCongTrinh}
+            rowsPerPage={rowsPerPage}
+          />
+        </div>
       </section>
 
       <Modal

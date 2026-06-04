@@ -30,19 +30,15 @@ function Navbar({ onToggleSidebar, isSidebarOpen }: NavbarProps) {
             type="button"
             onClick={onToggleSidebar}
             className="p-2 rounded-lg text-white hover:bg-white/20 transition-colors flex items-center justify-center"
-            aria-label="Toggle Sidebar"
           >
-            {/* 1. Dưới mốc 1280px (Dưới xl): LUÔN HIỆN icon 3 gạch */}
             <div className="lg:hidden">
               <RiMenuLine size={24} />
             </div>
-
-            {/* 2. Từ mốc 1280px trở lên (xl:block): Đổi icon theo trạng thái Đóng/Mở */}
             <div className="hidden lg:block">
               {isSidebarOpen ? (
-                <RiMenuFoldLine size={24} /> // Icon dấu < (Thu gọn)
+                <RiMenuFoldLine size={24} />
               ) : (
-                <RiMenuUnfoldLine size={24} /> // Icon dấu > (Mở rộng)
+                <RiMenuUnfoldLine size={24} />
               )}
             </div>
           </button>
