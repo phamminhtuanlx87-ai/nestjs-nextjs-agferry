@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import banner_left from "@/assets/images/banner_left.png";
 import Image from "next/image";
 import Button from "../ui/Button";
@@ -21,47 +21,61 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
-export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { logout, user } = useAuthStore();
   const onClickHandler = () => {
     logout();
   };
+  const router = useRouter();
   return (
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 xl:hidden transition-opacity duration-300"
-          onClick={onClose}
+          className="fixed inset-0 bg-black/40 z-50 md:hidden transition-opacity duration-300"
+          onClick={onClose} // Click ra ngoài tự động đóng sidebar
         />
       )}
-
-      {/* THANH SIDEBAR CHÍNH */}
+      {/* <aside
+      className="w-64 h-screen bg-primary text-white flex flex-col transition-transform duration-300 shrink-0
+             fixed top-0 left-0 z-50 -translate-x-full 
+             md:static md:translate-x-0"
+    > */}
       <aside
-        className={`h-screen bg-primary text-white flex flex-col transition-all duration-300 shrink-0 z-50
+        className={`w-64 h-screen bg-primary text-white flex flex-col transition-transform duration-300 shrink-0 z-50
           fixed top-0 left-0 
-          ${
-            isOpen
-              ? "w-64 translate-x-0"
-              : "w-0 -translate-x-full xl:w-0 xl:-translate-x-full"
-          }`}
+          ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+         lg:static lg:translate-x-0`} // Trên máy tính luôn cố định, trên mobile phụ thuộc vào isOpen
       >
-        <div>
-          {/* Logo */}
-          <div className="flex items-center gap-2 font-bold text-white hover:text-accent transition cursor-pointer p-4 border-b border-white/20">
-            <div className="bg-neutral-bg rounded-full">
-              <Image
-                src={banner_left}
-                alt="Cty Cổ phần Phà An Giang"
-                className="object-cover w-10 h-10"
-                loading="eager"
-              />
-            </div>
-            <h1 className="text-lg font-bold">An Giang Ferry JSC</h1>
+        {/* Logo */}
+        <div className="flex items-center gap-2 font-bold text-white  p-4 border-b border-white/20">
+          <div
+            className="bg-neutral-bg rounded-full hover:text-accent transition cursor-pointer"
+            onClick={() => router.push("/tong-quan")}
+          >
+            <Image
+              src={banner_left}
+              alt="Cty Cổ phần Phà An Giang"
+              className="object-cover w-10 h-10"
+              loading="eager"
+            />
           </div>
+          <span
+            className="text-sm lg:text-lg hover:text-accent transition cursor-pointer min-w-100"
+            onClick={() => router.push("/tong-quan")}
+          >
+            An Giang Ferry JSC
+          </span>
           {/* <h2 className="h-14 flex items-center justify-between px-4 border-b border-white/20 text-lg font-semibold cursor-pointer hover:text-accent transition">
           Bảng điều khiển
         </h2> */}
+          <div
+            className={`p-4 font-bold border-b border-white/10 flex justify-between items-center ${isOpen ? "block" : "hidden"} md:block`}
+          >
+            <button onClick={onClose} className="md:hidden text-white text-xl hover:text-accent transition hover:bg-white/20 rounded-lg p-1">
+              ✕
+            </button>
+          </div>
         </div>
 
         <nav className="flex-1 p-2 space-y-2">

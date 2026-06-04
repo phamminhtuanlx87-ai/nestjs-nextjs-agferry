@@ -26,30 +26,29 @@ function Navbar({ onToggleSidebar, isSidebarOpen }: NavbarProps) {
       <nav className="flex items-center justify-between bg-neutral-bg-header p-4">
         <div className="flex items-center gap-6">
           {/* NÚT BẤM MENU: Bây giờ LUÔN HIỆN ở mọi màn hình để bấm ẩn/hiện Sidebar */}
-         {/* NÚT BẤM ĐIỀU KHIỂN ICON ĐỘNG */}
-        <button
-          type="button"
-          onClick={onToggleSidebar}
-          className="p-2 rounded-lg text-white hover:bg-white/20 transition-colors flex items-center justify-center"
-          aria-label="Toggle Sidebar"
-        >
-          {/* Vùng xử lý Icon thông minh */}
-          <div className="xl:hidden">
-            {/* 1. Dưới mốc 1280px: LUÔN HIỆN icon 3 gạch */}
-            <RiMenuLine size={24} />
-          </div>
-          <div className="hidden xl:block">
-            {/* 2. Từ mốc 1280px trở lên: Đổi icon theo trạng thái Đóng/Mở */}
-            {isSidebarOpen ? (
-              <RiMenuFoldLine size={24} /> // Icon dấu < (Thu gọn)
-            ) : (
-              <RiMenuUnfoldLine size={24} /> // Icon dấu > (Mở rộng)
-            )}
-          </div>
-        </button>
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            className="p-2 rounded-lg text-white hover:bg-white/20 transition-colors flex items-center justify-center"
+            aria-label="Toggle Sidebar"
+          >
+            {/* 1. Dưới mốc 1280px (Dưới xl): LUÔN HIỆN icon 3 gạch */}
+            <div className="lg:hidden">
+              <RiMenuLine size={24} />
+            </div>
+
+            {/* 2. Từ mốc 1280px trở lên (xl:block): Đổi icon theo trạng thái Đóng/Mở */}
+            <div className="hidden lg:block">
+              {isSidebarOpen ? (
+                <RiMenuFoldLine size={24} /> // Icon dấu < (Thu gọn)
+              ) : (
+                <RiMenuUnfoldLine size={24} /> // Icon dấu > (Mở rộng)
+              )}
+            </div>
+          </button>
 
           <div className="flex items-center gap-4">
-            <NavbarLink href="/long-quan">Trang chủ</NavbarLink>
+            <NavbarLink href="/tong-quan">Trang chủ</NavbarLink>
             <NavbarLink href="/pha">Phương tiện</NavbarLink>
             <NavbarLink href="/tien-luong">Tiền lương</NavbarLink>
           </div>

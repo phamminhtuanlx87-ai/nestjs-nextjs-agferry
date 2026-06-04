@@ -81,7 +81,7 @@ export default function CongTrinhTable({
     {
       label: "Tên công trình",
       key: "ten_cong_trinh",
-      className: "min-w-[200px] max-w-[320px] wrap-break-word",
+      className: "min-w-50 wrap-break-word",
     },
     {
       label: "Ngày khởi tạo",
@@ -106,7 +106,7 @@ export default function CongTrinhTable({
     {
       label: "Quyết toán",
       key: "quyet_toan",
-      className: "min-w-[120px] hidden md:table-cell",
+      className: "min-w-20 hidden md:table-cell",
       align: "right" as const,
     }, // Căn phải
     {
@@ -118,7 +118,7 @@ export default function CongTrinhTable({
     {
       label: "Hành động",
       key: "actions",
-      className: "min-w-[120px]",
+      className: "min-w-20",
       align: "center" as const,
     },
   ];
@@ -167,7 +167,9 @@ export default function CongTrinhTable({
               <span className="text-gray-400 text-xs"> ₫</span>
             </td>
             <td className="text-center max-w-16">
-              {renderStatus(project.giai_doan?.at(-1)?.ma_hieu || "")}
+              <div className="block">
+                {renderStatus(project.giai_doan?.at(-1)?.ma_hieu || "")}
+              </div>
             </td>
 
             <td className="px-6 py-4">
