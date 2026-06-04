@@ -29,27 +29,31 @@ function Navbar({ onToggleSidebar, isSidebarOpen }: NavbarProps) {
           <button
             type="button"
             onClick={onToggleSidebar}
-            className="p-2 rounded-lg text-white hover:bg-white/20 transition-colors flex items-center justify-center"
+            className="p-2 rounded-lg text-white hover:bg-white/20 transition-colors flex items-center justify-center 2xl:hidden"
+            /* 2xl:hidden đảm bảo lên màn hình lớn 1536px nút này biến mất hoàn toàn */
           >
-            <div className="lg:hidden">
+            {/* 1. Dưới mốc 1280px (Mobile/Tablet): Hiện nút 3 gạch */}
+            <div className="xl:hidden">
               <RiMenuLine size={24} />
             </div>
-            <div className="hidden lg:block">
+
+            {/* 2. Tại mốc 1280px (xl): Hiện icon mũi tên đóng/mở động */}
+            <div className="hidden xl:block">
               {isSidebarOpen ? (
-                <RiMenuFoldLine size={24} />
+                <RiMenuFoldLine size={24} /> // Trạng thái mở rộng (w-64): Hiện mũi tên thu gọn (<)
               ) : (
-                <RiMenuUnfoldLine size={24} />
+                <RiMenuUnfoldLine size={24} /> // Trạng thái đang thu hẹp (w-20): Hiện mũi tên mở rộng (>)
               )}
             </div>
           </button>
 
-          <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
             <NavbarLink href="/tong-quan">Trang chủ</NavbarLink>
             <NavbarLink href="/pha">Phương tiện</NavbarLink>
             <NavbarLink href="/tien-luong">Tiền lương</NavbarLink>
           </div>
         </div>
-        <nav className="hidden md:flex gap-3 text justify-start items-center">
+        <nav className="flex gap-3 text justify-start items-center">
           <div
             className="relative w-10 h-10 cursor-pointer hover:scale-110 transition-all duration-300"
             onClick={() => router.push("/me")}

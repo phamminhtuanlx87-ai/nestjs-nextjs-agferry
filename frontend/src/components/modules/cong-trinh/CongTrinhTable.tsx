@@ -76,7 +76,7 @@ export default function CongTrinhTable({
     {
       label: "Mã CT",
       key: "ma_cong_trinh",
-      className: "hidden 2xl:table-cell text-center min-w-20",
+      className: "hidden 2xl:table-cell text-center",
     },
     {
       label: "Tên công trình",
@@ -86,14 +86,14 @@ export default function CongTrinhTable({
     {
       label: "Ngày khởi tạo",
       key: "ngay_tao_du_an",
-      className: "hidden md:table-cell",
+      className: "hidden lg:table-cell",
       align: "center" as const,
     },
     {
       label: "Dự toán\nđược duyệt",
       key: "du_toan",
       className:
-        "min-w-20 whitespace-pre-line leading-snug  hidden 2xl:table-cell",
+        "min-w-20 whitespace-pre-line leading-snug hidden 2xl:table-cell",
       align: "center" as const,
     }, // Căn phải cho số tiền
     {
@@ -134,10 +134,10 @@ export default function CongTrinhTable({
               {project.ma_cong_trinh}
             </td>
 
-            <td className="px-6 py-4 text-gray-800 font-bold min-w-50 max-w-40 wrap-break-word">
+            <td className="px-6 py-4 text-gray-800 font-bold min-w-40 max-w-50 wrap-break-word">
               {project.ten_cong_trinh}
             </td>
-            <td className="px-6 py-4 hidden md:table-cell text-center">
+            <td className="px-6 py-4 hidden lg:table-cell text-center">
               {project.ngay_tao_du_an
                 ? new Date(project.ngay_tao_du_an).toLocaleDateString("vi-VN")
                 : "---"}

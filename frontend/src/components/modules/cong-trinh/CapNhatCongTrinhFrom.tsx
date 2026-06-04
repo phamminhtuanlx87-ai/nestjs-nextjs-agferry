@@ -367,7 +367,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
     let lastActiveIndex = listGiaiDoan?.length;
     if (lastActiveIndex >= 5) lastActiveIndex = lastActiveIndex - 2;
     // Số lượng item hiển thị sẽ bằng vị trí active cuối cùng cộng thêm 1
-    return Math.min(lastActiveIndex + 1, GIAI_DOAN_SiDER.length)
+    return Math.min(lastActiveIndex + 1, GIAI_DOAN_SiDER.length);
   };
 
   return (
@@ -383,7 +383,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
               <span className="font-medium text-slate-900">Chi tiết hồ sơ</span>
             </nav>
           </div>
-          <div className="sticky top-0 z-50 bg-[#f8fafc] pt-2 pb-4">
+          <div className="sticky top-0 z-45 bg-[#f8fafc] pt-2 pb-4">
             <TieuDeCongTrinh
               congTrinh={congTrinh}
               mode="edit"
@@ -395,12 +395,13 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
           <main className="w-full mx-auto px-8 py-10 flex gap-8">
             {/* Thanh điều hướng nhanh bên trái (Sticky Menu) */}
             {/* Sidebar riêng */}
-            <CongTrinhSiderbar
-              steps={GIAI_DOAN_SiDER.slice(0, getStepSiderBar())}
-              activeId={activeId}
-              onStepClick={handleStepClick}
-            />
-
+            <div className="hidden lg:block">
+              <CongTrinhSiderbar
+                steps={GIAI_DOAN_SiDER.slice(0, getStepSiderBar())}
+                activeId={activeId}
+                onStepClick={handleStepClick}
+              />
+            </div>
             {/* Content chính - Gom vào một khối liền mạch hoặc các Card bo góc lớn */}
             <div className="flex-1 space-y-6">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">

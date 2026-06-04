@@ -53,7 +53,9 @@ export default function TieuDeCongTrinh({
               </Button>
               <div className="backdrop-blur-md border-b border-slate-200">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] mb-2 font-bold text-accent uppercase tracking-widest bg-indigo-50/80 px-2 py-0.5 rounded-md border border-indigo-100">
+                  <span className="text-[10px] mb-2 font-bold text-accent uppercase tracking-widest bg-indigo-50/80 px-2 py-0.5 rounded-md border border-indigo-100
+                  hidden lg:block
+                  ">
                     {mode === "edit"
                       ? "Chế độ chỉnh sửa hồ sơ"
                       : "Chế độ xem hồ sơ"}
@@ -66,8 +68,8 @@ export default function TieuDeCongTrinh({
                     </span>
                   </span>
                 </div>
-                <h1 className="text-xl mb-1 font-bold text-slate-900 flex items-center gap-3">
-                  <div className="w-2 h-8 bg-indigo-600 rounded-full"></div>{" "}
+                <h1 className="text-sm xl:text-xl mb-1 font-bold text-slate-900 flex items-center gap-3">
+                  <div className="w-2 h-8 bg-indigo-600 rounded-full "></div>{" "}
                   {/* Điểm nhấn side-bar nhỏ */}
                   Hồ sơ:{" "}
                   <span className="text-indigo-600 uppercase ml-1">
@@ -78,7 +80,7 @@ export default function TieuDeCongTrinh({
             </div>
           </div>
         </header>
-        <div className="flex gap-3">
+        <div className="gap-3 hidden sm:flex">
           <Button
             variant="secondary"
             className="px-6 border-slate-300"

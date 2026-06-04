@@ -5,6 +5,7 @@ import banner_left from "@/assets/images/banner_left.png";
 import Image from "next/image";
 import Button from "../ui/Button";
 import { useAuthStore } from "@/store/useAuthStore";
+import PingStatus from "../modules/ping/PingStatus";
 
 const menuItems = [
   { name: "Tổng quan", href: "/tong-quan", icon: "📊" },
@@ -44,22 +45,26 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       > */}
       <aside
         className={`h-screen bg-primary text-white flex flex-col transition-all duration-300 shrink-0 z-50
-          fixed top-0 left-0 xl:static
-          ${
-            isOpen
-              ? "w-64 translate-x-0" // Trạng thái Mở rộng
-              : "-translate-x-full xl:translate-x-0 xl:w-20" // Trên mobile ẩn hẳn, trên PC thu nhỏ thành thanh 20px
-          }`}
+    fixed top-0 left-0 
+    xl:static xl:translate-x-0
+    ${
+      isOpen
+        ? "w-64 translate-x-0 2xl:w-64"
+        : "-translate-x-full xl:w-20 2xl:w-64"
+    }`}
       >
         {/* Logo */}
         <div
           onClick={() => router.push("/tong-quan")}
-          className={`border-b border-white/10 flex items-center transition-all duration-300 cursor-pointer w-full h-20
-            ${
-              isOpen
-                ? "flex-row justify-start gap-3 p-4" // Khi mở rộng: Bố cục hàng ngang, căn trái, có padding 16px
-                : "flex-col justify-center items-center p-0 pt-8" // Khi thu hẹp: Chuyển thành trục dọc, căn giữa tuyệt đối, xóa sạch padding
-            }`}
+          className={`border-b border-white/10 flex items-center transition-all duration-300 cursor-pointer w-full h-20 
+    ${
+      isOpen
+        ? "flex-row justify-start gap-3 p-4" // Khi isOpen = true: Luôn ở dạng hàng ngang đầy đủ
+        : "flex-col justify-center items-center p-0 pt-8 xl:flex-col xl:justify-center xl:items-center xl:p-0 xl:pt-8 2xl:flex-row 2xl:justify-start 2xl:gap-3 2xl:p-4"
+      // Khi isOpen = false:
+      // - Dưới xl & tại xl: Chuyển thành trục dọc, căn giữa để hiện mỗi logo
+      // - Tại 2xl trở lên: Ghi đè lại thành hàng ngang, căn trái, p-4 đầy đủ
+    }`}
         >
           {/* KHỐI TRÒN CHỨA LOGO (Không lo méo, không lo dính lề) */}
           <div className="bg-neutral-bg rounded-full shrink-0 overflow-hidden shadow-sm w-10 h-10 flex items-center justify-center">
@@ -71,11 +76,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             />
           </div>
           {/* 2. KHỐI TEXT TÊN CÔNG TY (Chỉ hiển thị khi Sidebar đang mở rộng) */}
-          {isOpen && (
-            <span className="text-sm font-bold hover:text-accent transition-all duration-200 whitespace-nowrap">
-              An Giang Ferry JSC
-            </span>
-          )}
+          <span
+            className={`text-sm font-bold hover:text-accent transition-all duration-200 whitespace-nowrap
+      ${
+        isOpen
+          ? "block opacity-100"
+          : "hidden xl:hidden 2xl:block 2xl:opacity-100"
+      }`}
+          >
+            An Giang Ferry JSC
+          </span>
           <div
             className={`p-4 font-bold border-white/10 flex justify-between items-center ${isOpen ? "block" : "hidden"} xl:block`}
           >
@@ -112,14 +122,30 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     ? "bg-blue-50 dark:bg-blue-900/30 text-accent dark:text-orange-500 font-semibold"
                     : " text-white dark:text-gray-400 hover:bg-accent dark:hover:bg-gray-800"
                 }
-                ${isOpen ? "justify-start px-4" : "xl:justify-center xl:px-0"}
+               ${
+                 isOpen
+                   ? "flex-row justify-start gap-3 px-4" // Khi mở: Hàng ngang, căn trái, có khoảng cách
+                   : "flex-col justify-center items-center p-3 xl:flex-col xl:justify-center xl:items-center xl:px-0 2xl:flex-row 2xl:justify-start 2xl:gap-3 2xl:px-4"
+                 // Khi đóng:
+                 // - Dưới xl & tại xl: Chuyển trục dọc, căn giữa để icon nằm chính giữa thanh w-20
+                 // - Tại 2xl trở lên: Ghi đè lại thành hàng ngang, căn trái đầy đủ
+               }
               `}
-                    title={!isOpen ? item.name : ""}
+                    title={
+                      !isOpen &&
+                      !window.matchMedia("(min-width: 1536px)").matches
+                        ? item.name
+                        : ""
+                    }
                   >
                     <span className="shrink-0">{item.icon}</span>
                     <span
                       className={`text-sm transition-all duration-200 whitespace-nowrap
-                  ${isOpen ? "block opacity-100" : "hidden xl:hidden"}`}
+                         ${
+                           isOpen
+                             ? "block opacity-100" // Khi isOpen = true: Luôn hiện chữ
+                             : "hidden xl:hidden 2xl:block 2xl:opacity-100" // Khi isOpen = false: Ẩn ở mobile và xl, tự động hiện lại ở mốc 2xl
+                         }`}
                     >
                       {item.name}
                     </span>
@@ -134,7 +160,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <span>👤</span>
               <span
                 className={`text-sm transition-all duration-200 whitespace-nowrap
-                  ${isOpen ? "block opacity-100" : "hidden xl:hidden"}`}
+                         ${
+                           isOpen
+                             ? "block opacity-100" // Khi isOpen = true: Luôn hiện chữ
+                             : "hidden xl:hidden 2xl:block 2xl:opacity-100" // Khi isOpen = false: Ẩn ở mobile và xl, tự động hiện lại ở mốc 2xl
+                         }`}
               >
                 Thông tin cá nhân
               </span>
@@ -147,7 +177,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <span>🚪</span>
               <span
                 className={`text-sm transition-all duration-200 whitespace-nowrap
-                  ${isOpen ? "block opacity-100" : "hidden xl:hidden"}`}
+                         ${
+                           isOpen
+                             ? "block opacity-100" // Khi isOpen = true: Luôn hiện chữ
+                             : "hidden xl:hidden 2xl:block 2xl:opacity-100" // Khi isOpen = false: Ẩn ở mobile và xl, tự động hiện lại ở mốc 2xl
+                         }`}
               >
                 Đăng xuất
               </span>
@@ -157,6 +191,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         <div className="p-4 border-t border-[(--border)] text-xs text-gray-400 text-center">
           © 2026 Phà An Giang
+          <span
+            className={`text-sm transition-all duration-200 whitespace-nowrap
+                  ${isOpen ? "block opacity-100" : "hidden xl:hidden"}`}
+          >
+            <PingStatus />
+          </span>
         </div>
       </aside>
     </>
