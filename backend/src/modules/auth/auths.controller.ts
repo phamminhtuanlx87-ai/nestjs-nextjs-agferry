@@ -7,6 +7,7 @@ import {
   Post,
   Req,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -50,6 +51,13 @@ export class AuthController {
     };
   }
 
+  @Public() // Bỏ qua xác thực JWT
+  @Get('health') // Hoặc @Head('health')
+  checkHealth(@Res() res: any) {
+    // Trả về 200 OK không kèm Body để tối ưu phản hồi cho lệnh ping từ Frontend
+    return res.status(200).end();
+  }
+
   @Public() // Mở khóa cho khách đăng ký
   @Throttle({ default: { limit: 3, ttl: 900000 } }) // Ghi đè cấu hình: Trong 15 phút (900.000 ms), chỉ cho phép gọi tối đa 3 lần
   @Post('register')
@@ -57,6 +65,7 @@ export class AuthController {
     // Gọi sang userService với tham số báo hiệu đây là đăng ký công khai
     return this.usersService.create(registerDto, true);
   }
+
   // -------------------------------------
 
   @UseGuards(JwtAuthGuard)

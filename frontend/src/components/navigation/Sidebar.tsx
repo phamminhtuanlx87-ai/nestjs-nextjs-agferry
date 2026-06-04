@@ -160,11 +160,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <span>👤</span>
               <span
                 className={`text-sm transition-all duration-200 whitespace-nowrap
-                         ${
-                           isOpen
-                             ? "block opacity-100" // Khi isOpen = true: Luôn hiện chữ
-                             : "hidden xl:hidden 2xl:block 2xl:opacity-100" // Khi isOpen = false: Ẩn ở mobile và xl, tự động hiện lại ở mốc 2xl
-                         }`}
+                ${
+                  isOpen
+                    ? "block opacity-100" // Khi isOpen = true: Luôn hiện chữ
+                    : "hidden xl:hidden 2xl:block 2xl:opacity-100" // Khi isOpen = false: Ẩn ở mobile và xl, tự động hiện lại ở mốc 2xl
+                }`}
               >
                 Thông tin cá nhân
               </span>
@@ -177,11 +177,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <span>🚪</span>
               <span
                 className={`text-sm transition-all duration-200 whitespace-nowrap
-                         ${
-                           isOpen
-                             ? "block opacity-100" // Khi isOpen = true: Luôn hiện chữ
-                             : "hidden xl:hidden 2xl:block 2xl:opacity-100" // Khi isOpen = false: Ẩn ở mobile và xl, tự động hiện lại ở mốc 2xl
-                         }`}
+                ${
+                  isOpen
+                    ? "block opacity-100" // Khi isOpen = true: Luôn hiện chữ
+                    : "hidden xl:hidden 2xl:block 2xl:opacity-100" // Khi isOpen = false: Ẩn ở mobile và xl, tự động hiện lại ở mốc 2xl
+                }`}
               >
                 Đăng xuất
               </span>
@@ -193,7 +193,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           © 2026 Phà An Giang
           <span
             className={`text-sm transition-all duration-200 whitespace-nowrap
-                  ${isOpen ? "block opacity-100" : "hidden xl:hidden"}`}
+            ${
+              isOpen
+                ? "block opacity-100" // Khi isOpen = true: Luôn hiện chữ
+                : "hidden xl:hidden 2xl:block 2xl:opacity-100" // Khi isOpen = false: Ẩn ở mobile và xl, tự động hiện lại ở mốc 2xl
+            }`}
           >
             <PingStatus />
           </span>
