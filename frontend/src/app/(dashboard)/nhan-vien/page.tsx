@@ -2,6 +2,7 @@
 
 import { Guard } from "@/components/common/Guard";
 import UserTable, { IUser } from "@/components/modules/nhan-vien/UserTable";
+import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
 import Button from "@/components/ui/Button";
 import DropDown from "@/components/ui/DropDown";
 import Input from "@/components/ui/Input";
@@ -310,6 +311,7 @@ export default function NhanVienPage() {
 
   return (
     <div className="space-y-4">
+        <DynamicBreadcrumb />
       <div className="flex items-center justify-between">
         <h1 className="text-sm md:text-2xl font-semibold">
           Danh sách Tài khoản

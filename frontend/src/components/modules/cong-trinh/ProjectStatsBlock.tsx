@@ -32,7 +32,6 @@ export default function ProjectStatsBlock({
     selectedMonth,
     selectedYear,
   });
-
   return (
     <div className="relative w-full">
       <div className="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
@@ -43,11 +42,13 @@ export default function ProjectStatsBlock({
             Hệ thống quản lý Công trình/Dự án
           </div>
           <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
-           Công trình và dự án năm{" "}
+            Công trình và dự án năm{" "}
             <span className="text-blue-600">{selectedYear}</span>
           </h1>
           <p className="text-slate-500 text-sm mt-1">
-            Báo cáo tình hình thi công và quyết toán tính đến{" "}
+            Báo cáo tình hình thi công và quyết toán tính từ{" "}
+            <span className="font-semibold text-slate-700"> Tháng 01 </span>đến{" "}
+            đến{" "}
             <span className="font-semibold text-slate-700">
               {`Tháng ${selectedMonth}/${selectedYear}`}
             </span>

@@ -23,7 +23,6 @@ import QuyetToanForm from "./giai-doan/QuyetToanForm";
 import { CongTrinhSiderbar } from "./CongTrinhSiderbar";
 import axios from "axios";
 import TieuDeCongTrinh from "./TieuDeCongTrinh";
-import Link from "next/link";
 
 interface Props {
   congTrinh: ICongTrinh; // Sử dụng interface bạn đã định nghĩa
@@ -374,15 +373,6 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
     <div className="min-h-screen bg-[#f8fafc]">
       <FormProvider {...methods}>
         <CongTrinhProvider data={congTrinh}>
-          <div className="px-8 py-2">
-            <nav className="text-xs text-slate-500 flex gap-2 mb-1">
-              <span className="hover:text-primary cursor-pointer">
-                <Link href={"/cong-trinh"}>Công trình</Link>
-              </span>
-              <span>/</span>
-              <span className="font-medium text-slate-900">Chi tiết hồ sơ</span>
-            </nav>
-          </div>
           <div className="sticky top-0 z-45 bg-[#f8fafc] pt-2 pb-4">
             <TieuDeCongTrinh
               congTrinh={congTrinh}

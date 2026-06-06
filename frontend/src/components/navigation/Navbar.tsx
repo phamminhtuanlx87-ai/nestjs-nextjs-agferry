@@ -53,7 +53,7 @@ function Navbar({ onToggleSidebar, isSidebarOpen }: NavbarProps) {
             <NavbarLink href="/tien-luong">Tiền lương</NavbarLink>
           </div>
         </div>
-        <nav className="flex gap-3 text justify-start items-center">
+        <nav className="flex gap-3 text justify-start items-center ">
           <div
             className="relative w-10 h-10 cursor-pointer hover:scale-110 transition-all duration-300"
             onClick={() => router.push("/me")}

@@ -4,6 +4,7 @@ import React from "react";
 import ProjectStatsBlock from "@/components/modules/cong-trinh/ProjectStatsBlock";
 import DSCongTrinh from "@/components/modules/cong-trinh/DSCongTrinh";
 import { useCongTrinhData } from "@/hooks/useCongTrinhData";
+import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
 
 export default function CongTrinhpage() {
   const {
@@ -22,6 +23,7 @@ export default function CongTrinhpage() {
   return (
     <div>
       <div className="flex flex-col gap-6">
+        <DynamicBreadcrumb/>
         <ProjectStatsBlock
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}

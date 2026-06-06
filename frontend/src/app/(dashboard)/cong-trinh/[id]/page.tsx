@@ -1,5 +1,6 @@
 "use client";
 import CapNhatCongTrinhFrom from "@/components/modules/cong-trinh/CapNhatCongTrinhFrom";
+import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import { getCongTrinh, ICongTrinh } from "@/services/congTrinhService";
 import { useParams } from "next/navigation";
@@ -38,6 +39,7 @@ export default function CongTrinhChiTietPage() {
   
   return (
     <div>
+       <DynamicBreadcrumb mypathname={`cong-trinh/${dsCongTrinh[0].ten_cong_trinh}`}/>
       <CapNhatCongTrinhFrom congTrinh={dsCongTrinh[0]} />
     </div>
   );

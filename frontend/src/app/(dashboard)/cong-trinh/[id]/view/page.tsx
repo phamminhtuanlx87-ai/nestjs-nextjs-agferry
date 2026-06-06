@@ -1,10 +1,10 @@
 "use client";
 import { MA_HIEU_MAPPING } from "@/components/modules/cong-trinh/GiaiDoan";
 import TieuDeCongTrinh from "@/components/modules/cong-trinh/TieuDeCongTrinh";
+import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import { getCongTrinh, ICongTrinh } from "@/services/congTrinhService";
 import { formatMoney } from "@/utils/formatnumber";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -146,13 +146,7 @@ const ViewDetailCongTrinh = () => {
   return (
     <div className="bg-[#f8fafc] min-h-screen antialiased text-slate-800">
       <div className="px-8 py-2">
-        <nav className="text-xs text-slate-500 flex gap-2 mb-1">
-          <span className="hover:text-primary cursor-pointer">
-            <Link href={"/cong-trinh"}>Công trình</Link>
-          </span>
-          <span>/</span>
-          <span className="font-medium text-slate-900">Chi tiết hồ sơ</span>
-        </nav>
+       <DynamicBreadcrumb mypathname={`cong-trinh/${congTrinh?.ten_cong_trinh}`}/>
       </div>
       <div className="sticky top-0 z-50 bg-[#f8fafc] pt-2 pb-4">
         <TieuDeCongTrinh congTrinh={congTrinh} mode="view" />
