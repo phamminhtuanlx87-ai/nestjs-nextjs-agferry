@@ -25,7 +25,7 @@ interface QuanLyHoSoPros {
   data: ICongTrinh[];
   loading: boolean;
   rowsPerPage?: number;
-  active?: boolean
+  active?: boolean;
 }
 
 export default function HoSoTable({
@@ -37,19 +37,20 @@ export default function HoSoTable({
   rowsPerPage = 5,
   active = false,
 }: QuanLyHoSoPros) {
- const [expandedProjects, setExpandedProjects] = useState<Record<string, boolean>>(() => {
-  const initialExpandedStates: Record<string, boolean> = {};
-  
-  // Quét qua mảng data ngay từ đầu, cấu hình tất cả id thành true (mở sẵn)
-  data?.forEach((project) => {
-    if (project._id) {
-      initialExpandedStates[project._id] = active;
-    }
-  });
-  
-  return initialExpandedStates;
-});
+  const [expandedProjects, setExpandedProjects] = useState<
+    Record<string, boolean>
+  >(() => {
+    const initialExpandedStates: Record<string, boolean> = {};
 
+    // Quét qua mảng data ngay từ đầu, cấu hình tất cả id thành true (mở sẵn)
+    data?.forEach((project) => {
+      if (project._id) {
+        initialExpandedStates[project._id] = active;
+      }
+    });
+
+    return initialExpandedStates;
+  });
 
   const toggleProject = (id: string, active: boolean) => {
     setExpandedProjects((prev) => ({ ...prev, [id]: active }));
@@ -59,6 +60,28 @@ export default function HoSoTable({
   // const router = useRouter();
   const start = (currentPage - 1) * rowsPerPage;
   const end = start + rowsPerPage;
+
+  const isAnyExpanded =
+    data?.some((project) => expandedProjects[project._id]) || false;
+
+  const toggleAllProjects = () => {
+    // 1. Kiểm tra xem hiện tại có dự án nào đang mở không
+    const isAnyExpanded = data?.some(
+      (project) => expandedProjects[project._id],
+    );
+
+    // 2. Khai báo kèm ép kiểu Record để fix lỗi ts(7053)
+    const newExpandedState: Record<string, boolean> = {};
+
+    data?.forEach((project) => {
+      if (project._id) {
+        newExpandedState[project._id] = !isAnyExpanded;
+      }
+    });
+
+    // 3. Cập nhật trạng thái đồng loạt
+    setExpandedProjects(newExpandedState);
+  };
 
   const getFileInfo = (fileName: string) => {
     if (!fileName) return { name: "", ext: "FILE" };
@@ -154,7 +177,7 @@ export default function HoSoTable({
 
   const totalItems = filteredData?.length;
   const totalPages = Math.ceil(Number(totalItems) / rowsPerPage);
-  
+
   return (
     <div className="w-full bg-gray-50/50">
       {/* TIÊU ĐỀ TRANG & NÚT HÀNH ĐỘNG */}
@@ -248,9 +271,53 @@ export default function HoSoTable({
               </div>
             </div>
           </div>
+          <div className="h-4 w-px bg-gray-200 "></div>
+          <button
+            onClick={toggleAllProjects}
+            className={`flex cursor-pointer items-center justify-end gap-1 px-2.5 py-1 mx-2 text-sm font-medium border rounded-md shadow-sm transition-all duration-200 active:scale-95 ${
+              isAnyExpanded
+                ? "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-700"
+                : "bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100/70 hover:text-blue-700"
+            }`}
+          >
+            {isAnyExpanded ? (
+              <>
+                {/* Icon Thu gọn (Đóng lại) */}
+                <svg
+                  className="w-3.5 h-3.5 stroke-[2.5]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 11l7-7 7 7M5 19l7-7 7 7"
+                  />
+                </svg>
+                <span >Đóng tất cả</span>
+              </>
+            ) : (
+              <>
+                {/* Icon Bung rộng (Mở ra) */}
+                <svg
+                  className="w-3.5 h-3.5 stroke-[2.5]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 13l-7 7-7-7m14-6l-7 7-7-7"
+                  />
+                </svg>
+                <span>Mở tất cả</span>
+              </>
+            )}
+          </button>
 
           <div className="p-4 flex-1 space-y-4">
-            {/* Cụm công trình A04 */}
             <div className="space-y-4">
               {filteredData?.map((project) => (
                 <div
@@ -268,7 +335,7 @@ export default function HoSoTable({
                       <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wide">
                         {project.ten_cong_trinh}
                       </h3>
-                       {expandedProjects[project._id] ? (
+                      {expandedProjects[project._id] ? (
                         <BiChevronDown size={18} className="text-gray-500" />
                       ) : (
                         <BiChevronRight size={18} className="text-gray-500" />
@@ -280,7 +347,6 @@ export default function HoSoTable({
                       <span className="bg-slate-900 text-white text-[9px] px-2 py-0.5 rounded font-bold uppercase">
                         {project.totalActiveStages} GIAI ĐOẠN
                       </span>
-                     
                     </div>
                   </div>
 
@@ -305,52 +371,53 @@ export default function HoSoTable({
                               ({gd.file_links?.length || 0} tài liệu)
                             </span>
                           </div>
-                        
-                            <div className="border border-gray-100 rounded-md overflow-hidden">
-                              <table className="min-w-full divide-y divide-gray-100 text-left text-xs">
-                                <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
-                                  {/* VÒNG LẶP MAP CHUẨN ĐỂ ĐỔ FILE_LINKS TỰ ĐỘNG */}
-                                  {gd.file_links?.map((link, idx) => {
-                                    // Gọi hàm lấy tên và đuôi file (Đã chuẩn bị từ câu trước)
-                                    const { ext } = getFileInfo(link.link_name);
 
-                                    // 2. KIỂM TRA MÀU: Nếu ext tồn tại trong badgeColors thì lấy, ngược lại dùng màu xám mặc định
-                                    const currentBadgeColor =
-                                      badgeColors[ext] ||
-                                      "bg-gray-50 text-gray-600 border-gray-200";
+                          <div className="border border-gray-100 rounded-md overflow-hidden">
+                            <table className="min-w-full divide-y divide-gray-100 text-left text-xs">
+                              <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
+                                {/* VÒNG LẶP MAP CHUẨN ĐỂ ĐỔ FILE_LINKS TỰ ĐỘNG */}
+                                {gd.file_links?.map((link, idx) => {
+                                  // Gọi hàm lấy tên và đuôi file (Đã chuẩn bị từ câu trước)
+                                  const { ext } = getFileInfo(link.link_name);
 
-                                    // 3. KIỂM TRA KÝ HIỆU: Nếu không có đuôi file (file không có dạng .ext) thì hiện chữ "FILE"
-                                    const currentExtensionLabel = ext || "FILE";
-                                    return (
-                                      <tr
-                                        key={idx}
-                                        className="hover:bg-gray-50/50 transition-colors"
-                                      >
-                                        <td className="px-3 py-2 flex items-center gap-2">
-                                          {/* BADGE ĐUÔI FILE TỰ ĐỘNG */}
-                                          <span
-                                            className={`${currentBadgeColor} font-bold text-[9px] px-1 rounded border uppercase`}
-                                          >
-                                            {currentExtensionLabel || "FILE"}
-                                          </span>
+                                  // 2. KIỂM TRA MÀU: Nếu ext tồn tại trong badgeColors thì lấy, ngược lại dùng màu xám mặc định
+                                  const currentBadgeColor =
+                                    badgeColors[ext] ||
+                                    "bg-gray-50 text-gray-600 border-gray-200";
 
-                                          {/* TÊN FILE ĐÃ CẮT ĐUÔI + CHỐNG TRÀN CHỮ */}
-                                          <Link
-                                            href={link.link_name}
-                                            target="_blank"
-                                            className="truncate max-w-xs sm:max-w-md cursor-pointer hover:text-blue-600 font-medium text-gray-900"
-                                            title={link.link_name}
-                                          >
-                                            {link.link_name}
-                                          </Link>
-                                        </td>
-                                      </tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
-                            </div>
-                        
+                                  // 3. KIỂM TRA KÝ HIỆU: Nếu không có đuôi file (file không có dạng .ext) thì hiện chữ "FILE"
+                                  const currentExtensionLabel = ext || "FILE";
+                                  return (
+                                    <tr
+                                      key={idx}
+                                      className="hover:bg-gray-50/50 transition-colors"
+                                    >
+                                      <td className="px-3 py-2 flex items-center gap-2">
+                                        {/* BADGE ĐUÔI FILE TỰ ĐỘNG */}
+                                        <span
+                                          className={`${currentBadgeColor} font-bold text-[9px] px-1 rounded border uppercase`}
+                                        >
+                                          {currentExtensionLabel || "FILE"}
+                                        </span>
+
+                                        {/* TÊN FILE ĐÃ CẮT ĐUÔI + CHỐNG TRÀN CHỮ */}
+                                        
+                                        <Link
+                                          href={link.link_url}
+                                          target="_blank"
+                                          className="truncate max-w-xs sm:max-w-md cursor-pointer hover:text-blue-600 font-medium text-gray-900"
+                                          title={link.link_name}
+                                        >
+                                          {link.link_name}
+                                        </Link>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+
                           {/* Bảng danh sách các File của giai đoạn này */}
                         </div>
                       ))}
