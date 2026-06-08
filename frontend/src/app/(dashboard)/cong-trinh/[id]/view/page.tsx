@@ -5,6 +5,7 @@ import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import { getCongTrinh, ICongTrinh } from "@/services/congTrinhService";
 import { formatMoney } from "@/utils/formatnumber";
+import { alertService } from "@/utils/swal";
 import { useParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -142,11 +143,53 @@ const ViewDetailCongTrinh = () => {
       return acc;
     }, []); // Hết sạch lỗi đỏ, không dùng any
   };
+
+  const handleFileClick = async (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    linkUrl: string,
+  ) => {
+    if (typeof window !== "undefined") {
+      const now = new Date().getTime();
+      const remindedTime = localStorage.getItem("ioffice_reminded_time");
+
+      // Khoảng thời gian hết hạn phiên iOffice (10 phút = 10 * 60 * 1000 miligiây)
+      const TIMEOUT_LIMIT = 10 * 60 * 1000;
+
+      // Kiểm tra: Nếu chưa từng nhắc HOẶC lần nhắc cuối cùng đã quá 10 phút trước
+      const isExpired =
+        !remindedTime || now - parseInt(remindedTime) > TIMEOUT_LIMIT;
+
+      if (isExpired) {
+        // 1. Chặn hành vi mở link mặc định của thẻ <Link> ngay lập tức
+        e.preventDefault();
+
+        // 2. Hiện thông báo SweetAlert2 nhắc nhở
+        const result = await alertService.confirmLoginOffice();
+
+        // 3. Người dùng tương tác xong -> Cập nhật/Ghi đè mốc thời gian hiện tại vào kho lưu trữ
+        localStorage.setItem("ioffice_reminded_time", now.toString());
+
+        if (result.isConfirmed) {
+          // Chọn "Đến trang đăng nhập": Mở trang iOffice để nạp lại phiên 10 phút mới và mở file
+          window.open("https://angiang.vnptioffice.vn/", "_blank");
+          window.open(linkUrl, "_blank");
+        } else {
+          // Chọn "Tôi đã đăng nhập rồi": Tiếp tục mở thẳng file
+          window.open(linkUrl, "_blank");
+        }
+      }
+      // NẾU CÒN TRONG VÒNG 10 PHÚT:
+      // Mắc định không chạy vào IF -> Không bị e.preventDefault() chặn -> Link tự mở mượt mà bằng thẻ <Link>
+    }
+  };
+
   if (loading) return <LoadingScreen />;
   return (
     <div className="bg-[#f8fafc] min-h-screen antialiased text-slate-800">
       <div className="px-8 py-2">
-       <DynamicBreadcrumb mypathname={`cong-trinh/${congTrinh?.ten_cong_trinh}`}/>
+        <DynamicBreadcrumb
+          mypathname={`cong-trinh/${congTrinh?.ten_cong_trinh}`}
+        />
       </div>
       <div className="sticky top-0 z-50 bg-[#f8fafc] pt-2 pb-4">
         <TieuDeCongTrinh congTrinh={congTrinh} mode="view" />
@@ -675,6 +718,7 @@ const ViewDetailCongTrinh = () => {
                           rel="noopener noreferrer"
                           className="block text-xs text-indigo-600 hover:text-indigo-800 hover:underline py-0.5 truncate max-w-full"
                           title={file.file_name}
+                          onClick={(e) => handleFileClick(e, file.file_url)}
                         >
                           📄 {file.file_name}
                         </a>
