@@ -3,6 +3,7 @@
 import DropDown from "@/components/ui/DropDown";
 import { getMonthOptions, YEAR_OPTIONS } from "@/constants/time";
 import { ICongTrinh } from "@/services/congTrinhService";
+import { alertService } from "@/utils/swal";
 import Link from "next/link";
 import React, { useState } from "react";
 import {
@@ -177,6 +178,44 @@ export default function HoSoTable({
 
   const totalItems = filteredData?.length;
   const totalPages = Math.ceil(Number(totalItems) / rowsPerPage);
+  const handleFileClick = async (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    linkUrl: string,
+  ) => {
+    if (typeof window !== "undefined") {
+      const now = new Date().getTime();
+      const remindedTime = localStorage.getItem("ioffice_reminded_time");
+
+      // Khoảng thời gian hết hạn phiên iOffice (10 phút = 10 * 60 * 1000 miligiây)
+      const TIMEOUT_LIMIT = 10 * 60 * 1000;
+
+      // Kiểm tra: Nếu chưa từng nhắc HOẶC lần nhắc cuối cùng đã quá 10 phút trước
+      const isExpired =
+        !remindedTime || now - parseInt(remindedTime) > TIMEOUT_LIMIT;
+
+      if (isExpired) {
+        // 1. Chặn hành vi mở link mặc định của thẻ <Link> ngay lập tức
+        e.preventDefault();
+
+        // 2. Hiện thông báo SweetAlert2 nhắc nhở
+        const result = await alertService.confirmLoginOffice();
+
+        // 3. Người dùng tương tác xong -> Cập nhật/Ghi đè mốc thời gian hiện tại vào kho lưu trữ
+        localStorage.setItem("ioffice_reminded_time", now.toString());
+
+        if (result.isConfirmed) {
+          // Chọn "Đến trang đăng nhập": Mở trang iOffice để nạp lại phiên 10 phút mới và mở file
+          window.open("https://angiang.vnptioffice.vn/", "_blank");
+          window.open(linkUrl, "_blank");
+        } else {
+          // Chọn "Tôi đã đăng nhập rồi": Tiếp tục mở thẳng file
+          window.open(linkUrl, "_blank");
+        }
+      }
+      // NẾU CÒN TRONG VÒNG 10 PHÚT:
+      // Mắc định không chạy vào IF -> Không bị e.preventDefault() chặn -> Link tự mở mượt mà bằng thẻ <Link>
+    }
+  };
 
   return (
     <div className="w-full bg-gray-50/50">
@@ -295,7 +334,7 @@ export default function HoSoTable({
                     d="M5 11l7-7 7 7M5 19l7-7 7 7"
                   />
                 </svg>
-                <span >Đóng tất cả</span>
+                <span>Đóng tất cả</span>
               </>
             ) : (
               <>
@@ -401,12 +440,15 @@ export default function HoSoTable({
                                         </span>
 
                                         {/* TÊN FILE ĐÃ CẮT ĐUÔI + CHỐNG TRÀN CHỮ */}
-                                        
+
                                         <Link
                                           href={link.link_url}
                                           target="_blank"
                                           className="truncate max-w-xs sm:max-w-md cursor-pointer hover:text-blue-600 font-medium text-gray-900"
                                           title={link.link_name}
+                                          onClick={(e) =>
+                                            handleFileClick(e, link.link_url)
+                                          }
                                         >
                                           {link.link_name}
                                         </Link>

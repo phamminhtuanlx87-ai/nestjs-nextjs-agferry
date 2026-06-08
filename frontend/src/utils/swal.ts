@@ -125,4 +125,38 @@ export const alertService = {
       },
     });
   },
+
+
+
+   
+
+  confirmLoginOffice: async () => {
+    return Swal.fire({
+      title: '<span style="font-size: 18px; font-weight: 600; color: #1e293b;">Lưu ý quyền xem file</span>',
+      html: `
+        <div style="text-align: center; text-wrap: balance;">
+          <p style="color: #475569; font-size: 13px; margin-bottom: 8px;">
+            Để xem tài liệu này, bạn cần đảm bảo đã đăng nhập tài khoản trên hệ thống <b style="color: #2563eb;">angiang.vnptoffice.vn</b>.
+          </p>
+          <p style="color: #94a3b8; font-size: 11px;">
+            (Hệ thống chỉ nhắc nhở ở lần đầu tiên thao tác)
+          </p>
+        </div>
+      `,
+      icon: 'info',
+      iconColor: '#3b82f6',
+      showCancelButton: true,
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Đến trang đăng nhập',
+      cancelButtonText: 'Tôi đã đăng nhập rồi',
+      reverseButtons: true,
+      customClass: {
+        popup: 'rounded-xl'
+      }
+    });
+  }
+
+
+  
 };
