@@ -63,10 +63,24 @@ export class CongtrinhService {
       // Ngày đầu tiên của tháng sau (ví dụ: 2026-02-01 00:00:00)
       const endDate = new Date(filter.year, filter.month, 1);
 
-      query.ngay_tao_du_an = {
-        $gte: startDate, // Lớn hơn hoặc bằng ngày đầu tháng
-        $lt: endDate, // Nhỏ hơn ngày đầu tháng sau
-      };
+      query.$or = [
+        // TRƯỜNG HỢP 1: Công trình nằm trong kỳ lũy kế của năm được chọn
+        {
+          ngay_tao_du_an: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+        },
+        // TRƯỜNG HỢP 2: Công trình tạo trước đó nhưng CHƯA quyết toán (Ví dụ: Từ 2025 kéo dài qua)
+        {
+          ngay_tao_du_an: { $lt: endDate }, // Được tạo bất kỳ lúc nào trước mốc thời gian lọc này
+          $or: [
+            { ngay_quyet_toan: { $exists: false } }, // Chưa từng có trường ngày quyết toán
+            { ngay_quyet_toan: null }, // Hoặc ngày quyết toán đang để trống
+            { ngay_quyet_toan: { $gte: endDate } }, // Hoặc công trình mãi tới tương lai (sau mốc kết thúc) mới quyết toán
+          ],
+        },
+      ];
     }
     return await this.congTrinhModel
       .find(query)

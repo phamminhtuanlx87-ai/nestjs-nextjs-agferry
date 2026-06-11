@@ -33,7 +33,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-50 xl:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black/40 z-51 xl:hidden transition-opacity duration-300"
           onClick={onClose} // Click ra ngoài tự động đóng sidebar
         />
       )}
@@ -44,7 +44,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
          xl:static xl:translate-x-0`} // Trên máy tính luôn cố định, trên mobile phụ thuộc vào isOpen
       > */}
       <aside
-        className={`h-screen bg-primary text-white flex flex-col transition-all duration-300 shrink-0 z-50
+        className={`h-screen bg-primary text-white flex flex-col transition-all duration-300 shrink-0 z-52
     fixed top-0 left-0 
     xl:static xl:translate-x-0
     ${

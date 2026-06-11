@@ -298,7 +298,7 @@ export default function HoSoTable({
               </h2>
             </div>
             <div className="text-[11px] font-bold text-slate-500">
-              <div className=" bg-slate-200 border border-slate-50 rounded-2xl p-2 inline">
+              <div className=" bg-slate-200 border border-slate-50 rounded-2xl p-2 flex flex-col xl:block">
                 {"Để xem tài liệu vui lòng đăng nhập:  "}
                 <a
                   href="https://angiang.vnptioffice.vn/vpdt/main?lang=vi"

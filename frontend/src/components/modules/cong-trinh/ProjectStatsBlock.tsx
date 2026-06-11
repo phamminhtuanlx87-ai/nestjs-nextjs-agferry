@@ -4,8 +4,11 @@ import SummaryCard from "@/components/ui/SummaryCard";
 import { useCongTrinhCard } from "./useCongTrinhCard";
 import DropDown from "@/components/ui/DropDown";
 import { getMonthOptions, YEAR_OPTIONS } from "@/constants/time";
-import { BiCalendar } from "react-icons/bi";
+import { BiCalendar, BiNote, BiWallet } from "react-icons/bi";
 import { ICongTrinh } from "@/services/congTrinhService";
+import FinancialChart from "./FinancialChart";
+import { StatCard } from "@/components/ui/StatCard";
+import { FiPercent } from "react-icons/fi";
 
 interface ProjectStatsBlockProps {
   selectedMonth: number;
@@ -32,6 +35,14 @@ export default function ProjectStatsBlock({
     selectedMonth,
     selectedYear,
   });
+  const approvedRevenue = Number(stats.dutoan?.tongDuToan);
+  const settlementRevenue = Number(stats.quyetToan?.tongQuyetToan);
+  // Tự động tính toán tỷ lệ % thực tế
+  const rate =
+    approvedRevenue > 0
+      ? ((settlementRevenue / approvedRevenue) * 100).toFixed(1)
+      : "0.0";
+  const discrepancy = approvedRevenue - settlementRevenue;
   return (
     <div className="relative w-full">
       <div className="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
@@ -46,12 +57,24 @@ export default function ProjectStatsBlock({
             <span className="text-blue-600">{selectedYear}</span>
           </h1>
           <p className="text-slate-500 text-sm mt-1">
-            Báo cáo tình hình thi công và quyết toán tính từ{" "}
-            <span className="font-semibold text-slate-700"> Tháng 01 </span>đến{" "}
-            đến{" "}
-            <span className="font-semibold text-slate-700">
-              {`Tháng ${selectedMonth}/${selectedYear}`}
-            </span>
+            Báo cáo tình hình thi công và quyết toán{" "}
+            {selectedMonth === 1 ? (
+              <span className="font-semibold text-slate-700">
+                Tháng 01/{selectedYear}
+              </span>
+            ) : (
+              <>
+                <span className="font-semibold text-slate-700">
+                  lũy kế từ Tháng 01
+                </span>{" "}
+                đến{" "}
+                <span className="font-semibold text-slate-700">
+                  Tháng{" "}
+                  {selectedMonth < 10 ? `0${selectedMonth}` : selectedMonth}/
+                  {selectedYear}
+                </span>
+              </>
+            )}
           </p>
         </div>
 
@@ -76,6 +99,169 @@ export default function ProjectStatsBlock({
               icon={<BiCalendar className="w-4 h-4" />}
               onChange={(val) => onYearChange(Number(val))}
             />
+          </div>
+        </div>
+      </div>
+      <div>
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch mb-6">
+            {/* CARD 1: TỔNG DT ĐƯỢC DUYỆT */}
+            <StatCard
+              id="card-approved-revenue"
+              title="Tổng Dự Toán được duyệt"
+              icon={<BiWallet size={16} className="text-[#15157d]" />}
+              iconBgColor="bg-[#f0ecf5] border-[#e4e1ea]"
+              hoverBorderColor="hover:border-[#15157d]/30"
+              value={approvedRevenue}
+              footer={
+                <>
+                  <span className="bg-[#e1e0ff] text-[#15157d] px-2 py-0.5 rounded-md text-[10px] font-extrabold tracking-tight">
+                    {stats.dutoan?.dsDuToan} công trình
+                  </span>
+                  <span className="text-[10.5px] text-[#464652] font-medium italic">
+                    <span className="font-semibold text-slate-700">
+                      lũy kế đến Tháng{" "}
+                      {selectedMonth < 10 ? `0${selectedMonth}` : selectedMonth}
+                      /{selectedYear}
+                    </span>
+                  </span>
+                </>
+              }
+              backdropSvg={
+                <div className="w-30 h-10 opacity-30">
+                  <svg
+                    viewBox="0 0 100 50"
+                    fill="none"
+                    className="w-full h-full"
+                  >
+                    <path
+                      d="M0 40 Q25 45 40 25 T80 20 T100 5"
+                      stroke="#15157d"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              }
+            />
+
+            {/* CARD 2: TỔNG QUYẾT TOÁN */}
+            <StatCard
+              id="card-settled-revenue"
+              title="Tổng quyết toán"
+              icon={<BiNote size={16} className="text-[#1c2c5a]" />}
+              iconBgColor="bg-[#f0ecf5] border-[#e4e1ea]"
+              hoverBorderColor="hover:border-indigo-200"
+              value={settlementRevenue}
+              footer={
+                <>
+                  <span className="bg-[#cfe5ff] text-[#051d30] px-2 py-0.5 rounded-md text-[10px] font-extrabold tracking-tight">
+                    {stats.quyetToan?.dsQuyetToan} công trình
+                  </span>
+                  <span className="text-[10.5px] text-[#464652] font-medium italic">
+                    Đã hoàn thành quyết toán
+                  </span>
+                </>
+              }
+              backdropSvg={
+                <div className="w-20 h-20 opacity-5 -mb-2 -mr-1">
+                  <svg
+                    viewBox="0 0 50 50"
+                    className="w-full h-full text-slate-700"
+                    fill="none"
+                  >
+                    <circle
+                      cx="25"
+                      cy="25"
+                      r="20"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      d="M17 25 L22 30 L33 18"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              }
+            />
+
+            {/* CARD 3: TỶ LỆ QUYẾT TOÁN */}
+            <StatCard
+              id="card-settlement-ratio"
+              title="Tỷ lệ quyết toán"
+              icon={<FiPercent size={16} className="text-[#f491a0]" />}
+              iconBgColor="bg-[#fbf4f5] border-[#fce8eb]"
+              hoverBorderColor="hover:border-indigo-200"
+              value={rate}
+              unit="%"
+              footer={
+                <div className="flex flex-col gap-0.5 -mt-2 w-full">
+                  <div className="text-[11.5px] font-bold text-slate-700 flex items-center gap-1">
+                    <span>Đã đạt:</span>
+                    <span className="text-indigo-600">
+                      {parseFloat((settlementRevenue / 1000000000).toFixed(2))}{" "}
+                      / {parseFloat((approvedRevenue / 1000000000).toFixed(2))}{" "}
+                      tỷ
+                    </span>
+                  </div>
+                  <div className="text-[10.5px] font-medium text-slate-500 flex items-center gap-1 flex-wrap">
+                    <span>Ngân sách:</span>
+                    {discrepancy > 0 ? (
+                      <span className="bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-semibold text-[10px]">
+                        {new Intl.NumberFormat("vi-VN").format(discrepancy)} đ
+                      </span>
+                    ) : (
+                      <span className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-semibold text-[10px]">
+                        Vượt ngân sách được duyệt
+                      </span>
+                    )}
+                  </div>
+                </div>
+              }
+              backdropSvg={
+                <div className="w-16 h-16 opacity-15 mb-1">
+                  <svg
+                    viewBox="0 0 50 50"
+                    className="w-full h-full text-slate-400"
+                    fill="none"
+                  >
+                    <circle
+                      cx="25"
+                      cy="25"
+                      r="18"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    />
+                    <line
+                      x1="25"
+                      y1="25"
+                      x2="25"
+                      y2="10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    />
+                    <line
+                      x1="25"
+                      y1="25"
+                      x2="36"
+                      y2="36"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    />
+                  </svg>
+                </div>
+              }
+            />
+
+            {/* CARD 4: BIỂU ĐỒ HOÀN CHỈNH */}
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 relative overflow-hidden shadow-xs h-40 w-full hover:border-amber-200 transition">
+              <FinancialChart dsCongTrinh={data} />
+            </div>
           </div>
         </div>
       </div>

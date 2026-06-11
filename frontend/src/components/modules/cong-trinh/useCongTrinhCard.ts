@@ -207,6 +207,37 @@ export const useCongTrinhCard = ({
         isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear) &&
         e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu,
     );
+
+    //CARD TÔNG QUYẾT TOÁN
+    const listQT = dsCongTrinh.filter(
+      (e) => e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu,
+    );
+    const dsQuyetToan = listQT.length;
+    const tongQuyetToan = listQT.reduce(
+      (sum, item) => sum + (Number(item.giai_doan?.at(-1)?.tong_gia_tri) || 0),
+      0,
+    );
+    //CARD TÔNG DỰ TOÁN
+    // Định nghĩa sẵn mã hiệu để code gọn hơn
+    const MA_HIEU_7 = MA_HIEU_MAPPING[7].ma_hieu;
+    const MA_HIEU_2 = MA_HIEU_MAPPING[2].ma_hieu;
+
+    let tongDuToan = 0;
+    let listDTLength = 0;
+
+    dsCongTrinh?.forEach((item) => {
+      // 1. Tìm giai đoạn hợp lệ (Ưu tiên tìm giai đoạn 7, nếu không thấy thì tìm giai đoạn 2)
+      const targetGiaiDoan =
+        item.giai_doan?.find((gd) => gd?.ma_hieu === MA_HIEU_7) ||
+        item.giai_doan?.find((gd) => gd?.ma_hieu === MA_HIEU_2);
+
+      // 2. Nếu tìm thấy một trong hai giai đoạn thì tiến hành cộng dồn
+      if (targetGiaiDoan) {
+        tongDuToan += Number(targetGiaiDoan.tong_gia_tri || 0);
+        listDTLength++; // Tăng số lượng công trình thỏa mãn điều kiện
+      }
+    });
+
     // 2. Trả về object chứa đầy đủ cấu trúc dữ liệu sạch cho UI sử dụng
     return {
       total: {
@@ -230,6 +261,8 @@ export const useCongTrinhCard = ({
         change: getChangeText(currentQuyetToan, lastQuyetToan),
         timeAgo: getTimeAgo(quyetToanThangNay),
         percent: getPercentText(currentTotal, currentQuyetToan),
+        dsQuyetToan: dsQuyetToan,
+        tongQuyetToan: tongQuyetToan,
       },
       hoanThanh: {
         current: currentHoanThanh,
@@ -238,6 +271,10 @@ export const useCongTrinhCard = ({
         change: getChangeText(currentHoanThanh, lastHoanThanh),
         timeAgo: getTimeAgo(hoanThanhThangNay),
         percent: getPercentText(currentTotal, currentHoanThanh),
+      },
+      dutoan: {
+        tongDuToan: tongDuToan,
+        dsDuToan: listDTLength,
       },
     };
   }, [dsCongTrinh, selectedMonth, selectedYear]);

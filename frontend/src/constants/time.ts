@@ -7,17 +7,17 @@ const startYear = 2025;
 export const getMonthOptions = (selectedYear:number) => {
   const allMonths = [
     { value: 1, label: 'Tháng 01' },
-    { value: 2, label: 'Tháng 02' },
-    { value: 3, label: 'Tháng 03' },
-    { value: 4, label: 'Tháng 04' },
-    { value: 5, label: 'Tháng 05' },
-    { value: 6, label: 'Tháng 06' },
-    { value: 7, label: 'Tháng 07' },
-    { value: 8, label: 'Tháng 08' },
-    { value: 9, label: 'Tháng 09' },
-    { value: 10, label: 'Tháng 10' },
-    { value: 11, label: 'Tháng 11' },
-    { value: 12, label: 'Tháng 12' },
+    { value: 2, label: 'Luỹ kế đến Tháng 02' },
+    { value: 3, label: 'Luỹ kế đến Tháng 03' },
+    { value: 4, label: 'Luỹ kế đến Tháng 04' },
+    { value: 5, label: 'Luỹ kế đến Tháng 05' },
+    { value: 6, label: 'Luỹ kế đến Tháng 06' },
+    { value: 7, label: 'Luỹ kế đến Tháng 07' },
+    { value: 8, label: 'Luỹ kế đến Tháng 08' },
+    { value: 9, label: 'Luỹ kế đến Tháng 09' },
+    { value: 10, label: 'Luỹ kế đến Tháng 10' },
+    { value: 11, label: 'Luỹ kế đến Tháng 11' },
+    { value: 12, label: 'Luỹ kế đến Tháng 12' },
   ];
 
   // Nếu năm được chọn là năm hiện tại, lọc lấy các tháng <= tháng hiện tại

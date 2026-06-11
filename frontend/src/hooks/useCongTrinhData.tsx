@@ -15,6 +15,7 @@ export function useCongTrinhData() {
   // Hàm loadData cố định danh tính bằng useCallback
   const loadData = useCallback(async (month: number, year: number) => {
     try {
+      
       const data = await getAllCongTrinh(month, year);
       setDsCongTrinh(data || []);
     } catch (error) {
@@ -27,6 +28,7 @@ export function useCongTrinhData() {
     const fetchData = async () => {
       try {
         setLoading(true);
+
         await loadData(selectedMonth, selectedYear);
       } catch (error) {
         console.error("Lỗi hệ thống trong useEffect Hook:", error);
