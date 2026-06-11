@@ -36,18 +36,32 @@ export const useCongTrinhCard = ({
       createdAt: string | Date,
       month: number | string,
       year: number | string,
+      isSettled: boolean,
     ) => {
       if (!createdAt) return false;
 
       const date = new Date(createdAt);
       if (isNaN(date.getTime())) return false;
 
-      // Ép kiểu về Number để tránh lỗi so sánh khác kiểu dữ liệu
       const projectMonth = date.getMonth() + 1;
       const projectYear = date.getFullYear();
 
-      // Kiểm tra: Thuộc cùng năm VÀ tháng phải từ Tháng 1 đến Tháng được chọn
-      return projectYear === +year && projectMonth <= +month;
+      const targetYear = +year;
+      const targetMonth = +month;
+
+      // TRƯỜNG HỢP 1: Công trình thuộc năm cũ (nhỏ hơn năm được chọn) VÀ chưa quyết toán
+      if (projectYear < targetYear && !isSettled) {
+        return true; // Phải tính luôn cho năm hiện tại
+      }
+
+      // TRƯỜNG HỢP 2: Công trình thuộc chính năm được chọn
+      if (projectYear === targetYear) {
+        // Tháng phải nằm trong khoảng từ tháng 1 đến tháng được chọn
+        return projectMonth <= targetMonth;
+      }
+
+      // Các trường hợp còn lại (năm cũ đã quyết toán, hoặc công trình thuộc năm tương lai)
+      return false;
     };
 
     // Hàm helper tính toán phần trăm/số lượng chênh lệch dạng hiển thị (+1, -2, 0)
@@ -62,12 +76,47 @@ export const useCongTrinhCard = ({
     };
 
     // --- CARD 1: TỔNG CÔNG TRÌNH ---
-    const currentTotal = dsCongTrinh.filter((e) =>
-      isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear),
-    ).length;
-    const lastTotal = dsCongTrinh.filter((e) =>
-      isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear),
-    ).length;
+    const currentTotal = dsCongTrinh.filter((e) => {
+      if (!e.ngay_tao_du_an) return false;
+
+      const dateNoiTao = new Date(e.ngay_tao_du_an);
+      const projectYear = dateNoiTao.getFullYear();
+      const projectMonth = dateNoiTao.getMonth() + 1;
+
+      const targetYear = +selectedYear;
+      const targetMonth = +selectedMonth;
+
+      // 1. Nếu công trình khởi tạo trong chính năm được chọn (2026)
+      if (projectYear === targetYear) {
+        return projectMonth <= targetMonth; // Thỏa mãn từ tháng 1 đến tháng được chọn
+      }
+
+      // 2. Nếu công trình thuộc năm cũ (2025, 2024...)
+      if (projectYear < targetYear) {
+        const quyetToanStage = e.giai_doan?.[8];
+
+        // TRƯỜNG HỢP A: Công trình chưa quyết toán -> Chắc chắn tính cho năm 2026
+        if (!quyetToanStage) return true;
+
+        // TRƯỜNG HỢP B: Đã quyết toán -> Phải xem ngày quyết toán có thuộc năm đang lọc không
+        const ngayQuyetToan = quyetToanStage.ngay_thuc_hien;
+        if (ngayQuyetToan) {
+          const dateQT = new Date(ngayQuyetToan);
+          const qtYear = dateQT.getFullYear();
+          const qtMonth = dateQT.getMonth() + 1;
+
+          // Nếu quyết toán rơi vào đúng năm đang lọc và nằm trong khoảng tháng được chọn
+          return qtYear === targetYear && qtMonth <= targetMonth;
+        }
+      }
+
+      return false;
+    }).length;
+    const lastTotal = dsCongTrinh.filter((e) => {
+      // Kiểm tra nếu có giai_doan[8] thì coi như đã quyết toán (true), ngược lại là false
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
+      return isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear, isSettled);
+    }).length;
 
     // ==========================================
     // ĐỊNH NGHĨA NHÓM MÃ HIỆU CHO TỪNG CARD (Dễ quản lý, tránh sai index)
@@ -79,37 +128,40 @@ export const useCongTrinhCard = ({
     // --- CARD 2: ĐANG THI CÔNG ---
     // ==========================================
     const currentThiCong = dsCongTrinh.filter((e) => {
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
       const isInTime = isProjectInTime(
         e.ngay_tao_du_an,
         selectedMonth,
         selectedYear,
+        isSettled,
       );
+
       if (!isInTime || !e.giai_doan) return false;
 
-      // Lấy mã hiệu của giai đoạn cuối cùng (nếu không có thì mặc định chuỗi rỗng)
       const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
+      const isMatch = MA_THI_CONG_NT.includes(lastMaHieu);
 
-      // Kiểm tra mã hiệu cuối cùng có phải là "TC" hoặc "NT" không
-
-      return MA_THI_CONG_NT.includes(lastMaHieu);
+      return isMatch;
     }).length;
 
     const lastThiCong = dsCongTrinh.filter((e) => {
-      const isInTime = isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear);
-      if (!isInTime || !e.giai_doan) return false;
-
-      const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
-      return MA_THI_CONG_NT.includes(lastMaHieu);
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
+      return (
+        isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear, isSettled) &&
+        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu
+      );
     }).length;
 
     // ==========================================
     // --- CARD 3: ĐANG QUYẾT TOÁN ---
     // ==========================================
     const currentQuyetToan = dsCongTrinh.filter((e) => {
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
       const isInTime = isProjectInTime(
         e.ngay_tao_du_an,
         selectedMonth,
         selectedYear,
+        isSettled,
       );
       if (!isInTime || !e.giai_doan) return false;
 
@@ -120,24 +172,46 @@ export const useCongTrinhCard = ({
     }).length;
 
     const lastQuyetToan = dsCongTrinh.filter((e) => {
-      const isInTime = isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear);
-      if (!isInTime || !e.giai_doan) return false;
-
-      const lastMaHieu = e.giai_doan.at(-1)?.ma_hieu || "";
-      return MA_QUYET_TOAN.includes(lastMaHieu);
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
+      return (
+        isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear, isSettled) &&
+        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu
+      );
     }).length;
     // --- CARD 4: HOÀN THÀNH (Mã hiệu cuối cùng là "HT") ---
     // (Bạn hãy check lại mã hiệu viết tắt của Hoàn thành trong DB của bạn xem có phải "HT" không nhé)
-    const currentHoanThanh = dsCongTrinh.filter(
-      (e) =>
-        isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu,
-    ).length;
-    const lastHoanThanh = dsCongTrinh.filter(
-      (e) =>
-        isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu,
-    ).length;
+    const currentHoanThanh = dsCongTrinh.filter((e) => {
+      // 1. Kiểm tra xem công trình đã đi đến giai đoạn cuối cùng (Quyết toán) chưa
+      const isAtLastStage =
+        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu;
+      if (!isAtLastStage) return false;
+
+      // 2. Lấy ngày cập nhật hoặc ngày tạo của giai đoạn quyết toán này
+      const ngayQuyetToan =
+        e.giai_doan?.at(-1)?.ngay_thuc_hien ||
+        e.giai_doan?.at(-1)?.ngay_thuc_hien;
+      if (!ngayQuyetToan) return false;
+
+      // 3. Kiểm tra ngày quyết toán này có nằm trong năm/tháng đang được chọn hay không
+      const date = new Date(ngayQuyetToan);
+      if (isNaN(date.getTime())) return false;
+
+      const quyetToanMonth = date.getMonth() + 1;
+      const quyetToanYear = date.getFullYear();
+
+      // Thỏa mãn nếu thuộc năm được chọn VÀ hoàn thành từ tháng 1 đến tháng được chọn (hoặc bằng chính tháng đó)
+      return (
+        quyetToanYear === +selectedYear && quyetToanMonth <= +selectedMonth
+      );
+    }).length;
+
+    const lastHoanThanh = dsCongTrinh.filter((e) => {
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
+      return (
+        isProjectInTime(e.ngay_tao_du_an, prevMonth, prevYear, isSettled) &&
+        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu
+      );
+    }).length;
     // --- Tìm đến phần return ở cuối useMemo của file useProjectStats.ts ---
     const thiCongRatio =
       currentTotal > 0 ? Math.round((currentThiCong / currentTotal) * 100) : 0;
@@ -173,40 +247,66 @@ export const useCongTrinhCard = ({
     // --- BẮD ĐẦU LOGIC LỌC VÀ ĐẾM CHO TỪNG CARD ---
 
     // 1. Nhóm Tổng công trình
-    const totalProjectsThangNay = dsCongTrinh.filter((e) =>
-      isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear),
-    );
+    const totalProjectsThangNay = dsCongTrinh.filter((e) => {
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
+      return isProjectInTime(
+        e.ngay_tao_du_an,
+        selectedMonth,
+        selectedYear,
+        isSettled,
+      );
+    });
 
     // 2. Nhóm Đang thi công
-    const thiCongThangNay = dsCongTrinh.filter(
-      (e) =>
-        isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear) &&
+    const thiCongThangNay = dsCongTrinh.filter((e) => {
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
+      return (
+        isProjectInTime(
+          e.ngay_tao_du_an,
+          selectedMonth,
+          selectedYear,
+          isSettled,
+        ) &&
         e.giai_doan
           ?.at(-1)
           ?.ma_hieu.includes(
             MA_HIEU_MAPPING[3].ma_hieu || MA_HIEU_MAPPING[4].ma_hieu,
-          ),
-    );
+          )
+      );
+    });
 
     // 3. Nhóm Đang quyết toán
-    const quyetToanThangNay = dsCongTrinh.filter(
-      (e) =>
-        isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear) &&
+    const quyetToanThangNay = dsCongTrinh.filter((e) => {
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
+      return (
+        isProjectInTime(
+          e.ngay_tao_du_an,
+          selectedMonth,
+          selectedYear,
+          isSettled,
+        ) &&
         e.giai_doan
           ?.at(-1)
           ?.ma_hieu.includes(
             MA_HIEU_MAPPING[5].ma_hieu ||
               MA_HIEU_MAPPING[6].ma_hieu ||
               MA_HIEU_MAPPING[7].ma_hieu,
-          ),
-    );
+          )
+      );
+    });
 
     // 4. Nhóm Hoàn thành
-    const hoanThanhThangNay = dsCongTrinh.filter(
-      (e) =>
-        isProjectInTime(e.ngay_tao_du_an, selectedMonth, selectedYear) &&
-        e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu,
-    );
+    const hoanThanhThangNay = dsCongTrinh.filter((e) => {
+      const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
+      return (
+        isProjectInTime(
+          e.ngay_tao_du_an,
+          selectedMonth,
+          selectedYear,
+          isSettled,
+        ) && e.giai_doan?.at(-1)?.ma_hieu === MA_HIEU_MAPPING[8].ma_hieu
+      );
+    });
 
     //CARD TÔNG QUYẾT TOÁN
     const listQT = dsCongTrinh.filter(

@@ -16,6 +16,7 @@ export default function CongTrinhpage() {
     filteredTableData, // Mảng ĐÃ LỌC động truyền cho Bảng hiển thị
     setFilterStatus,
     loading,
+    refreshData,
   } = useCongTrinhData();
 
   if (loading) return <LoadingScreen />;
@@ -23,7 +24,7 @@ export default function CongTrinhpage() {
   return (
     <div>
       <div className="flex flex-col gap-6">
-        <DynamicBreadcrumb/>
+        <DynamicBreadcrumb />
         <ProjectStatsBlock
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
@@ -34,10 +35,9 @@ export default function CongTrinhpage() {
           onCardClick={setFilterStatus}
         />
         <DSCongTrinh
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
           data={filteredTableData}
           rowsPerPage={20}
+          onRefresh={refreshData}
         />
       </div>
     </div>

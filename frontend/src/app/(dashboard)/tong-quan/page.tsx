@@ -19,6 +19,7 @@ export default function TongQuanPage() {
     filteredTableData, // Mảng ĐÃ LỌC động truyền cho Bảng hiển thị
     setFilterStatus,
     loading,
+    refreshData,
   } = useCongTrinhData();
 
   if (loading) return <LoadingScreen />;
@@ -38,9 +39,9 @@ export default function TongQuanPage() {
           onCardClick={setFilterStatus}
         />
         <DSCongTrinh
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
           data={filteredTableData}
+          rowsPerPage={20}
+          onRefresh={refreshData}
         />
         <div className="mt-5 flex justify-end">
           <button
