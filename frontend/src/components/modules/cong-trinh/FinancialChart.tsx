@@ -11,10 +11,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// 1. Dữ liệu thô (Mock Data) theo cấu trúc các tháng
 
 interface ChartPros {
-  dsCongTrinh: ICongTrinh[];
+  dsCongTrinh?: ICongTrinh[];
 }
 
 const FinancialChart = ({ dsCongTrinh}: ChartPros) => {
