@@ -11,15 +11,15 @@ import { UserDepartment, UserPositions } from '../constants/user.constants';
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  userName: string;
+  userName!: string;
 
   @IsString()
   @IsNotEmpty()
-  password: string;
+  password!: string;
 
   @IsString()
   @IsNotEmpty()
-  fullName: string;
+  fullName!: string;
 
   @IsEmail()
   @IsOptional()

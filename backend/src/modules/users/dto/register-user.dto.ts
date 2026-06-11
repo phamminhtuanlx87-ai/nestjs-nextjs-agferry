@@ -2,15 +2,15 @@ import { IsString, MinLength } from 'class-validator';
 
 export class RegisterUserDto {
   @IsString()
-  userName: string;
+  userName!: string;
 
   @IsString()
   @MinLength(6)
-  password: string;
+  password!: string;
 
   @IsString()
-  fullName: string;
+  fullName!: string;
   // Tuyệt đối không để trường 'role' hay 'permissions' ở đây
   @IsString()
-  email: string;
+  email!: string;
 }

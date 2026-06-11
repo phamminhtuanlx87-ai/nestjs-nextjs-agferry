@@ -5,11 +5,11 @@ import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 class DepartmentDto {
   @IsString()
   @IsNotEmpty()
-  id: string;
+  id!: string;
 
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name!: string;
 }
 
 // DTO nhỏ cho File đính kèm
@@ -18,19 +18,19 @@ class PositionsDto extends DepartmentDto {}
 export class getMeDTO {
   @IsString()
   @IsNotEmpty()
-  fullName: string;
+  fullName!: string;
 
   @IsString()
   @IsNotEmpty()
-  email: string;
+  email!: string;
 
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => DepartmentDto)
-  department: DepartmentDto;
+  department!: DepartmentDto;
 
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => PositionsDto)
-  positions: PositionsDto;
+  positions!: PositionsDto;
 }

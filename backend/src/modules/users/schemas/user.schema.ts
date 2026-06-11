@@ -14,29 +14,29 @@ export type UserDocument = HydratedDocument<User>;
 })
 export class User {
   @Prop({ required: true, unique: true, trim: true })
-  userName: string;
+  userName!: string;
 
   @Prop({ required: true, trim: true })
-  fullName: string;
+  fullName!: string;
 
   @Prop({ lowercase: true, trim: true })
-  email: string;
+  email!: string;
 
   @Prop({ required: true, select: false }) // select: false sẽ ẩn mật khẩu khỏi các câu lệnh query mặc định
-  passwordHash: string;
+  passwordHash!: string;
 
   @Prop({ default: false })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Prop({ default: null })
-  googleId: string;
+  googleId!: string;
 
   @Prop({
     type: String,
     enum: Object.values(UserRole), // Chỉ cho phép các giá trị trong UserRole
     default: UserRole.USER,
   })
-  role: string;
+  role!: string;
 
   // Sửa từ string sang mảng string để chứa được 7 quyền như dữ liệu của bạn
   @Prop({
@@ -50,7 +50,7 @@ export class User {
       UserPermission.PROJECT_VIEW,
     ],
   })
-  permissions: string[];
+  permissions!: string[];
 
   // Định nghĩa rõ cấu trúc object phòng ban
   @Prop({
@@ -61,7 +61,7 @@ export class User {
     _id: false, // Không tạo _id riêng cho object này
     default: null,
   })
-  department: {
+  department!: {
     id: string;
     name: string;
   };
@@ -74,7 +74,7 @@ export class User {
     _id: false, // Không tạo _id riêng cho object này
     default: null,
   })
-  positions: {
+  positions!: {
     id: string;
     name: string;
   };

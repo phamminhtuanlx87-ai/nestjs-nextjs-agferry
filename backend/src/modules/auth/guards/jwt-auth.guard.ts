@@ -13,7 +13,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {
     super();
   }
-  private currentContext: ExecutionContext;
+  private currentContext!: ExecutionContext;
   canActivate(context: ExecutionContext) {
     this.currentContext = context;
     // 1. Dùng Reflector để kiểm tra xem route hoặc class có nhãn @Public không
