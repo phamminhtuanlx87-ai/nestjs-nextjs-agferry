@@ -38,11 +38,25 @@ export default function ProjectStatsBlock({
   const approvedRevenue = Number(stats.dutoan?.tongDuToan);
   const settlementRevenue = Number(stats.quyetToan?.tongQuyetToan);
   // Tự động tính toán tỷ lệ % thực tế
-  const rate =
-    approvedRevenue > 0
-      ? ((settlementRevenue / approvedRevenue) * 100).toFixed(1)
-      : "0.0";
+  const calculatedRate =
+    approvedRevenue > 0 ? (settlementRevenue / approvedRevenue) * 100 : 0;
+  const rate = new Intl.NumberFormat("vi-VN", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(calculatedRate);
+
   const discrepancy = approvedRevenue - settlementRevenue;
+
+  const cpxdDuToan = Number(stats.dutoan?.tongCPXD);
+  const cpxdQuyetToan = Number(stats.quyetToan?.tongCPXD);
+  // Tự động tính toán tỷ lệ % thực tế
+  const cpxdCalculatedRate =
+    cpxdDuToan > 0 ? (cpxdQuyetToan / cpxdDuToan) * 100 : 0;
+  const cpxdRate = new Intl.NumberFormat("vi-VN", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(cpxdCalculatedRate);
+
   return (
     <div className="relative w-full">
       <div className="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
@@ -111,8 +125,12 @@ export default function ProjectStatsBlock({
               title="Tổng Dự Toán được duyệt"
               icon={<BiWallet size={16} className="text-[#15157d]" />}
               iconBgColor="bg-[#f0ecf5] border-[#e4e1ea]"
-              hoverBorderColor="hover:border-[#15157d]/30"
+              hoverBorderColor="hover:border-[#15157d]/30 cursor-pointer hover:scale-[1.02]  transition-all duration-300"
               value={approvedRevenue}
+              value2={cpxdDuToan}
+              onClick={() => {
+                onCardClick?.("DU_TOAN");
+              }}
               footer={
                 <>
                   <span className="bg-[#e1e0ff] text-[#15157d] px-2 py-0.5 rounded-md text-[10px] font-extrabold tracking-tight">
@@ -152,8 +170,10 @@ export default function ProjectStatsBlock({
               title="Tổng quyết toán"
               icon={<BiNote size={16} className="text-[#1c2c5a]" />}
               iconBgColor="bg-[#f0ecf5] border-[#e4e1ea]"
-              hoverBorderColor="hover:border-indigo-200"
+              hoverBorderColor="hover:border-indigo-200 cursor-pointer hover:scale-[1.02]  transition-all duration-300"
               value={settlementRevenue}
+              value2={cpxdQuyetToan}
+              onClick={() => onCardClick?.("HOAN_THANH")}
               footer={
                 <>
                   <span className="bg-[#cfe5ff] text-[#051d30] px-2 py-0.5 rounded-md text-[10px] font-extrabold tracking-tight">
@@ -221,6 +241,17 @@ export default function ProjectStatsBlock({
                       </span>
                     )}
                   </div>
+                  <div className="text-xs text-slate-500 mt-1 flex justify-self-start gap-1">
+                    <span>Riêng Chi phí Xây dựng:</span>
+                    <span className="font-semibold text-blue-600">
+                      {cpxdRate}%
+                    </span>
+                    <span className="text-indigo-600">
+                      (Đã đạt:{" "}
+                      {parseFloat((cpxdQuyetToan / 1000000000).toFixed(2))} /{" "}
+                      {parseFloat((cpxdDuToan / 1000000000).toFixed(2))} tỷ)
+                    </span>
+                  </div>
                 </div>
               }
               backdropSvg={
@@ -259,7 +290,7 @@ export default function ProjectStatsBlock({
             />
 
             {/* CARD 4: BIỂU ĐỒ HOÀN CHỈNH */}
-            <div className="bg-white border border-slate-200/80 rounded-xl p-4 relative overflow-hidden shadow-xs h-40 w-full hover:border-amber-200 transition">
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 relative overflow-hidden shadow-xs h-40 w-full hover:border-amber-200 transition-all">
               <FinancialChart dsCongTrinh={data} />
             </div>
           </div>

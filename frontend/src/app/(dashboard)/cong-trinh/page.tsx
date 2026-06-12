@@ -1,6 +1,6 @@
 "use client";
 import LoadingScreen from "@/components/ui/LoadingScreen";
-import React from "react";
+import React, { useRef } from "react";
 import ProjectStatsBlock from "@/components/modules/cong-trinh/ProjectStatsBlock";
 import DSCongTrinh from "@/components/modules/cong-trinh/DSCongTrinh";
 import { useCongTrinhData } from "@/hooks/useCongTrinhData";
@@ -19,6 +19,16 @@ export default function CongTrinhpage() {
     refreshData,
   } = useCongTrinhData();
 
+  const tableRef = useRef<HTMLDivElement>(null);
+  const handleCardClick = (status: string) => {
+    setFilterStatus(status); // Vẫn đổi bộ lọc card như cũ
+
+    // Ra lệnh cuộn màn hình xuống vị trí Table
+    tableRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
   if (loading) return <LoadingScreen />;
 
   return (
@@ -32,13 +42,15 @@ export default function CongTrinhpage() {
           onYearChange={setSelectedYear}
           data={dsCongTrinh}
           loading={loading}
-          onCardClick={setFilterStatus}
+          onCardClick={handleCardClick}
         />
-        <DSCongTrinh
-          data={filteredTableData}
-          rowsPerPage={20}
-          onRefresh={refreshData}
-        />
+        <div ref={tableRef}>
+          <DSCongTrinh
+            data={filteredTableData}
+            rowsPerPage={20}
+            onRefresh={refreshData}
+          />
+        </div>
       </div>
     </div>
   );

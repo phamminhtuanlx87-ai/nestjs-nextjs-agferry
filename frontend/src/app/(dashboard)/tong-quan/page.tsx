@@ -6,6 +6,7 @@ import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import { useCongTrinhData } from "@/hooks/useCongTrinhData";
 import { useRouter } from "next/navigation";
+import { useRef } from "react";
 import { HiOutlineArrowSmRight } from "react-icons/hi";
 export default function TongQuanPage() {
   // Lấy toàn bộ "vũ khí" ra từ Custom Hook dùng chung
@@ -22,6 +23,17 @@ export default function TongQuanPage() {
     refreshData,
   } = useCongTrinhData();
 
+  const tableRef = useRef<HTMLDivElement>(null);
+  const handleCardClick = (status: string) => {
+    setFilterStatus(status); // Vẫn đổi bộ lọc card như cũ
+
+    // Ra lệnh cuộn màn hình xuống vị trí Table
+    tableRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   if (loading) return <LoadingScreen />;
 
   return (
@@ -36,13 +48,15 @@ export default function TongQuanPage() {
           onYearChange={setSelectedYear}
           data={dsCongTrinh}
           loading={loading}
-          onCardClick={setFilterStatus}
+          onCardClick={handleCardClick}
         />
-        <DSCongTrinh
-          data={filteredTableData}
-          rowsPerPage={20}
-          onRefresh={refreshData}
-        />
+        <div ref={tableRef}>
+          <DSCongTrinh
+            data={filteredTableData}
+            rowsPerPage={20}
+            onRefresh={refreshData}
+          />
+        </div>
         <div className="mt-5 flex justify-end">
           <button
             onClick={() => router.push("/cong-trinh")} // Chuyển hướng sang trang hồ sơ

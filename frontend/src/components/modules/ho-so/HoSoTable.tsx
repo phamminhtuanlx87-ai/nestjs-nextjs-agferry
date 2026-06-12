@@ -524,7 +524,12 @@ export default function HoSoTable({
             </div>
             <div className="p-4 flex-1">
               <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
+                <div className="h-30 p-3 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 text-sm">
+                  {/* Sau này anh ném Biểu đồ đường/cột hoặc Thống kê tiền vé phà vào đây */}
+                  [Nơi quản lý văn bản hành chính] ... Đang phát triển thêm tính
+                  năng này nên tạm thời chưa có dữ liệu để hiển thị
+                </div>
+                {/* <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
                   <tbody className="divide-y divide-gray-200 bg-white text-gray-700">
                     <tr className="hover:bg-gray-50/50">
                       <td className="px-4 py-3 flex items-center gap-2">
@@ -567,7 +572,7 @@ export default function HoSoTable({
                       </td>
                     </tr>
                   </tbody>
-                </table>
+                </table> */}
               </div>
             </div>
           </div>
@@ -584,7 +589,12 @@ export default function HoSoTable({
             </div>
             <div className="p-4 flex-1">
               <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
+                <div className="h-30 p-3 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 text-sm">
+                  {/* Sau này anh ném Biểu đồ đường/cột hoặc Thống kê tiền vé phà vào đây */}
+                  [Nơi quản lý văn bản Cá nhân] ... Đang phát triển thêm tính
+                  năng này nên tạm thời chưa có dữ liệu để hiển thị
+                </div>
+                {/* <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
                   <tbody className="divide-y divide-gray-200 bg-white text-gray-700">
                     <tr className="hover:bg-gray-50/50">
                       <td className="px-4 py-3 flex items-center gap-2">
@@ -607,7 +617,7 @@ export default function HoSoTable({
                       </td>
                     </tr>
                   </tbody>
-                </table>
+                </table> */}
               </div>
             </div>
           </div>

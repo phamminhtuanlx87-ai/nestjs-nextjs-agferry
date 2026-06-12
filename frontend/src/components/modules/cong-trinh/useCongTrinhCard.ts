@@ -317,12 +317,18 @@ export const useCongTrinhCard = ({
       (sum, item) => sum + (Number(item.giai_doan?.at(-1)?.tong_gia_tri) || 0),
       0,
     );
+
+     const cpxdQuyetToan = listQT.reduce(
+      (sum, item) => sum + (Number(item.giai_doan?.at(-1)?.chi_phi_xay_dung) || 0),
+      0,
+    );
     //CARD TÔNG DỰ TOÁN
     // Định nghĩa sẵn mã hiệu để code gọn hơn
     const MA_HIEU_7 = MA_HIEU_MAPPING[7].ma_hieu;
     const MA_HIEU_2 = MA_HIEU_MAPPING[2].ma_hieu;
 
     let tongDuToan = 0;
+    let tongCPXD = 0;
     let listDTLength = 0;
 
     dsCongTrinh?.forEach((item) => {
@@ -334,6 +340,7 @@ export const useCongTrinhCard = ({
       // 2. Nếu tìm thấy một trong hai giai đoạn thì tiến hành cộng dồn
       if (targetGiaiDoan) {
         tongDuToan += Number(targetGiaiDoan.tong_gia_tri || 0);
+        tongCPXD += Number(targetGiaiDoan.chi_phi_xay_dung || 0);
         listDTLength++; // Tăng số lượng công trình thỏa mãn điều kiện
       }
     });
@@ -363,6 +370,7 @@ export const useCongTrinhCard = ({
         percent: getPercentText(currentTotal, currentQuyetToan),
         dsQuyetToan: dsQuyetToan,
         tongQuyetToan: tongQuyetToan,
+        tongCPXD: cpxdQuyetToan,
       },
       hoanThanh: {
         current: currentHoanThanh,
@@ -374,6 +382,7 @@ export const useCongTrinhCard = ({
       },
       dutoan: {
         tongDuToan: tongDuToan,
+        tongCPXD: tongCPXD,
         dsDuToan: listDTLength,
       },
     };

@@ -3,7 +3,9 @@ import { getAllCongTrinh, ICongTrinh } from "@/services/congTrinhService"; // Đ
 
 export function useCongTrinhData() {
   const now = new Date();
-  const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth() + 1);
+  const [selectedMonth, setSelectedMonth] = useState<number>(
+    now.getMonth() + 1,
+  );
   const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear());
   const [dsCongTrinh, setDsCongTrinh] = useState<ICongTrinh[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -40,8 +42,20 @@ export function useCongTrinhData() {
       const lastMaHieu = item.giai_doan?.at(-1)?.ma_hieu || "";
 
       if (filterStatus === "THI_CONG") return ["TC", "NT"].includes(lastMaHieu);
-      if (filterStatus === "QUYET_TOAN") return ["DT_PS", "TTR_DT_PS", "PD_DT_PS"].includes(lastMaHieu);
+      if (filterStatus === "QUYET_TOAN")
+        return ["DT_PS", "TTR_DT_PS", "PD_DT_PS"].includes(lastMaHieu);
       if (filterStatus === "HOAN_THANH") return ["QT"].includes(lastMaHieu);
+
+      if (filterStatus === "DU_TOAN")
+        return [
+          "TTR_DT", // Key 2
+          "PD_DT", // Key 3
+          "TC", // Key 4
+          "NT", // Key 5
+          "DT_PS", // Key 6
+          "TTR_DT_PS", // Key 7
+          "PD_DT_PS", // Key 8
+        ].includes(lastMaHieu);
 
       return true;
     });
@@ -53,9 +67,9 @@ export function useCongTrinhData() {
     selectedYear,
     setSelectedYear,
     dsCongTrinh,
-    filteredTableData, 
-    filterStatus, 
-    setFilterStatus, 
+    filteredTableData,
+    filterStatus,
+    setFilterStatus,
     loading,
     refreshData, // 🔥 Bây giờ là một hàm an toàn, không bị tạo mới sau mỗi lần re-render
   };
