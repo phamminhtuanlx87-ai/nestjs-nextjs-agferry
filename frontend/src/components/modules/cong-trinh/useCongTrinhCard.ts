@@ -250,7 +250,7 @@ export const useCongTrinhCard = ({
     const totalProjectsThangNay = dsCongTrinh.filter((e) => {
       const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
       return isProjectInTime(
-        e.ngay_tao_du_an,
+        e.updatedAt,
         selectedMonth,
         selectedYear,
         isSettled,
@@ -262,7 +262,7 @@ export const useCongTrinhCard = ({
       const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
       return (
         isProjectInTime(
-          e.ngay_tao_du_an,
+          e.updatedAt,
           selectedMonth,
           selectedYear,
           isSettled,
@@ -280,7 +280,7 @@ export const useCongTrinhCard = ({
       const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
       return (
         isProjectInTime(
-          e.ngay_tao_du_an,
+          e.updatedAt,
           selectedMonth,
           selectedYear,
           isSettled,
@@ -300,7 +300,7 @@ export const useCongTrinhCard = ({
       const isSettled = e.giai_doan && e.giai_doan[8] ? true : false;
       return (
         isProjectInTime(
-          e.ngay_tao_du_an,
+          e.updatedAt,
           selectedMonth,
           selectedYear,
           isSettled,
