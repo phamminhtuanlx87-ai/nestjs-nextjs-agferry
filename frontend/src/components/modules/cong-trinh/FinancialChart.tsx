@@ -13,7 +13,7 @@ import {
 
 interface ChartPros {
   dsCongTrinh?: ICongTrinh[];
-  selectYear: number;
+  selectYear?: number;
 }
 
 const FinancialChart = ({ dsCongTrinh, selectYear }: ChartPros) => {
