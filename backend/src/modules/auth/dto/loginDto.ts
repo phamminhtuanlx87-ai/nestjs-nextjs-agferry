@@ -3,9 +3,9 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class LoginDTO {
   @IsString()
   @IsNotEmpty()
-  userName: string;
+  userName!: string;
 
   @IsString()
   @IsNotEmpty()
-  password: string;
+  password!: string;
 }

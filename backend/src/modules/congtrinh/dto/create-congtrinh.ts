@@ -14,22 +14,22 @@ import { Type } from 'class-transformer';
 class FileLinkDto {
   @IsString()
   @IsNotEmpty()
-  link_name: string;
+  link_name!: string;
 
   @IsString()
   @IsNotEmpty()
-  link_url: string;
+  link_url!: string;
 }
 
 // DTO nhỏ cho từng Giai đoạn
 class GiaiDoanDto {
   @IsString()
   @IsNotEmpty()
-  ma_hieu: string;
+  ma_hieu!: string;
 
   @IsString()
   @IsNotEmpty()
-  ten_giai_doan: string;
+  ten_giai_doan!: string;
 
   @IsString()
   @IsOptional()
@@ -86,11 +86,11 @@ class GiaiDoanDto {
 export class CongTrinhDto {
   @IsString({ message: 'Tên công trình phải là chuỗi văn bản' })
   @IsNotEmpty({ message: 'Không được để trống tên công trình' })
-  ten_cong_trinh: string;
+  ten_cong_trinh!: string;
 
   @IsString()
   @IsNotEmpty()
-  ma_cong_trinh: string;
+  ma_cong_trinh!: string;
 
   @IsString()
   @IsOptional()

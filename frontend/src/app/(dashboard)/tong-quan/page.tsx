@@ -53,7 +53,7 @@ export default function TongQuanPage() {
         <div ref={tableRef}>
           <DSCongTrinh
             data={filteredTableData}
-            rowsPerPage={20}
+            rowsPerPage={5}
             onRefresh={refreshData}
           />
         </div>
