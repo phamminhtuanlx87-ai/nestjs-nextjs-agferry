@@ -13,7 +13,7 @@ export default function Modal({
   onClose,
   title,
   children,
-  className = "min-w-2xl lg:min-w-4xl",
+  className = "min-w-full lg:min-w-4xl",
 }: ModalProps) {
   if (!isOpen) return null;
 

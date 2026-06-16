@@ -17,8 +17,9 @@ export default function DashboardLayout({
     <AuthGuard>
       <div className="flex h-screen w-full bg-neutral-100">
         {/* 1. Đảm bảo truyền đúng state đóng mở xuống cho Sidebar */}
-        <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
-
+        <div className="overflow-y-auto no-scrollbar">
+          <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
+        </div>
         <div className="flex flex-col flex-1 h-screen min-w-0">
           {/* 2. Đảm bảo truyền hàm ĐẢO TRẠNG THÁI xuống cho Navbar */}
           <Navbar

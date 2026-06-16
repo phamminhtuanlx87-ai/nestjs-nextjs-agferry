@@ -1,7 +1,7 @@
 "use client";
 
 import { ICongTrinh } from "@/services/congTrinhService";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -18,7 +18,6 @@ interface ChartPros {
 
 const FinancialChart = ({ dsCongTrinh, selectYear }: ChartPros) => {
   const [isMounted, setIsMounted] = useState(false);
-  const previousYear = Number(selectYear) - 1;
   // Hàm định dạng hiển thị tiền tệ VNĐ khi rê chuột vào cột (Tooltip)
   const formatCurrency = (value: number) => {
     const num = Number(value);
@@ -35,71 +34,85 @@ const FinancialChart = ({ dsCongTrinh, selectYear }: ChartPros) => {
   };
 
   // 1. Khởi tạo mảng: Nhét hẳn cột "Năm 2025" (hoặc "Trước 2026") làm phần tử đầu tiên
-  const chartDataMock = [
-    {
-      name: `${previousYear}`, // Tên hiển thị dưới chân cột đồ thị
-      fullName: `Năm ${previousYear}`,
-      duToan: 0,
-      quyetToan: 0,
-    },
-    ...Array.from({ length: 12 }, (_, index) => {
-      const monthNum = index + 1;
-      return {
-        name: `T${monthNum < 10 ? "0" : ""}${monthNum}`, // T01, T02...
-        fullName: `Tháng ${monthNum < 10 ? "0" : ""}${monthNum}`,
+  const chartDataMock = useMemo(() => {
+    const previousYear = Number(selectYear) - 1;
+
+    // 1. Khởi tạo cấu trúc mảng gốc (Chỉ chạy 1 lần duy nhất khi render)
+    const data = [
+      {
+        name: `${previousYear}`,
+        fullName: `Năm ${previousYear}`,
         duToan: 0,
         quyetToan: 0,
-      };
-    }),
-  ];
-  // 2. Duyệt qua danh sách công trình từ props để cộng dồn tiền vào từng tháng tương ứng
-  dsCongTrinh?.forEach((item) => {
-    const duToanDateString =
-      item.giai_doan[7]?.ngay_thuc_hien ?? item.giai_doan[2]?.ngay_thuc_hien;
-    const itemYear = new Date(duToanDateString as string).getFullYear();
+      },
+      ...Array.from({ length: 12 }, (_, index) => {
+        const monthNum = index + 1;
+        return {
+          name: `T${monthNum < 10 ? "0" : ""}${monthNum}`,
+          fullName: `Tháng ${monthNum < 10 ? "0" : ""}${monthNum}`,
+          duToan: 0,
+          quyetToan: 0,
+        };
+      }),
+    ];
 
-    // TÌNH HUỐNG 1: Năm cũ (Chuyển tiếp)
-    if (itemYear < Number(selectYear)) {
-      chartDataMock[0].duToan += Number(
-        item.giai_doan[7]?.tong_gia_tri ?? item.giai_doan[2]?.tong_gia_tri ?? 0,
-      );
-    }
-    // TÌNH HUỐNG 2: Năm hiện tại
-    else if (itemYear === Number(selectYear)) {
-      // Xử lý Dự toán
-      if (duToanDateString) {
-        const duToanMonth = new Date(duToanDateString as string).getMonth(); // 0-11
-        // PHẢI CỘNG THÊM 1 vì index 0 đã bị chiếm bởi "Năm 2025"
-        const targetIndex = duToanMonth + 1;
+    // Nếu chưa có danh sách công trình thì trả về mảng rỗng ngay, đỡ tốn CPU chạy tiếp
+    if (!dsCongTrinh || dsCongTrinh.length === 0) return data;
 
-        if (targetIndex <= 12) {
-          chartDataMock[targetIndex].duToan += Number(
-            item.giai_doan[7]?.tong_gia_tri ??
-              item.giai_doan[2]?.tong_gia_tri ??
-              0,
-          );
-        }
-      }
-
-      // Xử lý Quyết toán
+    // 2. Duyệt 1 vòng duy nhất qua mảng công trình
+    dsCongTrinh.forEach((item) => {
+      // Trích xuất chuỗi ngày tháng an toàn
+      const duToanDateString =
+        item.giai_doan[7]?.ngay_thuc_hien ?? item.giai_doan[2]?.ngay_thuc_hien;
       const quyetToanDateString = item.giai_doan[8]?.ngay_thuc_hien;
-      if (quyetToanDateString) {
-        const quyetToanMonth = new Date(
-          quyetToanDateString as string,
-        ).getMonth();
-        const targetIndex = quyetToanMonth + 1;
 
-        if (targetIndex <= 12) {
-          // LƯU Ý: Chỗ này hình như anh đang cộng nhầm giá trị của duToan cho quyetToan?
-          // Anh nên kiểm tra lại xem có lấy nhầm item.giai_doan[8] không nhé!
-          chartDataMock[targetIndex].quyetToan += Number(
-            item.giai_doan[8]?.tong_gia_tri ?? 0,
-          );
+      // --- XỬ LÝ LOGIC DỰ TOÁN ---
+      if (duToanDateString) {
+        const duToanDate = new Date(duToanDateString as string);
+        const itemYear = duToanDate.getFullYear();
+
+        const duToanValue = Number(
+          item.giai_doan[7]?.tong_gia_tri ??
+            item.giai_doan[2]?.tong_gia_tri ??
+            0,
+        );
+
+        // Tình huống 1: Thuộc về năm cũ (Chuyển tiếp)
+        if (itemYear < Number(selectYear)) {
+          data[0].duToan += duToanValue;
+        }
+        // Tình huống 2: Thuộc về năm hiện tại
+        else if (itemYear === Number(selectYear)) {
+          const duToanMonth = duToanDate.getMonth(); // 0 - 11
+          const targetIndex = duToanMonth + 1; // Bù trừ index 0 của năm cũ
+
+          if (targetIndex <= 12) {
+            data[targetIndex].duToan += duToanValue;
+          }
         }
       }
-    }
-    console.log(chartDataMock);
-  });
+
+      // --- XỬ LÝ LOGIC QUYẾT TOÁN ---
+      if (quyetToanDateString) {
+        const quyetToanDate = new Date(quyetToanDateString as string);
+        const quyetToanYear = quyetToanDate.getFullYear();
+
+        // Chỉ cộng dồn quyết toán nếu nó thuộc về năm đang chọn
+        if (quyetToanYear === Number(selectYear)) {
+          const quyetToanMonth = quyetToanDate.getMonth();
+          const targetIndex = quyetToanMonth + 1;
+
+          if (targetIndex <= 12) {
+            data[targetIndex].quyetToan += Number(
+              item.giai_doan[8]?.tong_gia_tri ?? 0,
+            );
+          }
+        }
+      }
+    });
+
+    return data;
+  }, [dsCongTrinh, selectYear]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -128,7 +141,7 @@ const FinancialChart = ({ dsCongTrinh, selectYear }: ChartPros) => {
             dataKey="name"
             type="category"
             fontSize={11}
-            interval={0}
+            interval="preserveStartEnd"
             axisLine={false}
             tickLine={false}
             tick={{ fill: "#64748b", fontSize: 11, fontWeight: 500 }}
@@ -141,10 +154,7 @@ const FinancialChart = ({ dsCongTrinh, selectYear }: ChartPros) => {
           {/* Hộp thoại hiển thị thông tin chi tiết mượt mà khi di chuột */}
           <Tooltip
             // Sửa lỗi eslint: Bỏ biến props nếu không dùng đến để tránh bị bắt lỗi "never used"
-            formatter={(value, name) => [
-              formatCurrency(Number(value)),
-              name,
-            ]}
+            formatter={(value, name) => [formatCurrency(Number(value)), name]}
             // Sửa lỗi labelFormatter: Ép kiểu any cho label để vượt qua bộ lọc TypeScript
             labelFormatter={(label) => {
               // Ép sang chuỗi để xử lý logic an toàn
@@ -179,6 +189,7 @@ const FinancialChart = ({ dsCongTrinh, selectYear }: ChartPros) => {
             stackId="financialStack"
             fill="#e28743"
             radius={[0, 0, 4, 4]} // Bo góc nhẹ cạnh đáy
+            background={{ fill: "#f1f1f6", radius: 6 }}
           />
 
           {/* Cột 2: Dự toán xếp CHỒNG lên trên (Màu xanh đậm đặc trưng hệ thống) */}
