@@ -10,6 +10,7 @@ import { alertService } from "@/utils/swal";
 import { useState } from "react";
 import { Guard } from "@/components/common/Guard";
 import { UserPermission } from "@/store/useAuthStore";
+import ResponsivePagination from "@/components/ui/ResponsivePagination";
 
 interface CongTrinhTableProps {
   // projects: ICongTrinh[];
@@ -217,44 +218,13 @@ export default function CongTrinhTable({
         ))}
       </Table>
       {/* INFO + PAGINATION */}
-      <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-        <p className="text-sm text-gray-500">
-          Hiển thị {start + 1} - {Math.min(end, Number(totalItems))} của{" "}
-          {totalItems} công trình
-        </p>
-
-        <div className="flex gap-2">
-          <button
-            className="px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-40"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-          >
-            ‹
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              className={`px-3 py-1 border rounded ${
-                currentPage === i + 1
-                  ? "bg-indigo-600 text-white border-indigo-600"
-                  : "hover:bg-gray-100"
-              }`}
-              onClick={() => setCurrentPage(i + 1)}
-            >
-              {i + 1}
-            </button>
-          ))}
-
-          <button
-            className="px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-40"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-          >
-            ›
-          </button>
-        </div>
-      </div>
+      <ResponsivePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        setCurrentPage={setCurrentPage}
+        itemsPerPage={rowsPerPage}
+      />
     </div>
   );
 }

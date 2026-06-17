@@ -290,7 +290,7 @@ export default function ProjectStatsBlock({
             />
 
             {/* CARD 4: BIỂU ĐỒ HOÀN CHỈNH */}
-            <div className="bg-white border border-slate-200/80 rounded-xl p-4 relative overflow-hidden shadow-xs h-40 w-full hover:border-amber-200 transition-all">
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 relative overflow-hidden shadow-xs h-44 w-full hover:border-amber-200 transition-all">
               <FinancialChart dsCongTrinh={data} selectYear={selectedYear}/>
             </div>
           </div>

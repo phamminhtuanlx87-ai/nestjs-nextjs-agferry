@@ -11,6 +11,25 @@ import {
 import { Type } from 'class-transformer';
 
 // DTO nhỏ cho File đính kèm
+class ThongTinThemDto {
+  @IsNumber()
+  @IsOptional()
+  ps_tang?: number;
+
+  @IsNumber()
+  @IsOptional()
+  ps_giam?: number;
+
+  @IsNumber()
+  @IsOptional()
+  cp_tham_tra_ps?: number;
+
+  @IsString()
+  @IsOptional()
+  don_vi_giam_sat?: string;
+}
+
+// DTO nhỏ cho File đính kèm
 class FileLinkDto {
   @IsString()
   @IsNotEmpty()
@@ -49,19 +68,11 @@ class GiaiDoanDto {
 
   @IsNumber()
   @IsOptional()
-  chenh_lech_tgt?: number;
+  so_ngay_tc_pgv?: number;
 
   @IsNumber()
   @IsOptional()
-  chenh_lech_cpxd?: number;
-
-  @IsNumber()
-  @IsOptional()
-  so_ngay_tc_pgv?: string;
-
-  @IsNumber()
-  @IsOptional()
-  so_ngay_tc_thuc_te?: string;
+  so_ngay_tc_thuc_te?: number;
 
   @IsString()
   @IsOptional()
@@ -80,6 +91,11 @@ class GiaiDoanDto {
   @Type(() => FileLinkDto)
   @IsOptional()
   file_links?: FileLinkDto[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ThongTinThemDto)
+  thong_tin_them?: ThongTinThemDto;
 }
 
 // DTO CHÍNH để tạo Công Trình

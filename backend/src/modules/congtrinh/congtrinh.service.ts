@@ -35,7 +35,6 @@ export class CongtrinhService {
 
     // 3. Ghi đè dữ liệu mới vào bản ghi cũ (Object.assign)
     Object.assign(project, dto);
-
     // 4. Lưu lại - Cách này sẽ kích hoạt Middleware .pre('save')
     // giúp fullName hay các trường khác được dọn dẹp lại nếu có logic xử lý
     return await project.save();

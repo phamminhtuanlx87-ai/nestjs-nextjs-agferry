@@ -23,6 +23,7 @@ export default function PDDuToanPSForm({ stage }: Props) {
     formState: { errors },
   } = useFormContext<ProjectFormData>();
   const data = useCongTrinh();
+
   // 🌟 GỌI HOOK CHO NHÁNH 6: Thẩm tra Dự toán phát sinh
   const pddtps = useStageLock({ targetIndex: 7 });
   return (
@@ -109,26 +110,31 @@ export default function PDDuToanPSForm({ stage }: Props) {
                     disabled={pddtps.isDisabled}
                     error={errors.giai_doan?.[7]?.chi_phi_xay_dung?.message}
                   />
+                  
+                  <div className="col-span-1 md:col-span-3">
+                    <SelectField
+                      label="Đơn vị"
+                      defaultValue={OPTIONS_DU_TOAN[0].value}
+                      options={OPTIONS_DU_TOAN}
+                      {...register(`giai_doan.7.ma_don_vi`, {
+                        required: !pddtps.isDisabled
+                          ? "Vui lòng nhập Đơn vị"
+                          : false,
+                      })}
+                      disabled={pddtps.isDisabled}
+                      error={errors.giai_doan?.[7]?.ma_don_vi?.message}
+                    ></SelectField>
+                  </div>
 
-                  <SelectField
-                    label="Đơn vị"
-                    defaultValue={OPTIONS_DU_TOAN[0].value}
-                    options={OPTIONS_DU_TOAN}
-                    {...register(`giai_doan.7.ma_don_vi`, {
-                      required: !pddtps.isDisabled
-                        ? "Vui lòng nhập Đơn vị"
-                        : false,
-                    })}
-                    disabled={pddtps.isDisabled}
-                    error={errors.giai_doan?.[7]?.ma_don_vi?.message}
-                  ></SelectField>
                   {!pddtps.isDisabled && (
-                    <MultiFileControl
-                      control={control}
-                      // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
-                      name="giai_doan.7.file_links"
-                      label="Danh sách tài liệu đính kèm"
-                    />
+                    <div className="col-span-1 md:col-span-3">
+                      <MultiFileControl
+                        control={control}
+                        // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
+                        name="giai_doan.7.file_links"
+                        label="Danh sách tài liệu đính kèm"
+                      />
+                    </div>
                   )}
                 </div>
               </div>

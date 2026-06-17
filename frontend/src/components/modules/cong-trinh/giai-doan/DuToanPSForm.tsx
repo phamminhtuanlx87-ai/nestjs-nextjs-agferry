@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { GiaiDoanDto, ProjectFormData } from "../ProjectFormData";
 import Input from "@/components/ui/Input";
 import { useFormContext } from "react-hook-form";
@@ -26,10 +26,36 @@ const OPTIONS_THAM_TRA = [
   { value: "IQ", label: "Công Ty TNHH Tư vấn Giao thông IQ" },
 ];
 
+const parseVietnameseNumber = (
+  value: string | number | undefined | null,
+): number => {
+  if (value === undefined || value === null) return 0;
+  // Chuyển về chuỗi, xóa sạch các dấu chấm phân cách hàng nghìn, rồi mới ép thành Number
+  const cleanString = value.toString().replace(/\./g, "");
+  const parsed = Number(cleanString);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
+const calculateSum = (
+  baseVal: string | number | undefined | null,
+  plusVal: string | number | undefined | null,
+  minusVal: string | number | undefined | null,
+  extraVal: string | number | undefined | null,
+): number => {
+  return (
+    parseVietnameseNumber(baseVal) +
+    parseVietnameseNumber(plusVal) -
+    parseVietnameseNumber(minusVal) +
+    parseVietnameseNumber(extraVal)
+  );
+};
+
 export default function DuToanPSForm({ stage }: Props) {
   const {
     register,
     control,
+    setValue,
+    watch,
     formState: { errors },
   } = useFormContext<ProjectFormData>();
   const data = useCongTrinh();
@@ -37,6 +63,100 @@ export default function DuToanPSForm({ stage }: Props) {
   const dtps = useStageLock({ targetIndex: 5 });
   // 🌟 GỌI HOOK CHO NHÁNH 6: Thẩm tra Dự toán phát sinh
   const ttrdtps = useStageLock({ targetIndex: 6 });
+
+  const tong_gia_tri = watch("giai_doan.2.tong_gia_tri");
+  const chi_phi_xay_dung = watch("giai_doan.2.chi_phi_xay_dung");
+
+  const ps_tang = watch("giai_doan.5.thong_tin_them.ps_tang");
+  const ps_giam = watch("giai_doan.5.thong_tin_them.ps_giam");
+  const cp_tham_tra_ps = watch("giai_doan.5.thong_tin_them.cp_tham_tra_ps");
+
+  const ps_tang_tham_tra = watch("giai_doan.6.thong_tin_them.ps_tang");
+  const ps_giam_tham_tra = watch("giai_doan.6.thong_tin_them.ps_giam");
+  const cp_tham_tra_ps_tham_tra = watch(
+    "giai_doan.6.thong_tin_them.cp_tham_tra_ps",
+  );
+
+  useEffect(() => {
+    if (tong_gia_tri || ps_tang || ps_giam || cp_tham_tra_ps) {
+      // 2. Tính toán giá trị điều chỉnh (Không cần ép kiểu 'as string' rườm rà)
+      const chi_phi_xay_dung_dc = calculateSum(
+        chi_phi_xay_dung,
+        ps_tang,
+        ps_giam,
+        0,
+      );
+      const tong_gia_tri_dc = calculateSum(
+        tong_gia_tri,
+        ps_tang,
+        ps_giam,
+        cp_tham_tra_ps,
+      );
+
+      // 3. Format chuỗi tiền tệ vi-VN
+      const formattedTGT = tong_gia_tri_dc.toLocaleString("vi-VN");
+      const formattedCPXD = chi_phi_xay_dung_dc.toLocaleString("vi-VN");
+
+      // 4. BẬT CHỐT CHẶN: Chỉ cập nhật form khi giá trị tính toán thực sự KHÁC với giá trị hiện tại trên Form
+      // Điều này dập tắt hoàn toàn lỗi vòng lặp vô hạn (Infinite Loop)!
+      if (tong_gia_tri !== formattedTGT) {
+        setValue("giai_doan.5.tong_gia_tri", formattedTGT);
+      }
+      if (chi_phi_xay_dung !== formattedCPXD) {
+        setValue("giai_doan.5.chi_phi_xay_dung", formattedCPXD);
+      }
+    }
+  }, [
+    tong_gia_tri,
+    chi_phi_xay_dung,
+    ps_tang,
+    ps_giam,
+    cp_tham_tra_ps,
+    setValue,
+  ]);
+
+  useEffect(() => {
+    if (
+      tong_gia_tri ||
+      ps_tang_tham_tra ||
+      ps_giam_tham_tra ||
+      cp_tham_tra_ps_tham_tra
+    ) {
+      const chi_phi_xay_dung_dc = calculateSum(
+        chi_phi_xay_dung,
+        ps_tang_tham_tra,
+        ps_giam_tham_tra,
+        0,
+      );
+
+      const tong_gia_tri_dc = calculateSum(
+        tong_gia_tri,
+        ps_tang_tham_tra,
+        ps_giam_tham_tra,
+        cp_tham_tra_ps_tham_tra,
+      );
+
+      // 3. Format chuỗi tiền tệ vi-VN
+      const formattedTGT = tong_gia_tri_dc.toLocaleString("vi-VN");
+      const formattedCPXD = chi_phi_xay_dung_dc.toLocaleString("vi-VN");
+
+      // 4. BẬT CHỐT CHẶN: Chỉ cập nhật form khi giá trị tính toán thực sự KHÁC với giá trị hiện tại trên Form
+      // Điều này dập tắt hoàn toàn lỗi vòng lặp vô hạn (Infinite Loop)!
+      if (tong_gia_tri !== formattedTGT) {
+        setValue("giai_doan.6.tong_gia_tri", formattedTGT);
+      }
+      if (chi_phi_xay_dung !== formattedCPXD) {
+        setValue("giai_doan.6.chi_phi_xay_dung", formattedCPXD);
+      }
+    }
+  }, [
+    tong_gia_tri,
+    chi_phi_xay_dung,
+    ps_tang_tham_tra,
+    ps_giam_tham_tra,
+    cp_tham_tra_ps_tham_tra,
+    setValue,
+  ]);
   return (
     <div>
       {stage.find((gd) => gd.ma_hieu === MA_HIEU_MAPPING[4].ma_hieu) && (
@@ -98,6 +218,9 @@ export default function DuToanPSForm({ stage }: Props) {
                   <Input
                     label="Tổng giá trị dự toán (Điều chỉnh)"
                     type="text"
+                    readOnly
+                    // Thêm class để hiển thị giao diện giống như bị khóa (màu xám, chuột hình cấm)
+                    className="bg-gray-100 cursor-not-allowed opacity-70"
                     {...register(`giai_doan.5.tong_gia_tri`, {
                       onChange: (e) => {
                         const formatted = formatCurrency(e.target.value);
@@ -114,6 +237,9 @@ export default function DuToanPSForm({ stage }: Props) {
                   <Input
                     label="Tổng chi phí xây dựng (Điều chỉnh)"
                     type="text"
+                    readOnly
+                    // Thêm class để hiển thị giao diện giống như bị khóa (màu xám, chuột hình cấm)
+                    className="bg-gray-100 cursor-not-allowed opacity-70 "
                     {...register(`giai_doan.5.chi_phi_xay_dung`, {
                       onChange: (e) => {
                         const formatted = formatCurrency(e.target.value);
@@ -127,24 +253,86 @@ export default function DuToanPSForm({ stage }: Props) {
                     error={errors.giai_doan?.[5]?.chi_phi_xay_dung?.message}
                   />
 
-                  <SelectField
-                    label="Đơn vị lập Dự toán (Điều chỉnh)"
-                    options={OPTIONS_DU_TOAN}
-                    {...register(`giai_doan.5.ma_don_vi`, {
+                  <Input
+                    label="Phát sinh tăng"
+                    type="text"
+                    placeholder="0"
+                    {...register(`giai_doan.5.thong_tin_them.ps_tang`, {
+                      onChange: (e) => {
+                        const formatted = formatCurrency(e.target.value);
+                        e.target.value = formatted;
+                      },
                       required: !dtps.isDisabled
-                        ? "Vui lòng nhập Đơn vị lập Dự toán (Điều chỉnh)"
+                        ? "Vui lòng nhập Phát sinh tăng"
                         : false,
                     })}
                     disabled={dtps.isDisabled}
-                    error={errors.giai_doan?.[5]?.ma_don_vi?.message}
-                  ></SelectField>
+                    error={
+                      errors.giai_doan?.[5]?.thong_tin_them?.ps_tang?.message
+                    }
+                  />
+
+                  <Input
+                    label="Phát sinh giảm"
+                    type="text"
+                    placeholder="0"
+                    {...register(`giai_doan.5.thong_tin_them.ps_giam`, {
+                      onChange: (e) => {
+                        const formatted = formatCurrency(e.target.value);
+                        e.target.value = formatted;
+                      },
+                      required: !dtps.isDisabled
+                        ? "Vui lòng nhập Phát sinh giảm"
+                        : false,
+                    })}
+                    disabled={dtps.isDisabled}
+                    error={
+                      errors.giai_doan?.[5]?.thong_tin_them?.ps_giam?.message
+                    }
+                  />
+
+                  <Input
+                    label="Chi phí thẩm tra Dự toán phát sinh"
+                    type="text"
+                    placeholder="0"
+                    {...register(`giai_doan.5.thong_tin_them.cp_tham_tra_ps`, {
+                      onChange: (e) => {
+                        const formatted = formatCurrency(e.target.value);
+                        e.target.value = formatted;
+                      },
+                      required: !dtps.isDisabled
+                        ? "Vui lòng nhập Chi phí thẩm tra"
+                        : false,
+                    })}
+                    disabled={dtps.isDisabled}
+                    error={
+                      errors.giai_doan?.[5]?.thong_tin_them?.cp_tham_tra_ps
+                        ?.message
+                    }
+                  />
+                  <div className="col-span-1 md:col-span-3">
+                    <SelectField
+                      label="Đơn vị lập Dự toán (Điều chỉnh)"
+                      options={OPTIONS_DU_TOAN}
+                      {...register(`giai_doan.5.ma_don_vi`, {
+                        required: !dtps.isDisabled
+                          ? "Vui lòng nhập Đơn vị lập Dự toán (Điều chỉnh)"
+                          : false,
+                      })}
+                      disabled={dtps.isDisabled}
+                      error={errors.giai_doan?.[5]?.ma_don_vi?.message}
+                    ></SelectField>
+                  </div>
+
                   {!dtps.isDisabled && (
-                    <MultiFileControl
-                      control={control}
-                      // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
-                      name="giai_doan.5.file_links"
-                      label="Danh sách tài liệu đính kèm"
-                    />
+                    <div className="col-span-1 md:col-span-3">
+                      <MultiFileControl
+                        control={control}
+                        // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
+                        name="giai_doan.5.file_links"
+                        label="Danh sách tài liệu đính kèm"
+                      />
+                    </div>
                   )}
                 </div>
               </div>
@@ -198,6 +386,9 @@ export default function DuToanPSForm({ stage }: Props) {
                       <Input
                         label="Tổng giá trị dự toán (Điều chỉnh) sau thẩm tra"
                         type="text"
+                        readOnly
+                        // Thêm class để hiển thị giao diện giống như bị khóa (màu xám, chuột hình cấm)
+                        className="bg-gray-100 cursor-not-allowed opacity-70"
                         {...register(`giai_doan.6.tong_gia_tri`, {
                           onChange: (e) => {
                             const formatted = formatCurrency(e.target.value);
@@ -214,6 +405,9 @@ export default function DuToanPSForm({ stage }: Props) {
                       <Input
                         label="Tổng chi phí xây dựng (Điều chỉnh)"
                         type="text"
+                        readOnly
+                        // Thêm class để hiển thị giao diện giống như bị khóa (màu xám, chuột hình cấm)
+                        className="bg-gray-100 cursor-not-allowed opacity-70"
                         {...register(`giai_doan.6.chi_phi_xay_dung`, {
                           onChange: (e) => {
                             const formatted = formatCurrency(e.target.value);
@@ -226,26 +420,93 @@ export default function DuToanPSForm({ stage }: Props) {
                         disabled={ttrdtps.isDisabled}
                         error={errors.giai_doan?.[6]?.chi_phi_xay_dung?.message}
                       />
-                      
-                      <SelectField
-                        label="Đơn vị lập Dự toán (Điều chỉnh)"
-                        options={OPTIONS_THAM_TRA}
-                        {...register(`giai_doan.6.ma_don_vi`, {
-                         required: !ttrdtps.isDisabled
-                            ? "Vui lòng nhập Đơn vị lập Dự toán (Điều chỉnh)"
+
+                      <Input
+                        label="Phát sinh tăng"
+                        type="text"
+                        placeholder="0"
+                        {...register(`giai_doan.6.thong_tin_them.ps_tang`, {
+                          onChange: (e) => {
+                            const formatted = formatCurrency(e.target.value);
+                            e.target.value = formatted;
+                          },
+                          required: !dtps.isDisabled
+                            ? "Vui lòng nhập Phát sinh tăng"
                             : false,
                         })}
-                        disabled={ttrdtps.isDisabled}
-                        error={errors.giai_doan?.[6]?.ma_don_vi?.message}
-                      ></SelectField>
+                        disabled={dtps.isDisabled}
+                        error={
+                          errors.giai_doan?.[6]?.thong_tin_them?.ps_tang
+                            ?.message
+                        }
+                      />
+
+                      <Input
+                        label="Phát sinh giảm"
+                        type="text"
+                        placeholder="0"
+                        {...register(`giai_doan.6.thong_tin_them.ps_giam`, {
+                          onChange: (e) => {
+                            const formatted = formatCurrency(e.target.value);
+                            e.target.value = formatted;
+                          },
+                          required: !dtps.isDisabled
+                            ? "Vui lòng nhập Phát sinh giảm"
+                            : false,
+                        })}
+                        disabled={dtps.isDisabled}
+                        error={
+                          errors.giai_doan?.[6]?.thong_tin_them?.ps_giam
+                            ?.message
+                        }
+                      />
+
+                      <Input
+                        label="Chi phí thẩm tra Dự toán phát sinh"
+                        type="text"
+                        placeholder="0"
+                        {...register(
+                          `giai_doan.6.thong_tin_them.cp_tham_tra_ps`,
+                          {
+                            onChange: (e) => {
+                              const formatted = formatCurrency(e.target.value);
+                              e.target.value = formatted;
+                            },
+                            required: !dtps.isDisabled
+                              ? "Vui lòng nhập Chi phí thẩm tra"
+                              : false,
+                          },
+                        )}
+                        disabled={dtps.isDisabled}
+                        error={
+                          errors.giai_doan?.[6]?.thong_tin_them?.cp_tham_tra_ps
+                            ?.message
+                        }
+                      />
+
+                      <div className="col-span-1 md:col-span-3">
+                        <SelectField
+                          label="Đơn vị lập Dự toán (Điều chỉnh)"
+                          options={OPTIONS_THAM_TRA}
+                          {...register(`giai_doan.6.ma_don_vi`, {
+                            required: !ttrdtps.isDisabled
+                              ? "Vui lòng nhập Đơn vị lập Dự toán (Điều chỉnh)"
+                              : false,
+                          })}
+                          disabled={ttrdtps.isDisabled}
+                          error={errors.giai_doan?.[6]?.ma_don_vi?.message}
+                        ></SelectField>
+                      </div>
 
                       {!ttrdtps.isDisabled && (
+                        <div className="col-span-1 md:col-span-3">
                         <MultiFileControl
                           control={control}
                           // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
                           name="giai_doan.6.file_links"
                           label="Danh sách tài liệu đính kèm"
                         />
+                        </div>
                       )}
                     </div>
                   </div>

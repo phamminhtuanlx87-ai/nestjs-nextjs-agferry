@@ -1,4 +1,10 @@
 
+export interface ThongTinThemDto {
+  ps_tang?: string | number;
+  ps_giam?: string | number;
+  cp_tham_tra_ps?: string | number,
+  don_vi_giam_sat?: string,
+}
 
 export interface FileLinkDto {
   link_name: string;
@@ -18,6 +24,7 @@ export interface GiaiDoanDto {
   so_ngay_tc_thuc_te?:string;
   dia_diem_tc?:string;
   file_links?: FileLinkDto[];
+  thong_tin_them?:ThongTinThemDto;
 }
 
 export interface ProjectFormData {

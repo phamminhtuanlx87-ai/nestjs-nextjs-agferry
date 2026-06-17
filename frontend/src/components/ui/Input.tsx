@@ -15,7 +15,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-shadow-sm text-gray-500  font-semibold dark:text-gray-200"
+            className="block w-full text-sm text-shadow-sm text-gray-500 font-semibold dark:text-gray-200 leading-relaxed"
           >
             {label}
           </label>
@@ -23,7 +23,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           id={inputId}
           ref={ref} // Gán ref cực kỳ quan trọng ở đây
-          className={`input-primary h-11 border
+          className={`input-primary w-full py-2.5 px-3 border
            ${error ? "border-red-500" : "border-gray-300"}
             ${className}
           `}

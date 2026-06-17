@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import {
   useFieldArray,
@@ -7,6 +8,8 @@ import {
   useWatch,
 } from "react-hook-form";
 import { FiPlus, FiTrash2, FiFileText, FiLink, FiEye } from "react-icons/fi";
+import { VnptWarningFooter } from "./VnptWarningFooter";
+import { alertService } from "@/utils/swal";
 
 interface MultiFileControlProps<T extends FieldValues> {
   control: Control<T>;
@@ -27,38 +30,76 @@ export const MultiFileControl = <T extends FieldValues>({
   // Watch dữ liệu để kiểm tra link URL thực tế cho nút "Xem"
   const watchedFields = useWatch({
     control,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     name: name as any,
   });
 
+  const handleFileClick = async (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    linkUrl: string,
+  ) => {
+    if (typeof window !== "undefined") {
+      const now = new Date().getTime();
+      const remindedTime = localStorage.getItem("ioffice_reminded_time");
+
+      // Khoảng thời gian hết hạn phiên iOffice (10 phút = 10 * 60 * 1000 miligiây)
+      const TIMEOUT_LIMIT = 10 * 60 * 1000;
+
+      // Kiểm tra: Nếu chưa từng nhắc HOẶC lần nhắc cuối cùng đã quá 10 phút trước
+      const isExpired =
+        !remindedTime || now - parseInt(remindedTime) > TIMEOUT_LIMIT;
+
+      if (isExpired) {
+        // 1. Chặn hành vi mở link mặc định của thẻ <Link> ngay lập tức
+        e.preventDefault();
+
+        // 2. Hiện thông báo SweetAlert2 nhắc nhở
+        const result = await alertService.confirmLoginOffice();
+
+        // 3. Người dùng tương tác xong -> Cập nhật/Ghi đè mốc thời gian hiện tại vào kho lưu trữ
+        localStorage.setItem("ioffice_reminded_time", now.toString());
+
+        if (result.isConfirmed) {
+          // Chọn "Đến trang đăng nhập": Mở trang iOffice để nạp lại phiên 10 phút mới và mở file
+          window.open("https://angiang.vnptioffice.vn/", "_blank");
+          window.open(linkUrl, "_blank");
+        } else {
+          // Chọn "Tôi đã đăng nhập rồi": Tiếp tục mở thẳng file
+          window.open(linkUrl, "_blank");
+        }
+      }
+      // NẾU CÒN TRONG VÒNG 10 PHÚT:
+      // Mắc định không chạy vào IF -> Không bị e.preventDefault() chặn -> Link tự mở mượt mà bằng thẻ <Link>
+    }
+  };
+
   return (
     <>
-      <div className="bg-gray-100 col-span-2 mt-8 rounded-2xl">
-        {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-slate-50">
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-4 bg-blue-500 rounded-full" />
-            <label className="text-[11px] font-bold text-slate-600 uppercase tracking-widest">
-              {label}
-            </label>
-            <span className="bg-blue-400 text-white text-sm font-semibold px-2 py-0.5 rounded-full">
-              {fields.length}
-            </span>
+      <div className="w-full col-span-1 md:col-span-3 mt-4">
+        {/* Container chính bọc toàn bộ khối */}
+        <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 shadow-sm">
+          {/* Header: Tiêu đề & Nút Thêm */}
+          <div className="flex justify-between items-center pb-3 mb-3 border-b border-slate-200/60">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 bg-blue-500 rounded-full" />
+              <label className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">
+                {label}
+              </label>
+              <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-5 text-center">
+                {fields.length}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => append({ link_name: "", link_url: "" } as any)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 hover:text-blue-800 cursor-pointer rounded-lg transition-all"
+            >
+              <FiPlus size={14} /> Thêm tài liệu
+            </button>
           </div>
 
-          <button
-            type="button"
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onClick={() => append({ link_name: "", link_url: "" } as any)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-500 hover:text-blue-800 hover:bg-blue-100 cursor-pointer rounded-lg transition-all"
-          >
-            <FiPlus size={14} /> Thêm tài liệu
-          </button>
-          
-        </div>
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm">
-          {/* List */}
-          <div className="space-y-2">
+          {/* Danh sách tệp đính kèm */}
+          <div className="space-y-3">
             {fields.map((field, index) => {
               const currentUrl = watchedFields?.[index]?.link_url;
               const isUploaded = !!currentUrl;
@@ -66,43 +107,80 @@ export const MultiFileControl = <T extends FieldValues>({
               return (
                 <div
                   key={field.id}
-                  className={`group flex items-center gap-3 p-2 rounded-xl border transition-all ${
+                  className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-xl border transition-all ${
                     isUploaded
-                      ? "bg-emerald-50/20 border-emerald-100"
-                      : "bg-slate-50 border-slate-200"
+                      ? "bg-emerald-50/10 border-emerald-100 shadow-sm"
+                      : "bg-white border-slate-200 shadow-sm"
                   }`}
                 >
-                  {/* Icon file */}
-                  <div
-                    className={`shrink-0 p-2.5 rounded-lg ${isUploaded ? "bg-emerald-100 text-emerald-600" : "bg-white text-slate-400 shadow-sm"}`}
-                  >
-                    <FiFileText size={18} />
+                  {/* Hàng ngang chứa Icon và các nút Thao tác trên Mobile */}
+                  <div className="flex items-center justify-between w-full sm:w-auto shrink-0 gap-2 border-b border-slate-100 pb-2 sm:pb-0 sm:border-0">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`p-2 rounded-lg ${isUploaded ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400"}`}
+                      >
+                        <FiFileText size={18} />
+                      </div>
+                      {/* Số thứ tự hiển thị rõ ràng trên mobile */}
+                      <span className="text-xs font-bold text-slate-500 sm:hidden">
+                        Tài liệu #{index + 1}
+                      </span>
+                    </div>
+
+                    {/* Nhóm nút bấm thao tác di chuyển lên góc trên đối với Mobile */}
+                    <div className="flex items-center gap-1 sm:hidden">
+                      {isUploaded && (
+                        <a
+                          onClick={(e) => handleFileClick(e, currentUrl)}
+                          href={currentUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                          title="Xem tài liệu"
+                        >
+                          <FiEye size={18} />
+                        </a>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => remove(index)}
+                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        title="Xóa"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Inputs - Căn giữa hàng dọc bằng items-center */}
-                  <div className="flex-1 grid grid-cols-2 gap-4 items-center">
-                    <input
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      {...control.register(`${name}.${index}.link_name` as any)}
-                      placeholder="Tên gợi nhớ tài liệu..."
-                      className="w-full bg-transparent text-[13px] font-medium text-slate-700 focus:outline-none placeholder:text-slate-400"
-                    />
-
-                    <div className="flex items-center gap-2 bg-white/60 px-3 py-1.5 rounded-lg border border-slate-200/50 group-focus-within:border-blue-200 transition-colors">
-                      <FiLink size={12} className="text-slate-400 shrink-0" />
+                  {/* Khu vực Form Điền thông tin: Tự động chia 1 cột trên Mobile, 2 cột trên PC */}
+                  <div className="w-full flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
+                    {/* Ô nhập tên tài liệu */}
+                    <div className="w-full bg-slate-50/50 px-3 py-2 rounded-lg border border-slate-200/70 focus-within:border-blue-400 focus-within:bg-white transition-all">
                       <input
                         {...control.register(
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          `${name}.${index}.link_name` as any,
+                        )}
+                        placeholder="Tên gợi nhớ tài liệu... (Ví dụ: Quyết định số 556)"
+                        className="w-full bg-transparent text-[13px] font-medium text-slate-700 focus:outline-none placeholder:text-slate-400"
+                      />
+                    </div>
+
+                    {/* Ô nhập link URL */}
+                    <div className="w-full flex items-center gap-2 bg-slate-50/50 px-3 py-2 rounded-lg border border-slate-200/70 focus-within:border-blue-400 focus-within:bg-white transition-all">
+                      <FiLink size={13} className="text-slate-400 shrink-0" />
+                      <input
+                        {...control.register(
                           `${name}.${index}.link_url` as any,
                         )}
-                        placeholder="Dán đường dẫn (URL) vào đây..."
-                        className="w-full bg-transparent text-[12px] text-blue-600 focus:outline-none truncate"
+                        placeholder="Dán đường dẫn (URL) tài liệu vào đây..."
+                        className="w-full bg-transparent text-[12px] text-blue-600 font-medium focus:outline-none truncate placeholder:text-slate-400"
                       />
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-1 pr-1 ">
+                  {/* Nhóm nút bấm thao tác mặc định hiển thị trên Desktop */}
+                  <div className="hidden sm:flex items-center gap-1 shrink-0 pl-1">
                     {isUploaded && (
                       <a
                         href={currentUrl}
@@ -111,7 +189,7 @@ export const MultiFileControl = <T extends FieldValues>({
                         className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
                         title="Xem tài liệu"
                       >
-                        <FiEye size={20} />
+                        <FiEye size={18} />
                       </a>
                     )}
                     <button
@@ -120,7 +198,7 @@ export const MultiFileControl = <T extends FieldValues>({
                       className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                       title="Xóa dòng"
                     >
-                      <FiTrash2 size={20} />
+                      <FiTrash2 size={18} />
                     </button>
                   </div>
                 </div>
@@ -128,24 +206,18 @@ export const MultiFileControl = <T extends FieldValues>({
             })}
           </div>
 
+          {/* Trạng thái trống */}
           {fields.length === 0 && (
-            <div className="py-2 text-center border-2 border-dashed border-slate-50 rounded-xl">
-              <span className="text-slate-400 text-xs italic">
-                Chưa có tệp đính kèm nào
+            <div className="py-6 text-center border-2 border-dashed border-slate-200 rounded-xl bg-white/50">
+              <span className="text-slate-400 text-xs font-medium italic">
+                Chưa có tệp đính kèm nào được thêm vào danh sách
               </span>
             </div>
           )}
         </div>
-        <div className="text-[11px] font-bold text-slate-500 p-2">
-          {"Để xem tài liệu vui lòng đăng nhập:  "}
-          <a
-            href="https://angiang.vnptioffice.vn/vpdt/main?lang=vi"
-            target="blank"
-            className="text-blue-500 italic text-sm"
-          >
-            angiang.vnptioffice.vn
-          </a>
-        </div>
+
+        {/* Gọi Component Footer Cảnh báo VNPT tĩnh riêng biệt đặt tại đây */}
+        <VnptWarningFooter />
       </div>
     </>
   );

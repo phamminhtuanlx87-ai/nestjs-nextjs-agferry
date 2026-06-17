@@ -124,12 +124,12 @@ const FinancialChart = ({ dsCongTrinh, selectYear }: ChartPros) => {
   if (!isMounted) {
     return (
       <div
-        className={`w-full  h-28 min-h-28 mt-2 bg-slate-50/50 rounded-xl animate-pulse`}
+        className={`w-full  h-32 min-h-28 mt-2 bg-slate-50/50 rounded-xl animate-pulse`}
       />
     );
   }
   return (
-    <div className={`relative w-full mt-2 select-none h-28 min-h-28`}>
+    <div className={`relative w-full mt-2 select-none h-32 min-h-28`}>
       <ResponsiveContainer width="100%" height={100}>
         <BarChart
           data={chartDataMock}

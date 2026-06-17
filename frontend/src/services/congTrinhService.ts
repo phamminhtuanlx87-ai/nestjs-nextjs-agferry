@@ -54,12 +54,21 @@ export interface IGiaiDoan {
   ngay_thuc_hien?: string;
   ngay_hoan_thanh?: string;
   file_links?: ILinkFile[];
+  thong_tin_them?: IThongTinThem;
 }
 
 export interface ILinkFile {
   link_name: string;
   link_url: string;
 }
+
+export interface IThongTinThem {
+  ps_tang?: string | number;
+  ps_giam?: string | number;
+  cp_tham_tra_ps?: string | number,
+  don_vi_giam_sat?: string,
+}
+
 export const getAllCongTrinh = async (
   month: number,
   year: number,

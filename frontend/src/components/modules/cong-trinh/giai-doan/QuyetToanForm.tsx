@@ -108,22 +108,29 @@ export default function QuyetToanForm({ stage }: Props) {
                     error={errors.giai_doan?.[8]?.chi_phi_xay_dung?.message}
                   />
 
-                  <SelectField
-                    label="Đơn vị"
-                    options={OPTIONS_DU_TOAN}
-                    {...register(`giai_doan.8.ma_don_vi`, {
-                      required: !qt.isDisabled ? "Vui lòng nhập Đơn vị" : false,
-                    })}
-                    disabled={qt.isDisabled}
-                    error={errors.giai_doan?.[8]?.ma_don_vi?.message}
-                  ></SelectField>
+                  <div className="col-span-1 md:col-span-3">
+                    <SelectField
+                      label="Đơn vị"
+                      options={OPTIONS_DU_TOAN}
+                      {...register(`giai_doan.8.ma_don_vi`, {
+                        required: !qt.isDisabled
+                          ? "Vui lòng nhập Đơn vị"
+                          : false,
+                      })}
+                      disabled={qt.isDisabled}
+                      error={errors.giai_doan?.[8]?.ma_don_vi?.message}
+                    ></SelectField>
+                  </div>
+
                   {!qt.isDisabled && (
-                    <MultiFileControl
-                      control={control}
-                      // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
-                      name="giai_doan.6.file_links"
-                      label="Danh sách tài liệu đính kèm"
-                    />
+                    <div className="col-span-1 md:col-span-3">
+                      <MultiFileControl
+                        control={control}
+                        // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
+                        name="giai_doan.6.file_links"
+                        label="Danh sách tài liệu đính kèm"
+                      />
+                    </div>
                   )}
                 </div>
               </div>

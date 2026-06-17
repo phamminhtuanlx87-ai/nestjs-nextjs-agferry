@@ -70,7 +70,7 @@ export function DuToanForm({ stage }: Props) {
           {/* Nhánh Dự toán */}
           <div>
             <div
-              className={`overflow-hidden transition-all duration-300
+              className={`overflow-hidden transition-all duration-300 min-w-full
                   ${
                     duToan.isDisabled
                       ? "bg-slate-50/80 opacity-50 pointer-events-none select-none grayscale-30 p-4"
@@ -81,51 +81,53 @@ export function DuToanForm({ stage }: Props) {
                 <span className="bg-amber-900 w-1 h-4 mr-2 rounded-full"></span>
                 <span className="text-sm font-bold uppercase">Dự toán</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <>
-                  <Input
-                    label="Ngày lập dự toán"
-                    type="date"
-                    {...register(`giai_doan.0.ngay_thuc_hien`, {
-                      required: !duToan.isDisabled
-                        ? "Vui lòng nhập ngày lập dự toán"
-                        : false,
-                    })}
-                    disabled={duToan.isDisabled}
-                    error={errors.giai_doan?.[0]?.ngay_thuc_hien?.message}
-                  />
-                  <Input
-                    label="Tổng giá trị dự toán"
-                    type="text"
-                    placeholder="0"
-                    {...register(`giai_doan.0.tong_gia_tri`, {
-                      onChange: (e) => {
-                        const formatted = formatCurrency(e.target.value);
-                        e.target.value = formatted;
-                      },
-                      required: !duToan.isDisabled
-                        ? "Vui lòng nhập tổng giá trị dự toán"
-                        : false,
-                    })}
-                    disabled={duToan.isDisabled}
-                    error={errors.giai_doan?.[0]?.tong_gia_tri?.message}
-                  />
-                  <Input
-                    label="Tổng chi phí xây dựng"
-                    type="text"
-                    placeholder="0"
-                    {...register(`giai_doan.0.chi_phi_xay_dung`, {
-                      onChange: (e) => {
-                        const formatted = formatCurrency(e.target.value);
-                        e.target.value = formatted;
-                      },
-                      required: !duToan.isDisabled
-                        ? "Vui lòng nhập tổng chi phí xây dựng"
-                        : false,
-                    })}
-                    disabled={duToan.isDisabled}
-                    error={errors.giai_doan?.[0]?.chi_phi_xay_dung?.message}
-                  />
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                <Input
+                  label="Ngày lập dự toán"
+                  type="date"
+                  {...register(`giai_doan.0.ngay_thuc_hien`, {
+                    required: !duToan.isDisabled
+                      ? "Vui lòng nhập ngày lập dự toán"
+                      : false,
+                  })}
+                  disabled={duToan.isDisabled}
+                  error={errors.giai_doan?.[0]?.ngay_thuc_hien?.message}
+                />
+                <Input
+                  label="Tổng giá trị dự toán"
+                  type="text"
+                  placeholder="0"
+                  {...register(`giai_doan.0.tong_gia_tri`, {
+                    onChange: (e) => {
+                      const formatted = formatCurrency(e.target.value);
+                      e.target.value = formatted;
+                    },
+                    required: !duToan.isDisabled
+                      ? "Vui lòng nhập tổng giá trị dự toán"
+                      : false,
+                  })}
+                  disabled={duToan.isDisabled}
+                  error={errors.giai_doan?.[0]?.tong_gia_tri?.message}
+                />
+                <Input
+                  label="Tổng chi phí xây dựng"
+                  type="text"
+                  placeholder="0"
+                  {...register(`giai_doan.0.chi_phi_xay_dung`, {
+                    onChange: (e) => {
+                      const formatted = formatCurrency(e.target.value);
+                      e.target.value = formatted;
+                    },
+                    required: !duToan.isDisabled
+                      ? "Vui lòng nhập tổng chi phí xây dựng"
+                      : false,
+                  })}
+                  disabled={duToan.isDisabled}
+                  error={errors.giai_doan?.[0]?.chi_phi_xay_dung?.message}
+                />
+
+                <div className="col-span-1 md:col-span-3">
                   <SelectField
                     label="Đơn vị"
                     options={OPTIONS_DU_TOAN}
@@ -136,16 +138,19 @@ export function DuToanForm({ stage }: Props) {
                     })}
                     disabled={duToan.isDisabled}
                     error={errors.giai_doan?.[0]?.ma_don_vi?.message}
-                  ></SelectField>
-                  {!duToan.isDisabled && (
+                  />
+                </div>
+
+                {!duToan.isDisabled && (
+                  <div className="col-span-1 md:col-span-3">
                     <MultiFileControl
                       control={control}
                       // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
                       name="giai_doan.0.file_links"
                       label="Danh sách tài liệu đính kèm"
                     />
-                  )}
-                </>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -224,23 +229,29 @@ export function DuToanForm({ stage }: Props) {
                     })}
                     disabled={thamTra.isDisabled}
                   />
-                  <SelectField
-                    label="Đơn vị"
-                    options={OPTIONS_THAM_TRA}
-                    {...register(`giai_doan.1.ma_don_vi`, {
-                      required: !thamTra.isDisabled
-                        ? "Vui lòng chọn Đơn vị"
-                        : false,
-                    })}
-                    disabled={thamTra.isDisabled}
-                  ></SelectField>
+
+                  <div className="col-span-1 md:col-span-3">
+                    <SelectField
+                      label="Đơn vị"
+                      options={OPTIONS_THAM_TRA}
+                      {...register(`giai_doan.1.ma_don_vi`, {
+                        required: !thamTra.isDisabled
+                          ? "Vui lòng chọn Đơn vị"
+                          : false,
+                      })}
+                      disabled={thamTra.isDisabled}
+                    ></SelectField>
+                  </div>
+
                   {!thamTra.isDisabled && (
+                     <div className="col-span-1 md:col-span-3">
                     <MultiFileControl
                       control={control}
                       // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
                       name="giai_doan.1.file_links"
                       label="Danh sách tài liệu đính kèm"
                     />
+                    </div>
                   )}
                 </div>
               </div>

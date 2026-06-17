@@ -3,24 +3,39 @@ import { HydratedDocument } from 'mongoose';
 
 export type CongTrinhDocument = HydratedDocument<CongTrinh>;
 
+@Schema({ _id: false })
+class ThongTinThem {
+  @Prop()
+  ps_tang?: number;
+
+  @Prop()
+  ps_giam?: number;
+
+  @Prop()
+  cp_tham_tra_ps?: number;
+
+  @Prop()
+  don_vi_giam_sat?: string;
+}
+
 // 1. Schema cho File đính kèm
 @Schema({ _id: false }) // Không cần tạo ID riêng cho từng link file
 class FileLink {
   @Prop({ required: true })
-  link_name: string;
+  link_name!: string;
 
   @Prop({ required: true })
-  link_url: string;
+  link_url!: string;
 }
 
 // 2. Schema cho từng Giai Đoạn
 @Schema({ _id: false })
 class GiaiDoan {
   @Prop({ required: true })
-  ma_hieu: string;
+  ma_hieu!: string;
 
   @Prop({ required: true })
-  ten_giai_doan: string;
+  ten_giai_doan!: string;
 
   @Prop()
   ma_don_vi?: string;
@@ -55,9 +70,11 @@ class GiaiDoan {
   @Prop()
   ngay_hoan_thanh?: Date;
 
-  // Thêm mảng file_links theo yêu cầu của Tuấn
   @Prop({ type: [FileLink], default: [] })
-  file_links: FileLink[];
+  file_links!: FileLink[];
+
+  @Prop({ type: ThongTinThem })
+  thong_tin_them?: ThongTinThem;
 }
 @Schema({
   timestamps: true, // Tự động tạo createdAt, updatedAt
@@ -65,22 +82,22 @@ class GiaiDoan {
 })
 export class CongTrinh {
   @Prop({ required: true, trim: true })
-  ten_cong_trinh: string;
+  ten_cong_trinh!: string;
 
   @Prop({ required: true, trim: true, unique: true })
-  ma_cong_trinh: string;
+  ma_cong_trinh!: string;
 
   @Prop({ default: 'Cty Cổ phần Phà An Giang' })
-  don_vi_chu_quan: string;
+  don_vi_chu_quan!: string;
 
   @Prop({ default: Date.now })
-  ngay_tao_du_an: Date;
+  ngay_tao_du_an!: Date;
 
   @Prop({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
   // Lồng mảng GiaiDoan vào đây
   @Prop({ type: [GiaiDoan], default: [] })
-  giai_doan: GiaiDoan[];
+  giai_doan!: GiaiDoan[];
 }
 
 export const CongTrinhSchema = SchemaFactory.createForClass(CongTrinh);

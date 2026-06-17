@@ -6,6 +6,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import {
   ICongTrinh,
   ILinkFile,
+  IThongTinThem,
   UpdateCongtrinhRequest,
   updateProject,
 } from "@/services/congTrinhService";
@@ -128,38 +129,64 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
           ? congTrinh.ngay_tao_du_an.split("T")[0]
           : "",
 
-        giai_doan: congTrinh.giai_doan.map((gd) => ({
-          ...gd,
-          ngay_thuc_hien: gd.ngay_thuc_hien
-            ? gd.ngay_thuc_hien.split("T")[0]
-            : "",
-          ngay_hoan_thanh: gd.ngay_hoan_thanh
-            ? gd.ngay_hoan_thanh.split("T")[0]
-            : "",
-          tong_gia_tri: gd.tong_gia_tri?.toLocaleString("vi-VN") ?? "",
-          chi_phi_xay_dung: gd.chi_phi_xay_dung?.toLocaleString("vi-VN") ?? "",
-          so_ngay_tc_pgv:
-            gd.so_ngay_tc_pgv !== undefined && gd.so_ngay_tc_pgv !== null
-              ? String(gd.so_ngay_tc_pgv)
-              : "",
-          so_ngay_tc_thuc_te:
-            gd.so_ngay_tc_thuc_te !== undefined &&
-            gd.so_ngay_tc_thuc_te !== null
+        giai_doan: congTrinh.giai_doan.map((gd) => {
+          const currentMaHieu = gd.ma_hieu;
+
+          const isTC = currentMaHieu === "TC";
+          const isNT = currentMaHieu === "NT";
+          const isDT_PS = currentMaHieu === "DT_PS";
+          // 1. Tạo object thong_tin_them chuẩn chuỗi cho form
+
+          const tong_gia_tri = gd.tong_gia_tri?.toLocaleString("vi-VN") ?? "";
+          const chi_phi_xay_dung =
+            gd.chi_phi_xay_dung?.toLocaleString("vi-VN") ?? "";
+
+          const so_ngay_tc_pgv =
+            isTC && gd.so_ngay_tc_pgv != null ? String(gd.so_ngay_tc_pgv) : "";
+          const dia_diem_tc = isTC ? (gd.dia_diem_tc ?? "") : "";
+          const ngay_hoan_thanh =
+            isTC && gd.ngay_hoan_thanh != null
+              ? gd.ngay_hoan_thanh?.split("T")[0]
+              : "";
+
+          const so_ngay_tc_thuc_te =
+            isNT && gd.so_ngay_tc_thuc_te != null
               ? String(gd.so_ngay_tc_thuc_te)
+              : "";
+
+          const thong_tin_them_form =
+            isDT_PS || gd.thong_tin_them
+              ? {
+                  ps_tang:
+                    gd.thong_tin_them?.ps_tang?.toLocaleString("vi-VN") ?? "",
+                  ps_giam:
+                    gd.thong_tin_them?.ps_giam?.toLocaleString("vi-VN") ?? "",
+                  cp_tham_tra_ps:
+                    gd.thong_tin_them?.cp_tham_tra_ps?.toLocaleString(
+                      "vi-VN",
+                    ) ?? "",
+                  don_vi_giam_sat: gd.thong_tin_them?.don_vi_giam_sat ?? "",
+                }
+              : undefined;
+          // 2. Return về một Object giai đoạn khớp hoàn toàn kiểu dữ liệu mong đợi
+          return {
+            ...gd,
+            ngay_thuc_hien: gd.ngay_thuc_hien
+              ? gd.ngay_thuc_hien.split("T")[0]
               : "",
-          chenh_lech_tgt:
-            gd.chenh_lech_tgt !== undefined && gd.chenh_lech_tgt !== null
-              ? String(gd.chenh_lech_tgt)
-              : "",
-          chenh_lech_cpxd:
-            gd.chenh_lech_cpxd !== undefined && gd.chenh_lech_cpxd !== null
-              ? String(gd.chenh_lech_cpxd)
-              : "",
-          dia_diem_tc:
-            gd.dia_diem_tc !== undefined && gd.dia_diem_tc !== null
-              ? String(gd.dia_diem_tc)
-              : "",
-        })),
+            ngay_hoan_thanh: ngay_hoan_thanh,
+
+            // Ép tất cả các trường tiền tệ về chuỗi định dạng vi-VN
+            tong_gia_tri: tong_gia_tri,
+            chi_phi_xay_dung: chi_phi_xay_dung,
+            // BẮT BUỘC: Ép kiểu số về String bằng hàm String() để dập tắt lỗi của trường so_ngay_tc_pgv
+            so_ngay_tc_pgv: so_ngay_tc_pgv,
+            so_ngay_tc_thuc_te: so_ngay_tc_thuc_te,
+
+            dia_diem_tc: dia_diem_tc,
+            thong_tin_them: thong_tin_them_form,
+          };
+        }),
       });
     }
   }, [congTrinh, reset]);
@@ -193,6 +220,23 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
           const donViTuOptions = OPTIONS_DU_TOAN.find(
             (opt) => opt.value === gd.ma_don_vi,
           );
+          let thong_tin_them: IThongTinThem | undefined = undefined;
+
+          if (currentMaHieu === "DT_PS") {
+            thong_tin_them = {
+              ps_tang: parseToNumber(gd.thong_tin_them?.ps_tang as string) || 0,
+              ps_giam: parseToNumber(gd.thong_tin_them?.ps_giam as string) || 0,
+              cp_tham_tra_ps:
+                parseToNumber(gd.thong_tin_them?.cp_tham_tra_ps as string) || 0,
+              don_vi_giam_sat: gd.thong_tin_them?.don_vi_giam_sat,
+            };
+          }
+
+          if (currentMaHieu === "TC") {
+            thong_tin_them = {
+              don_vi_giam_sat: gd.thong_tin_them?.don_vi_giam_sat,
+            };
+          }
 
           return {
             ma_hieu: currentMaHieu,
@@ -221,12 +265,14 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
                 link_url: link.link_url,
               };
             }),
+            thong_tin_them: thong_tin_them,
           };
         }),
       isActive: true,
     };
     try {
       const response = await updateProject(congTrinh._id, payload);
+      console.log(payload);
       setIsLoading(true);
       if (response) {
         alertService.success("Cập nhật công trình thành công!");

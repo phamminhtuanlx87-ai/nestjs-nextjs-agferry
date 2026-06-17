@@ -13,7 +13,7 @@ interface Props {
 }
 // ĐỊNH NGHĨA DANH SÁCH Ở ĐÂY CHO DỄ TÌM
 const OPTIONS_DU_TOAN = [{ value: "XNCK", label: "XN Cơ khí Giao thông" }];
-const OPTIONS_NGHIEM_THU = [
+const OPTIONS_GIAM_SAT = [
   { value: "PKT", label: "Phòng Kỹ thuật - Vật tư" },
   {
     value: "HHTN",
@@ -160,18 +160,20 @@ export default function ThiCongForm({ stage }: Props) {
                     error={errors.giai_doan?.[3]?.ngay_hoan_thanh?.message}
                   />
 
-                  <SelectField
-                    label="Đơn vị Thi công"
-                    defaultValue={OPTIONS_DU_TOAN[0].value}
-                    options={OPTIONS_DU_TOAN}
-                    {...register(`giai_doan.3.ma_don_vi`, {
-                      required: !thiccong.isDisabled
-                        ? "Vui lòng nhập Đơn vị Thi công"
-                        : false,
-                    })}
-                    disabled={thiccong.isDisabled}
-                    error={errors.giai_doan?.[3]?.ma_don_vi?.message}
-                  ></SelectField>
+                  <div className="col-span-1 md:col-span-3">
+                    <SelectField
+                      label="Đơn vị Thi công"
+                      defaultValue={OPTIONS_DU_TOAN[0].value}
+                      options={OPTIONS_DU_TOAN}
+                      {...register(`giai_doan.3.ma_don_vi`, {
+                        required: !thiccong.isDisabled
+                          ? "Vui lòng nhập Đơn vị Thi công"
+                          : false,
+                      })}
+                      disabled={thiccong.isDisabled}
+                      error={errors.giai_doan?.[3]?.ma_don_vi?.message}
+                    ></SelectField>
+                  </div>
 
                   <Input
                     label="Địa điểm thi công"
@@ -181,10 +183,31 @@ export default function ThiCongForm({ stage }: Props) {
                         ? "Vui lòng nhập Địa điểm thi công"
                         : false,
                     })}
-                    defaultValue={"Số 818/A, Ấp An Thuận, Xã Hội An, Tỉnh An Giang"}
+                    defaultValue={
+                      "Số 818/A, Ấp An Thuận, Xã Hội An, Tỉnh An Giang"
+                    }
                     disabled={thiccong.isDisabled}
                     error={errors.giai_doan?.[3]?.dia_diem_tc?.message}
                   />
+                  <div className="col-span-1 md:col-span-3">
+                    <SelectField
+                      label="Đơn vị Giám sát"
+                      options={OPTIONS_GIAM_SAT}
+                      {...register(
+                        `giai_doan.3.thong_tin_them.don_vi_giam_sat`,
+                        {
+                          required: !thiccong.isDisabled
+                            ? "Vui lòng nhập Đơn vị"
+                            : false,
+                        },
+                      )}
+                      disabled={thiccong.isDisabled}
+                      error={
+                        errors.giai_doan?.[3]?.thong_tin_them?.don_vi_giam_sat
+                          ?.message
+                      }
+                    ></SelectField>
+                  </div>
                 </div>
                 <div className="border-t border-dashed border-slate-200 px-8" />
               </div>
@@ -248,9 +271,9 @@ export default function ThiCongForm({ stage }: Props) {
                         }
                       />
 
-                      <SelectField
-                        label="Đơn vị"
-                        options={OPTIONS_NGHIEM_THU}
+                      {/* <SelectField
+                        label="Đơn vị Giám sát"
+                        options={OPTIONS_GIAM_SAT}
                         {...register(`giai_doan.4.ma_don_vi`, {
                           required: !nghiemthu.isDisabled
                             ? "Vui lòng nhập Đơn vị"
@@ -258,7 +281,7 @@ export default function ThiCongForm({ stage }: Props) {
                         })}
                         disabled={nghiemthu.isDisabled}
                         error={errors.giai_doan?.[4]?.ma_don_vi?.message}
-                      ></SelectField>
+                      ></SelectField> */}
                     </div>
                   </div>
                 </div>
