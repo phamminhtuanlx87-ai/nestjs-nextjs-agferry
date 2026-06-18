@@ -170,7 +170,6 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
                 }
               : undefined;
           // 2. Return về một Object giai đoạn khớp hoàn toàn kiểu dữ liệu mong đợi
-          console.log("isTTR_DT_PS:" + isTTR_DT_PS + " " + thong_tin_them_form);
           return {
             ...gd,
             ngay_thuc_hien: gd.ngay_thuc_hien
