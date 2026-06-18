@@ -108,7 +108,7 @@ export default function QuyetToanForm({ stage }: Props) {
                     error={errors.giai_doan?.[8]?.chi_phi_xay_dung?.message}
                   />
 
-                  <div className="col-span-1 md:col-span-3">
+                  <div className="w-full">
                     <SelectField
                       label="Đơn vị"
                       options={OPTIONS_DU_TOAN}
@@ -123,7 +123,7 @@ export default function QuyetToanForm({ stage }: Props) {
                   </div>
 
                   {!qt.isDisabled && (
-                    <div className="col-span-1 md:col-span-3">
+                    <div className="col-span-1 md:col-span-2">
                       <MultiFileControl
                         control={control}
                         // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)

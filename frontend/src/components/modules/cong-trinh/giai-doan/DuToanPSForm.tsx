@@ -310,7 +310,7 @@ export default function DuToanPSForm({ stage }: Props) {
                         ?.message
                     }
                   />
-                  <div className="col-span-1 md:col-span-3">
+                  <div className="w-full">
                     <SelectField
                       label="Đơn vị lập Dự toán (Điều chỉnh)"
                       options={OPTIONS_DU_TOAN}
@@ -325,7 +325,7 @@ export default function DuToanPSForm({ stage }: Props) {
                   </div>
 
                   {!dtps.isDisabled && (
-                    <div className="col-span-1 md:col-span-3">
+                    <div className="col-span-1 md:col-span-2">
                       <MultiFileControl
                         control={control}
                         // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
@@ -484,7 +484,7 @@ export default function DuToanPSForm({ stage }: Props) {
                         }
                       />
 
-                      <div className="col-span-1 md:col-span-3">
+                      <div className="w-full">
                         <SelectField
                           label="Đơn vị lập Dự toán (Điều chỉnh)"
                           options={OPTIONS_THAM_TRA}
@@ -499,7 +499,7 @@ export default function DuToanPSForm({ stage }: Props) {
                       </div>
 
                       {!ttrdtps.isDisabled && (
-                        <div className="col-span-1 md:col-span-3">
+                        <div className="col-span-1 md:col-span-2">
                         <MultiFileControl
                           control={control}
                           // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)

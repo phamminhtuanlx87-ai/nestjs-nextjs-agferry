@@ -160,7 +160,7 @@ export default function ThiCongForm({ stage }: Props) {
                     error={errors.giai_doan?.[3]?.ngay_hoan_thanh?.message}
                   />
 
-                  <div className="col-span-1 md:col-span-3">
+                  <div className="w-full">
                     <SelectField
                       label="Đơn vị Thi công"
                       defaultValue={OPTIONS_DU_TOAN[0].value}
@@ -189,7 +189,7 @@ export default function ThiCongForm({ stage }: Props) {
                     disabled={thiccong.isDisabled}
                     error={errors.giai_doan?.[3]?.dia_diem_tc?.message}
                   />
-                  <div className="col-span-1 md:col-span-3">
+                  <div className="w-full">
                     <SelectField
                       label="Đơn vị Giám sát"
                       options={OPTIONS_GIAM_SAT}
@@ -270,18 +270,6 @@ export default function ThiCongForm({ stage }: Props) {
                           errors.giai_doan?.[4]?.so_ngay_tc_thuc_te?.message
                         }
                       />
-
-                      {/* <SelectField
-                        label="Đơn vị Giám sát"
-                        options={OPTIONS_GIAM_SAT}
-                        {...register(`giai_doan.4.ma_don_vi`, {
-                          required: !nghiemthu.isDisabled
-                            ? "Vui lòng nhập Đơn vị"
-                            : false,
-                        })}
-                        disabled={nghiemthu.isDisabled}
-                        error={errors.giai_doan?.[4]?.ma_don_vi?.message}
-                      ></SelectField> */}
                     </div>
                   </div>
                 </div>

@@ -127,7 +127,7 @@ export function DuToanForm({ stage }: Props) {
                   error={errors.giai_doan?.[0]?.chi_phi_xay_dung?.message}
                 />
 
-                <div className="col-span-1 md:col-span-3">
+                <div className="w-full">
                   <SelectField
                     label="Đơn vị"
                     options={OPTIONS_DU_TOAN}
@@ -142,7 +142,7 @@ export function DuToanForm({ stage }: Props) {
                 </div>
 
                 {!duToan.isDisabled && (
-                  <div className="col-span-1 md:col-span-3">
+                  <div className="col-span-1 md:col-span-2">
                     <MultiFileControl
                       control={control}
                       // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
@@ -214,6 +214,7 @@ export function DuToanForm({ stage }: Props) {
                     })}
                     disabled={thamTra.isDisabled}
                   />
+
                   <Input
                     label="Tổng chi phí Xây dựng"
                     type="text"
@@ -230,7 +231,7 @@ export function DuToanForm({ stage }: Props) {
                     disabled={thamTra.isDisabled}
                   />
 
-                  <div className="col-span-1 md:col-span-3">
+                  <div className="w-full">
                     <SelectField
                       label="Đơn vị"
                       options={OPTIONS_THAM_TRA}
@@ -244,13 +245,13 @@ export function DuToanForm({ stage }: Props) {
                   </div>
 
                   {!thamTra.isDisabled && (
-                     <div className="col-span-1 md:col-span-3">
-                    <MultiFileControl
-                      control={control}
-                      // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
-                      name="giai_doan.1.file_links"
-                      label="Danh sách tài liệu đính kèm"
-                    />
+                    <div className="col-span-1 md:col-span-2">
+                      <MultiFileControl
+                        control={control}
+                        // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
+                        name="giai_doan.1.file_links"
+                        label="Danh sách tài liệu đính kèm"
+                      />
                     </div>
                   )}
                 </div>
