@@ -52,6 +52,7 @@ export enum UserDepartment {
   XNCK = 'Xí nghiệp Cơ khí Giao thông',
   BTGD = 'Ban Tổng Giám đốc',
   PTV = 'Phòng Tài vụ',
+  PVT = 'Phòng Vận tải',
   AD = 'Admin',
   CXD = 'Chưa xác định',
 }

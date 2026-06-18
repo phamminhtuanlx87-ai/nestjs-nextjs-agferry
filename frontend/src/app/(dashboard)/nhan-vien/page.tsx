@@ -72,6 +72,7 @@ export default function NhanVienPage() {
     { value: "XNCK", label: "Xí nghiệp Cơ khí Giao thông" },
     { value: "BTGD", label: "Ban Tổng Giám đốc" },
     { value: "PTV", label: "Phòng Tài vụ" },
+    { value: "PVT", label: "Phòng Vận tải" },
     { value: "CXD", label: "Chưa xác định" },
   ];
 
