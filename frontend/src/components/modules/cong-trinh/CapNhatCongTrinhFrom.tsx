@@ -135,6 +135,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
           const isTC = currentMaHieu === "TC";
           const isNT = currentMaHieu === "NT";
           const isDT_PS = currentMaHieu === "DT_PS";
+          const isTTR_DT_PS = currentMaHieu === "TTR_DT_PS";
           // 1. Tạo object thong_tin_them chuẩn chuỗi cho form
 
           const tong_gia_tri = gd.tong_gia_tri?.toLocaleString("vi-VN") ?? "";
@@ -155,7 +156,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
               : "";
 
           const thong_tin_them_form =
-            isDT_PS || gd.thong_tin_them
+            isDT_PS || isTTR_DT_PS || gd.thong_tin_them
               ? {
                   ps_tang:
                     gd.thong_tin_them?.ps_tang?.toLocaleString("vi-VN") ?? "",
@@ -169,6 +170,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
                 }
               : undefined;
           // 2. Return về một Object giai đoạn khớp hoàn toàn kiểu dữ liệu mong đợi
+          console.log("isTTR_DT_PS:" + isTTR_DT_PS + " " + thong_tin_them_form);
           return {
             ...gd,
             ngay_thuc_hien: gd.ngay_thuc_hien
@@ -222,7 +224,7 @@ export default function CapNhatCongTrinhFrom({ congTrinh }: Props) {
           );
           let thong_tin_them: IThongTinThem | undefined = undefined;
 
-          if (currentMaHieu === "DT_PS") {
+          if (currentMaHieu === "DT_PS" || currentMaHieu==="TTR_DT_PS") {
             thong_tin_them = {
               ps_tang: parseToNumber(gd.thong_tin_them?.ps_tang as string) || 0,
               ps_giam: parseToNumber(gd.thong_tin_them?.ps_giam as string) || 0,
