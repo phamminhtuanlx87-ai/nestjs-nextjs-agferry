@@ -182,6 +182,14 @@ const ViewDetailCongTrinh = () => {
       // Mắc định không chạy vào IF -> Không bị e.preventDefault() chặn -> Link tự mở mượt mà bằng thẻ <Link>
     }
   };
+  const numericValue = (value: string | number | undefined) => {
+    if (!value) return 0;
+    return Number(String(value).replace(/\./g, ""));
+  };
+  const chenhlech =
+    numericValue(congTrinh?.giai_doan?.[6]?.thong_tin_them?.ps_tang) +
+    numericValue(congTrinh?.giai_doan?.[6]?.thong_tin_them?.cp_tham_tra_ps) -
+    numericValue(congTrinh?.giai_doan?.[6]?.thong_tin_them?.ps_giam);
 
   if (loading) return <LoadingScreen />;
   return (
@@ -211,8 +219,7 @@ const ViewDetailCongTrinh = () => {
             value: formatMoney(
               (congTrinh?.giai_doan?.[7]?.tong_gia_tri as string) || "0",
             ),
-            value_PST: "",
-            value_PSG: "",
+            value_chenh_lech: chenhlech || "0",
             icon: (
               <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-amber-50 text-amber-500 shrink-0">
                 <div className="relative">
@@ -311,35 +318,57 @@ const ViewDetailCongTrinh = () => {
               {stat.icon}
             </div>
             <div className="space-y-0.5">
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                 {stat.label}
-              </p>
-              <p
+              </div>
+              <div
                 className={`text-lg font-black tracking-tight text-slate-900 ${stat.valueClass || ""}`}
               >
                 {stat.value}
+                {stat.value_chenh_lech &&
+                  (() => {
+                    const numericValue = Number(
+                      String(stat.value_chenh_lech).replace(/\./g, ""),
+                    );
+                    return (
+                      <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                        {/* Badge Phát sinh TĂNG (Giá trị >= 0) */}
+                        {!isNaN(numericValue) && numericValue > 0 && (
+                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 text-[11px] font-semibold shadow-sm">
+                            <span className="font-normal">PS Tăng:</span>
+                            <span className="text-[13px] font-bold leading-none">
+                              +
+                            </span>
+                            <span>
+                              {formatMoney(
+                                (stat.value_chenh_lech as string) || "0",
+                              )}
+                            </span>
+                          </div>
+                        )}
 
-                {/* 3. Khu vực hiển thị biến động Tăng / Giảm tinh gọn */}
-                {stat.value_PSG && stat.value_PST && (
-                  <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                    {/* Badge Phát sinh TĂNG */}
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 text-[11px] font-semibold shadow-sm">
-                      <span className="text-[13px] font-bold leading-none">
-                        +
-                      </span>
-                      <span> {stat.value_PST ? stat.value_PST : ""}</span>
-                    </div>
-
-                    {/* Badge Phát sinh GIẢM */}
-                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-100 text-[11px] font-semibold shadow-sm">
-                      <span className="text-[13px] font-bold leading-none">
-                        -
-                      </span>
-                      <span> {stat.value_PSG ? stat.value_PSG : ""}</span>
-                    </div>
-                  </div>
-                )}
-              </p>
+                        {/* Badge Phát sinh GIẢM (Giá trị < 0) */}
+                        {!isNaN(numericValue) && numericValue < 0 && (
+                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-100 text-[11px] font-semibold shadow-sm">
+                            {/* Mẹo nhỏ: Nếu chuỗi đã có sẵn dấu trừ "-" từ API, anh không cần gõ thêm dấu trừ cứng ở đây nữa */}
+                            <span className="font-normal">PS Giảm:</span>
+                            {!String(stat.value_chenh_lech).includes("-") && (
+                              <span className="text-[13px] font-bold leading-none">
+                                -
+                              </span>
+                            )}
+                            <span>
+                              {" "}
+                              {formatMoney(
+                                (stat.value_chenh_lech as string) || "0",
+                              )}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+              </div>
             </div>
           </div>
         ))}
@@ -513,7 +542,11 @@ const ViewDetailCongTrinh = () => {
                 >
                   <span className="underline decoration-indigo-300 underline-offset-4 group-hover:decoration-indigo-600">
                     {congTrinh?.giai_doan[3]?.dia_diem_tc}
+                    <span className="font-light">
+                      {` (${congTrinh?.giai_doan[3]?.ten_don_vi})`}
+                    </span>
                   </span>
+
                   <FiExternalLink
                     size={14}
                     className="text-indigo-400 group-hover:text-indigo-600 transition-colors shrink-0"

@@ -16,8 +16,7 @@ export default function ResponsivePagination({
   totalItems = 0,
   itemsPerPage = 5,
 }: PaginationProps) {
-  console.log(totalItems);
-  console.log(totalPages);
+
   if (totalPages <= 1) return null;
 
   // Tính toán toán số lượng hiển thị để làm text thông báo
