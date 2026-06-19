@@ -36,7 +36,7 @@ export const StatCard: React.FC<StatCardProps> = ({
       layout
       id={id}
       onClick={onClick}
-      className={`bg-white border border-slate-200/80 rounded-xl p-4.5 relative overflow-hidden shadow-xs group w-full h-44 ${hoverBorderColor}`}
+      className={`bg-white border border-slate-200/80 rounded-xl p-4.5 relative overflow-hidden shadow-xs group w-full h-full ${hoverBorderColor}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-1.5 z-10 relative">
@@ -60,7 +60,7 @@ export const StatCard: React.FC<StatCardProps> = ({
         </span>
       </h3>
       {!!value2 && Number(value2) > 0 && (
-        <div className="text-xs text-slate-500 mt-3 flex justify-self-start gap-1">
+        <div className=" text-xs text-slate-500 mt-3 flex lg:flex-col xl:flex-row justify-self-start gap-1">
           <span>Trong đó CP Xây dựng:</span>
           <span className="font-semibold text-slate-700">
             {new Intl.NumberFormat("vi-VN").format(Number(value2))}
@@ -69,7 +69,7 @@ export const StatCard: React.FC<StatCardProps> = ({
         </div>
       )}
       {/* Footer chứa thông tin phụ */}
-      <div className="flex items-center gap-1.5 mt-3.5 z-10 relative">
+      <div className="flex lg:flex-col lg:items-start xl:flex-row items-center gap-1.5 mt-3.5 z-10 relative">
         {footer}
       </div>
 

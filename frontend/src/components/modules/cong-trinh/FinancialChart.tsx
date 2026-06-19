@@ -2,6 +2,7 @@
 
 import { ICongTrinh } from "@/services/congTrinhService";
 import React, { useEffect, useMemo, useState } from "react";
+import { FiBarChart } from "react-icons/fi";
 import {
   BarChart,
   Bar,
@@ -129,7 +130,18 @@ const FinancialChart = ({ dsCongTrinh, selectYear }: ChartPros) => {
     );
   }
   return (
-    <div className={`relative w-full mt-2 select-none h-32 min-h-28`}>
+    <div className={`relative w-full select-none h-32 min-h-28`}>
+       {/* Header */}
+      <div className="flex items-center justify-between mb-1.5 z-10 relative">
+        <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">
+          Biểu đồ
+        </span>
+        <div
+          className={`w-8 h-8 rounded-lg flex items-center justify-center border bg-[#fbf4f5] border-[#fce8eb] hover:border-indigo-200`}
+        >
+          <FiBarChart  size={16} className="text-indigo-600"/>
+        </div>
+      </div>
       <ResponsiveContainer width="100%" height={100}>
         <BarChart
           data={chartDataMock}

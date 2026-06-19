@@ -56,7 +56,7 @@ export default function SummaryCard({
           )}
 
           {/* <!-- Footer --> */}
-          <div className="flex justify-between items-center mt-auto pt-3 border-t border-white/10 gap-2">
+          <div className="flex lg:flex-col lg:items-start xl:flex-row justify-between items-center mt-auto pt-3 border-t border-white/10 gap-2">
             {/* Khối hiển thị số lượng tăng giảm dạng Badge */}
             <span
               className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${

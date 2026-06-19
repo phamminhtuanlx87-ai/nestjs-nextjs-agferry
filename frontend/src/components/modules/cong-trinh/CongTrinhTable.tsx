@@ -1,16 +1,13 @@
 "use client";
-import Table from "@/components/ui/Table";
 import { projectStatusMap } from "./ProjectStatus";
-import { RiDeleteBinLine, RiEdit2Line, RiEyeLine } from "@remixicon/react";
-import Button from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 import { ICongTrinh } from "@/services/congTrinhService";
 import api from "@/lib/axios";
 import { alertService } from "@/utils/swal";
 import { useState } from "react";
-import { Guard } from "@/components/common/Guard";
-import { UserPermission } from "@/store/useAuthStore";
 import ResponsivePagination from "@/components/ui/ResponsivePagination";
+import { formatMoney } from "@/utils/formatnumber";
+import ProjectActions from "./ProjectActions";
 
 interface CongTrinhTableProps {
   // projects: ICongTrinh[];
@@ -73,150 +70,125 @@ export default function CongTrinhTable({
     }
   };
 
-  const TABLE_HEADERS = [
-    {
-      label: "Mã CT",
-      key: "ma_cong_trinh",
-      className: "hidden 2xl:table-cell text-center",
-    },
-    {
-      label: "Tên công trình",
-      key: "ten_cong_trinh",
-      className: "min-w-50 wrap-break-word",
-    },
-    {
-      label: "Ngày khởi tạo",
-      key: "ngay_tao_du_an",
-      className: "hidden lg:table-cell",
-      align: "center" as const,
-    },
-    {
-      label: "Dự toán\nđược duyệt",
-      key: "du_toan",
-      className:
-        "min-w-20 whitespace-pre-line leading-snug hidden 2xl:table-cell",
-      align: "center" as const,
-    }, // Căn phải cho số tiền
-    {
-      label: "Dự toán (Điều chỉnh)\nđược duyệt",
-      key: "du_toan_dc",
-      className:
-        "min-w-20 whitespace-pre-line leading-snug hidden 2xl:table-cell",
-      align: "center" as const,
-    }, // Căn phải cho số tiền
-    {
-      label: "Quyết toán",
-      key: "quyet_toan",
-      className: "min-w-20 hidden lg:table-cell",
-      align: "right" as const,
-    }, // Căn phải
-    {
-      label: "Trạng thái",
-      key: "trang_thai",
-      className: "text-center max-w-16",
-      align: "center" as const,
-    },
-    {
-      label: "Hành động",
-      key: "actions",
-      className: "",
-      align: "center" as const,
-    },
-  ];
   return (
     <div>
-      <Table headers={TABLE_HEADERS}>
-        {dsCongTrinh?.slice(start, end).map((project) => (
-          <tr
-            key={project._id}
-            className="hover:bg-indigo-100 transition-colors "
-          >
-            <td className="px-6 py-4 font-medium hidden 2xl:table-cell ">
-              {project.ma_cong_trinh}
-            </td>
+      {dsCongTrinh?.slice(start, end).map((project) => (
+        <div key={project.ma_cong_trinh}>
+          <div className="card-soft w-full min-h-34 mt-4 p-3">
+            {/* header  card*/}
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row text-[10px] mb-2 font-bold text-slate-500 tracking-widest bg-slate-100 px-2 py-0.5 rounded-md">
+                {/* 1. Phiên bản cho màn hình SIÊU NHỎ: Mặc định hiện, lên sm sẽ ẩn (hidden) */}
+                <span className="sm:hidden">Mã C.trình: </span>
 
-            <td className="px-6 py-4 text-gray-800 font-bold min-w-40 max-w-50 wrap-break-word">
-              {project.ten_cong_trinh}
-            </td>
-            <td className="px-6 py-4 hidden lg:table-cell text-center">
-              {project.ngay_tao_du_an
-                ? new Date(project.ngay_tao_du_an).toLocaleDateString("vi-VN")
-                : "---"}
-            </td>
-
-            <td className="px-6 py-4 text-right tabular-nums hidden 2xl:table-cell">
-              {/* Dùng Number() để ép kiểu về số trước khi format, mặc định là 0 nếu null */}
-              {Number(
-                project.giai_doan?.find((gd) => gd.ma_hieu === "PD_DT")
-                  ?.tong_gia_tri || 0,
-              ).toLocaleString("vi-VN")}
-              <span className="text-gray-400 text-xs"> ₫</span>
-            </td>
-
-            <td className="px-6 py-4 hidden 2xl:table-cell text-right tabular-nums">
-              {Number(
-                project.giai_doan?.find((gd) => gd.ma_hieu === "PD_DT_PS")
-                  ?.tong_gia_tri || 0,
-              ).toLocaleString("vi-VN")}
-              <span className="text-gray-400 text-xs"> ₫</span>
-            </td>
-            <td className="px-6 py-4 hidden lg:table-cell text-right tabular-nums font-semibold">
-              {Number(
-                project.giai_doan?.find((gd) => gd.ma_hieu === "QT")
-                  ?.tong_gia_tri || 0,
-              ).toLocaleString("vi-VN")}
-              <span className="text-gray-400 text-xs"> ₫</span>
-            </td>
-            <td className="text-center px-6 py-4">
-              {renderStatus(project.giai_doan?.at(-1)?.ma_hieu || "")}
-            </td>
-
-            <td className="px-6 py-4">
-              <div className="flex items-center justify-end gap-1">
-                <Guard requiredPermission={UserPermission.PROJECT_VIEW}>
-                  <Button
-                    type="button"
-                    className="p-2 rounded-lg text-indigo-600 bg-white hover:bg-indigo-300 transition-colors"
-                    onClick={() => {
-                      const targetId = project._id;
-                      router.push(`/cong-trinh/${targetId}/view`);
-                    }}
-                  >
-                    <RiEyeLine size={18}></RiEyeLine>
-                  </Button>
-                </Guard>
-                <Guard requiredPermission={UserPermission.PROJECT_UPDATE}>
-                  <Button
-                    type="button"
-                    className="p-2 rounded-lg text-indigo-600 bg-white hover:bg-indigo-300 transition-colors"
-                    onClick={() => {
-                      const targetId = project._id;
-                      router.push(`/cong-trinh/${targetId}`);
-                    }}
-                  >
-                    <RiEdit2Line size={18}></RiEdit2Line>
-                  </Button>
-                </Guard>
-                <Guard requiredPermission={UserPermission.PROJECT_DELETE}>
-                  <Button
-                    type="button"
-                    className="p-2 rounded-lg text-red-500 bg-white hover:bg-indigo-300 transition-colors"
-                    onClick={() =>
-                      handleDelete(
-                        project._id,
-                        project.ma_cong_trinh,
-                        project.ten_cong_trinh,
-                      )
-                    }
-                  >
-                    <RiDeleteBinLine size={18}></RiDeleteBinLine>
-                  </Button>
-                </Guard>
+                {/* 2. Phiên bản từ màn hình SM trở lên: Mặc định ẩn (hidden), lên sm sẽ hiện (sm:inline) */}
+                <span className="hidden sm:inline">Mã công trình: </span>
+                <span className="text-indigo-600">
+                  {" "}
+                  {project?.ma_cong_trinh ?? ""}
+                </span>
               </div>
-            </td>
-          </tr>
-        ))}
-      </Table>
+              <span>
+                {renderStatus(project.giai_doan?.at(-1)?.ma_hieu ?? "")}
+              </span>
+            </div>
+
+            {/* MAIN CARD */}
+            <div className="mt-4 space-y-2">
+              <div className="flex justify-between items-center">
+                {/* Tên công trình: Chữ to, rõ ràng, border nhẹ tách biệt */}
+                <h3 className="font-semibold text-gray-800 text-sm md:text-base line-clamp-2">
+                  {project.ten_cong_trinh}
+                </h3>
+                {/* Ngày tạo */}
+                <div className="text-xs text-gray-400 font-medium hidden lg:inline">
+                  📅 <span className="hidden sm:inline">Ngày tạo dự án: </span>
+                  <span className="text-slate-600">
+                    {project.ngay_tao_du_an
+                      ? new Date(project.ngay_tao_du_an).toLocaleDateString(
+                          "vi-VN",
+                        )
+                      : "---"}
+                  </span>
+                </div>
+              </div>
+              <hr className="my-2 border-gray-200" />
+
+              {/* Lưới hiển thị số liệu: Mobile đi hàng dọc hoặc hàng ngang linh hoạt */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-xs md:text-sm">
+                <div className="flex flex-col">
+                  <span className="text-gray-400 font-medium">
+                    Dự toán được duyệt
+                  </span>
+                  {/* Màn hình siêu nhỏ chỉ hiển thị 1 thông tin */}
+                  <span className="sm:hidden text-gray-700 font-bold mt-0.5">
+                    {formatMoney(
+                      (project.giai_doan[7]?.tong_gia_tri as string) ??
+                        (project.giai_doan[2]?.tong_gia_tri as string) ??
+                        "0",
+                    )}
+                  </span>
+                  {/* Màn hình sm >*/}
+                  <span className="hidden sm:inline text-gray-700 font-bold mt-0.5">
+                    {formatMoney(
+                      (project.giai_doan[2]?.tong_gia_tri as string) ?? "0",
+                    )}
+                  </span>
+                </div>
+                {/* Màn hình sm >*/}
+                <div className="hidden sm:flex flex-col">
+                  <span className="text-gray-400 font-medium">
+                    Dự toán Phát sinh được duyệt
+                  </span>
+                  <span className=" text-gray-700 font-bold mt-0.5">
+                    {formatMoney(
+                      (project.giai_doan[7]?.tong_gia_tri as string) ?? "0",
+                    )}
+                  </span>
+                </div>
+
+                <div className="flex flex-col">
+                  <span className="text-gray-400 font-medium">Quyết toán</span>
+                  <span className="text-gray-700 font-bold mt-0.5">
+                    {formatMoney(
+                      (project.giai_doan[8]?.tong_gia_tri as string) ?? "0",
+                    )}
+                  </span>
+                </div>
+                <div className="hidden lg:inline">
+                  <ProjectActions
+                    project={project}
+                    handleDelete={handleDelete}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* footer card */}
+            <hr className="my-2 border-gray-200" />
+
+            <div className="flex justify-between items-center lg:hidden">
+              {/* Ngày tạo */}
+              <div className="text-xs text-gray-400 font-medium">
+                📅 <span className="hidden sm:inline">Ngày tạo dự án: </span>
+                <span className="text-slate-600">
+                  {project.ngay_tao_du_an
+                    ? new Date(project.ngay_tao_du_an).toLocaleDateString(
+                        "vi-VN",
+                      )
+                    : "---"}
+                </span>
+              </div>
+
+              <ProjectActions
+                project={project}
+                handleDelete={handleDelete}
+              />
+            </div>
+          </div>
+        </div>
+      ))}
+
       {/* INFO + PAGINATION */}
       <ResponsivePagination
         currentPage={currentPage}

@@ -241,11 +241,13 @@ export default function ProjectStatsBlock({
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-slate-500 mt-1 flex justify-self-start gap-1">
-                    <span>Riêng Chi phí Xây dựng:</span>
-                    <span className="font-semibold text-blue-600">
-                      {cpxdRate}%
-                    </span>
+                  <div className="text-xs text-slate-500 mt-1 flex flex-col lg:flex-col justify-self-start gap-1">
+                    <div>
+                      <span>Riêng Chi phí Xây dựng: </span>
+                      <span className="font-semibold text-blue-600">
+                        {cpxdRate}%
+                      </span>
+                    </div>
                     <span className="text-indigo-600">
                       (Đã đạt:{" "}
                       {parseFloat((cpxdQuyetToan / 1000000000).toFixed(2))} /{" "}
@@ -290,8 +292,8 @@ export default function ProjectStatsBlock({
             />
 
             {/* CARD 4: BIỂU ĐỒ HOÀN CHỈNH */}
-            <div className="bg-white border border-slate-200/80 rounded-xl p-4 relative overflow-hidden shadow-xs h-44 w-full hover:border-amber-200 transition-all">
-              <FinancialChart dsCongTrinh={data} selectYear={selectedYear}/>
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 relative overflow-hidden shadow-xs h-full w-full hover:border-amber-200 transition-all">
+              <FinancialChart dsCongTrinh={data} selectYear={selectedYear} />
             </div>
           </div>
         </div>
