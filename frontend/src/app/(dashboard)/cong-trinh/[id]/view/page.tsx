@@ -204,7 +204,7 @@ const ViewDetailCongTrinh = () => {
       </div>
 
       {/* 2. KHỐI THỐNG KÊ SỐ LIỆU TÀI CHÍNH NHANH */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-5 mb-8">
         {[
           {
             label: "Tổng giá trị dự toán",
@@ -334,16 +334,19 @@ const ViewDetailCongTrinh = () => {
                       <div className="flex flex-wrap items-center gap-2 mt-0.5">
                         {/* Badge Phát sinh TĂNG (Giá trị >= 0) */}
                         {!isNaN(numericValue) && numericValue > 0 && (
-                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 text-[11px] font-semibold shadow-sm">
+                          <div className="inline-flex 2xl:flex-col 2xl:items-start items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 text-[11px] font-semibold shadow-sm">
                             <span className="font-normal">PS Tăng:</span>
-                            <span className="text-[13px] font-bold leading-none">
-                              +
-                            </span>
-                            <span>
-                              {formatMoney(
-                                (stat.value_chenh_lech as string) || "0",
-                              )}
-                            </span>
+                            <div>
+                              <span className="text-[13px] font-bold leading-none">
+                                + 
+                              </span>
+
+                              <span>
+                                {formatMoney(
+                                  (stat.value_chenh_lech as string) || "0",
+                                )}
+                              </span>
+                            </div>
                           </div>
                         )}
 

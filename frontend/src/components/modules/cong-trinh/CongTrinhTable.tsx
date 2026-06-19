@@ -148,7 +148,7 @@ export default function CongTrinhTable({
                 </div>
 
                 <div className="flex flex-col">
-                  <span className="text-gray-400 font-medium">Quyết toán</span>
+                  <span className="text-gray-400 font-medium">Tổng hợp Quyết toán</span>
                   <span className="text-gray-700 font-bold mt-0.5">
                     {formatMoney(
                       (project.giai_doan[8]?.tong_gia_tri as string) ?? "0",
