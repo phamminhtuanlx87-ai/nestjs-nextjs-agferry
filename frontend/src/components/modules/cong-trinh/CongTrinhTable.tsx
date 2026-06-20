@@ -70,6 +70,24 @@ export default function CongTrinhTable({
     }
   };
 
+  const chenhlech = ({
+    psTang,
+    psGiam,
+    cpThamTraPS,
+  }: {
+    psTang: string | number | undefined;
+    psGiam: string | number | undefined;
+    cpThamTraPS: string | number | undefined;
+  }) => {
+    const numericValue = (value: string | number | undefined) => {
+      if (!value) return 0;
+      return Number(String(value).replace(/\./g, ""));
+    };
+    return String(
+      numericValue(psTang) + numericValue(cpThamTraPS) - numericValue(psGiam),
+    );
+  };
+
   return (
     <div>
       {dsCongTrinh?.slice(start, end).map((project) => (
@@ -135,6 +153,45 @@ export default function CongTrinhTable({
                     )}
                   </span>
                 </div>
+
+                {/* Màn hình xl - Phần phát sinh >*/}
+                <div className="hidden lg:inline">
+                  {(() => {
+                    // 1. Tính toán giá trị số thực tế trước
+                    const giaTriChenhLech = chenhlech({
+                      psTang: project?.giai_doan?.[6]?.thong_tin_them?.ps_tang,
+                      cpThamTraPS:
+                        project?.giai_doan?.[6]?.thong_tin_them?.cp_tham_tra_ps,
+                      psGiam: project?.giai_doan?.[6]?.thong_tin_them?.ps_giam,
+                    });
+
+                    // 2. Xác định trạng thái Tăng hay Giảm (Nếu >= 0 là Tăng, ngược lại là Giảm)
+                    const laTang = Number(giaTriChenhLech) >= 0;
+
+                    return (
+                      <div className="hidden lg:flex flex-col">
+                        {/* Tiêu đề thay đổi động theo trạng thái */}
+                        <span className="text-gray-400 font-medium">
+                          {laTang
+                            ? "Phần phát sinh tăng"
+                            : "Phần phát sinh giảm"}
+                        </span>
+
+                        {/* Màu chữ thay đổi động: Tăng => màu xanh emerald-600, Giảm => màu đỏ rose-600 */}
+                        <span
+                          className={`font-bold mt-0.5 ${
+                            laTang ? "text-emerald-600" : "text-rose-600"
+                          }`}
+                        >
+                          {Number(giaTriChenhLech) > 0 ? "+" : ""}
+                          {/* Nếu là số âm, formatMoney có thể tự hiển thị dấu trừ hoặc anh thích giữ nguyên định dạng */}
+                          {formatMoney(String(giaTriChenhLech))}
+                        </span>
+                      </div>
+                    );
+                  })()}
+                </div>
+
                 {/* Màn hình sm >*/}
                 <div className="hidden sm:flex flex-col">
                   <span className="text-gray-400 font-medium">
@@ -148,14 +205,16 @@ export default function CongTrinhTable({
                 </div>
 
                 <div className="flex flex-col">
-                  <span className="text-gray-400 font-medium">Tổng hợp Quyết toán</span>
+                  <span className="text-gray-400 font-medium">
+                    Tổng hợp Quyết toán
+                  </span>
                   <span className="text-gray-700 font-bold mt-0.5">
                     {formatMoney(
                       (project.giai_doan[8]?.tong_gia_tri as string) ?? "0",
                     )}
                   </span>
                 </div>
-                <div className="hidden lg:inline">
+                <div className="hidden 2xl:inline">
                   <ProjectActions
                     project={project}
                     handleDelete={handleDelete}
@@ -167,7 +226,7 @@ export default function CongTrinhTable({
             {/* footer card */}
             <hr className="my-2 border-gray-200" />
 
-            <div className="flex justify-between items-center lg:hidden">
+            <div className="flex justify-between items-center 2xl:hidden">
               {/* Ngày tạo */}
               <div className="text-xs text-gray-400 font-medium">
                 📅 <span className="hidden sm:inline">Ngày tạo dự án: </span>
@@ -180,10 +239,7 @@ export default function CongTrinhTable({
                 </span>
               </div>
 
-              <ProjectActions
-                project={project}
-                handleDelete={handleDelete}
-              />
+              <ProjectActions project={project} handleDelete={handleDelete} />
             </div>
           </div>
         </div>
