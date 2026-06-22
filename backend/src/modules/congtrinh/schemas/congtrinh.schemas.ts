@@ -50,12 +50,6 @@ class GiaiDoan {
   chi_phi_xay_dung?: number;
 
   @Prop({ type: Number })
-  chenh_lech_tgt?: number;
-
-  @Prop({ type: Number })
-  chenh_lech_cpxd?: number;
-
-  @Prop({ type: Number })
   so_ngay_tc_pgv?: number;
 
   @Prop({ type: Number })

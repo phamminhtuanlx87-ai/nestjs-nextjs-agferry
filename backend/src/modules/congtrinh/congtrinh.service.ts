@@ -8,7 +8,7 @@ import { CongTrinhDto } from './dto/create-congtrinh';
 export class CongtrinhService {
   constructor(
     @InjectModel(CongTrinh.name)
-    private congTrinhModel: Model<CongTrinhDocument>, // Sử dụng cái type Hydrated mà mình vừa nói ở trên
+    private readonly congTrinhModel: Model<CongTrinhDocument>, // Sử dụng cái type Hydrated mà mình vừa nói ở trên
   ) {}
 
   async create(dto: CongTrinhDto): Promise<CongTrinhDocument> {

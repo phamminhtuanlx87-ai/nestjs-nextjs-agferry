@@ -13,6 +13,8 @@ import { CongtrinhModule } from './modules/congtrinh/congtrinh.module';
 
 // 1. IMPORT CÁC THÀNH PHẦN CỦA THROTTLER VÀO ĐÂY
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { DanhMucGiaVeModule } from './modules/danh-muc-gia-ve/danh-muc-gia-ve.module';
+import { SanLuongDoanhThuModule } from './modules/san-luong-doanh-thu/san-luong-doanh-thu.module';
 
 @Module({
   imports: [
@@ -20,7 +22,9 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
       envFilePath: '.env', // Chỉ định rõ file của bạn
       isGlobal: true, // Giúp các module khác như Auth, Users không cần import lại
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI!),
+    MongooseModule.forRoot(process.env.MONGODB_URI!, {
+      autoIndex: true, // Thần chú bắt buộc MongoDB quét và nạp lại unique index
+    }),
 
     // 2. CẤU HÌNH BỘ KHUNG CHẶN SPAM CHO TOÀN HỆ THỐNG
     ThrottlerModule.forRoot([
@@ -45,6 +49,8 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
     UsersModule,
     AuthModule,
     CongtrinhModule,
+    DanhMucGiaVeModule,
+    SanLuongDoanhThuModule,
   ],
   controllers: [AppController],
   providers: [

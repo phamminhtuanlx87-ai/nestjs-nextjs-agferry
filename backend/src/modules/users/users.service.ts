@@ -22,7 +22,9 @@ import { ResetPasswordDTO } from '../auth/dto/ResetPasswordDTO';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {}
 
   async create(
     createUserDto: CreateUserDto,
