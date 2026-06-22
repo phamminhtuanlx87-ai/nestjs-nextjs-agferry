@@ -97,6 +97,7 @@ export class CongtrinhController {
   @Get(':id')
   async getCongtrinh(@Param('id') id: string) {
     const result = await this.congTrinhService.getCongtrinh(id);
+    console.log('result:');
     return {
       statusCode: 200, // Thêm cái này để frontend dễ check
       message: 'Đã lấy thông tin công trình thành công!',

@@ -133,7 +133,7 @@ export default function CongTrinhTable({
               <hr className="my-2 border-gray-200" />
 
               {/* Lưới hiển thị số liệu: Mobile đi hàng dọc hoặc hàng ngang linh hoạt */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-xs md:text-sm">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 text-xs md:text-sm">
                 <div className="flex flex-col">
                   <span className="text-gray-400 font-medium">
                     Dự toán được duyệt
@@ -214,7 +214,7 @@ export default function CongTrinhTable({
                     )}
                   </span>
                 </div>
-                <div className="hidden 2xl:inline">
+                <div className="hidden xl:inline">
                   <ProjectActions
                     project={project}
                     handleDelete={handleDelete}
@@ -226,7 +226,7 @@ export default function CongTrinhTable({
             {/* footer card */}
             <hr className="my-2 border-gray-200" />
 
-            <div className="flex justify-between items-center 2xl:hidden">
+            <div className="flex justify-between items-center xl:hidden">
               {/* Ngày tạo */}
               <div className="text-xs text-gray-400 font-medium">
                 📅 <span className="hidden sm:inline">Ngày tạo dự án: </span>

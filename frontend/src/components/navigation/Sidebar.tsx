@@ -115,7 +115,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={onClose}
                     className={`
                 flex items-center space-x-3 p-3 rounded-lg transition-all
                 ${
