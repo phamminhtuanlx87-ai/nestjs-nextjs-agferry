@@ -29,3 +29,4 @@ export const formatCurrency = (value: string) => {
     if (!value && Number(value) !== 0) return "0 đ";
     return Number(value).toLocaleString("vi-VN") + " đ";
   };
+

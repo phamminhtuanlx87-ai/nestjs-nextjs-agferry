@@ -44,7 +44,12 @@ export class SanLuongDoanhThuController {
 
   @Get()
   findAll() {
-    return this.sanLuongDoanhThuService.findAll();
+    const result = this.sanLuongDoanhThuService.findAll();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Lấy dữ liệu thàng công',
+      data: result,
+    };
   }
 
   @Get(':id')

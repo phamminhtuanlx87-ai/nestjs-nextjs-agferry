@@ -4,9 +4,14 @@ import {
   IsNumber,
   IsDateString,
   Min,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateSanLuongDoanhThuDto {
+  @IsOptional()
+  @IsString()
+  _id?: string;
+
   @IsDateString(
     {},
     {

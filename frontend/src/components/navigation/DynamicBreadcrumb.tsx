@@ -14,6 +14,7 @@ const breadcrumbMap:Record<string, string> = {
   "doanh-thu": "Doanh thu / Lợi nhuận",
   "nhan-vien": "Người dùng",
   "me": "Thông tin cá nhân",
+  "nhap-lieu": "Nhập Sản lượng Doanh thu",
 };
 interface BreadcrumbProps {
   mypathname?: string;

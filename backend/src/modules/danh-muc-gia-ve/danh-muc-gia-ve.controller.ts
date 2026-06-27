@@ -8,6 +8,7 @@ import {
   Delete,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { DanhMucGiaVeService } from './danh-muc-gia-ve.service';
 import { CreateDanhMucGiaVeDto } from './dto/create-danh-muc-gia-ve.dto';
@@ -35,10 +36,10 @@ export class DanhMucGiaVeController {
 
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER, UserRole.GUEST)
   @Get()
-  async findAll() {
-    const result = await this.danhMucGiaVeService.findAll();
+  async findAll(@Query('ngay') ngay?: string) {
+    const result = await this.danhMucGiaVeService.findAll(ngay);
     return {
-      statusCode: HttpStatus.OK, // Thêm cái này để frontend dễ check
+      statusCode: HttpStatus.OK,
       message: 'Lấy danh sách danh mục giá vé thành công!',
       data: result,
     };

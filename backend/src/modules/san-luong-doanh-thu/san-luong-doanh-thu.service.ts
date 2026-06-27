@@ -16,8 +16,21 @@ import {
   DanhMucGiaVeDocument,
 } from '../danh-muc-gia-ve/entities/danh-muc-gia-ve.entity';
 
+/**
+ * Mốc thời gian bắt đầu triển khai hệ thống chạy thật (Nhập theo ngày).
+ * Định dạng chuẩn: YYYY-MM-DD
+ */
+export const START_DATE_REALTIME = '2026-08-01';
+
+/**
+ * Ngày quy ước cố định dành cho dữ liệu lịch sử (Nhập theo tháng).
+ */
+export const LEGACY_DAY_SNAPSHOT = '20';
+
 @Injectable()
 export class SanLuongDoanhThuService {
+  const;
+
   constructor(
     @InjectModel(SanLuongDoanhThu.name)
     private readonly sanLuongModel: Model<SanLuongDoanhThuDocument>,
@@ -27,6 +40,15 @@ export class SanLuongDoanhThuService {
   ) {}
 
   async create(dto: CreateSanLuongDoanhThuDto, userId: string) {
+    // 🛡️ Tuyến phòng thủ cuối cùng: Đồng bộ mốc START_DATE 01/08/2026
+    const targetDate = new Date(`${dto.ngay_nhap}T12:00:00.000Z`);
+    const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);
+
+    if (targetDate < fenceDate) {
+      const thangNamCat = dto.ngay_nhap.substring(0, 7); // Cắt lấy "YYYY-MM"
+      dto.ngay_nhap = `${thangNamCat}-${LEGACY_DAY_SNAPSHOT}`; // Ép về ngày quy ước tổng
+    }
+
     const ngayNhapDate = new Date(dto.ngay_nhap);
 
     // 🛑 PHÒNG TUYẾN 1: Chống nhập trùng dữ liệu (Gõ nhầm/Click đúp)
@@ -116,6 +138,16 @@ export class SanLuongDoanhThuService {
   }
 
   async update(id: string, dto: UpdateSanLuongDoanhThuDto, userId: string) {
+    if (dto.ngay_nhap) {
+      const targetDate = new Date(`${dto.ngay_nhap}T12:00:00.000Z`);
+      const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);
+
+      if (targetDate < fenceDate) {
+        const thangNamCat = dto.ngay_nhap.substring(0, 7);
+        dto.ngay_nhap = `${thangNamCat}-${LEGACY_DAY_SNAPSHOT}`;
+      }
+    }
+
     const banGhiCu = await this.sanLuongModel.findById(id).exec();
     if (!banGhiCu) {
       throw new BadRequestException(
