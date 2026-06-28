@@ -30,28 +30,32 @@ const InputSanLuong = forwardRef<HTMLInputElement, InputProps>(
     },
     ref,
   ) => {
-    const inputId = props.name || props.id;
+    const cleanQuantity = String(quantity || "0").replace(/\./g, "");
+    const cleanPrice = String(price || "0").replace(/\./g, "");
+
     const thanhTien =
-      Math.round(Number(quantity || 0) * (Number(price) || 0)) || 0;
-    // Xử lý sự kiện khi người dùng gõ số ngay bên trong InputSanLuong
+      Math.round(Number(cleanQuantity) * Number(cleanPrice)) || 0;
+
+    const inputId = props.name || props.id;
+ 
+   
+    // Xử lý sự kiện khi người dùng gõ số
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // 1. Loại bỏ toàn bộ ký tự không phải là số (giữ lại chuỗi số sạch, ví dụ: "17456")
+      // 1. Loại bỏ toàn bộ ký tự không phải là số (Giữ lại chuỗi thuần số: "10000")
       const rawValue = e.target.value.replace(/\D/g, "");
 
-      // 2. Tạo chuỗi hiển thị có dấu chấm định dạng để đưa ra màn hình (ví dụ: "17.456")
-      const formattedValue = formatCurrency(rawValue);
-
       if (onChange) {
-        // 3. Ghi đè chuỗi số thuần túy (STRING) vào event target để Hook Form nhận dạng đúng chuẩn HTML
+        // 2. Gán giá trị sạch không dấu chấm vào event target
         e.target.value = rawValue;
 
-        // 4. Kích hoạt onChange của React Hook Form
+        // 3. Cập nhật trực tiếp vào State của React Hook Form
         onChange(e);
-
-        // 5. Trả lại chuỗi định dạng dấu chấm ngay lập tức để hiển thị trên input cho người dùng
-        e.target.value = formattedValue;
       }
     };
+
+    // 🌟 MẤU CHỐT: Khi hiển thị ra thẻ <input>, ta dùng giá trị đã được định dạng dấu chấm.
+    // Nhưng khi truyền dữ liệu ngầm, Form vẫn hiểu là số thuần túy.
+    const hienThiGiaTri = formatCurrency(cleanQuantity);
     return (
       <div className="w-full flex flex-col">
         <div
@@ -93,6 +97,7 @@ const InputSanLuong = forwardRef<HTMLInputElement, InputProps>(
                   placeholder="0"
                   type="text"
                   onChange={handleInputChange}
+                  value={hienThiGiaTri === "0" ? "" : hienThiGiaTri}
                   {...props}
                   className={`w-full py-1 px-2 border rounded text-right text-sm font-semibold outline-none transition-all
                   ${error ? "border-red-500 bg-red-50/20 focus:ring-2 focus:ring-red-100" : "border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 shadow-sm"}

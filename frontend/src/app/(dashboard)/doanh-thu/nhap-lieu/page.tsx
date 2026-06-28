@@ -85,7 +85,7 @@ export default function NhapLieuDoanhThuPage() {
 
       const giaVe = parseToNumber(String(getGiaVe(ticket, maBen)));
 
-      tong += Math.round(qty as number * giaVe);
+      tong += Math.round((qty as number) * giaVe);
     });
 
     return tong;
@@ -350,18 +350,22 @@ export default function NhapLieuDoanhThuPage() {
                       {/* 🌟 THÊM ĐOẠN SORT NÀY VÀO TRƯỚC MAP */}
                       {[...nhomXeGomTheoPhanDoan[tenNhomCon]]
                         .sort((a, b) => {
-                          // Nếu là xe thô sơ, ba gác (hoặc mã loại vé tương ứng), đẩy lên đầu (trả về -1)
-                          if (
-                            a.ma_loai_ve?.includes("XK_THO_SO") ||
-                            a.ten_loai_ve?.includes("thô sơ")
-                          )
-                            return -1;
-                          if (
-                            b.ma_loai_ve?.includes("XK_THO_SO") ||
-                            b.ten_loai_ve?.includes("thô sơ")
-                          )
-                            return 1;
-                          return 0; // Giữ nguyên vị trí các loại xe khác
+                          const bangThuTu: { [key: string]: number } = {
+                            "XK_THO_SO": 1, // Xe thô sơ lên đầu tiên
+                            "XK_DUOI_7C": 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                            "XK_TU_7C_DEN_12C": 3,
+                            "XK_TU_12C_DEN_16C": 4,
+                            "XK_TU_16C_DEN_30C": 5,
+                            "XK_TU_30C_DEN_45C": 6, // Xe từ 30 đến 45 ghế xếp gần cuối
+                            "XK_45C": 7, // Xe từ 45 ghế trở lên bắt buộc nằm đáy (dưới cùng)
+                          };
+
+                          // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                          const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                          const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                          // 3. Sắp xếp tăng dần theo trọng số điểm
+                          return uuTienA - uuTienB;
                         })
                         .map((ticket, index) => {
                           const giaHienTai = getGiaVe(ticket, maBen);
@@ -503,10 +507,9 @@ export default function NhapLieuDoanhThuPage() {
                   </p>
                 )}
               </div>
-            </NhomSanLuongCard>
-
-            {/* CỘT 3: NHÓM THUÊ BAO PHÀ */}
-            <NhomSanLuongCard title="Nhóm Thuê Bao Phà" icon="⛓️">
+              <h3 className="font-bold text-gray-700 flex items-center gap-2 border-b pb-2 uppercase text-sm tracking-wider mt-4">
+                <span>⛓️</span> Nhóm Thuê Bao Phà
+              </h3>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
                 {danhSachThueBao.map((ticket, index) => {
                   const giaHienTai = getGiaVe(ticket, maBen);

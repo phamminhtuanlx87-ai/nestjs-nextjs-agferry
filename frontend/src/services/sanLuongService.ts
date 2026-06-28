@@ -26,3 +26,11 @@ export const getAllDanhMuc = async (ngayApDung: string): Promise<TicketType[]> =
   );
   return response.data.data;
 };
+
+
+// export const createSanLuongDonahThu = async (ngayApDung: string): Promise<TicketType[]> => {
+//   const response = await api.post<{ data: TicketType[] }>(
+   
+//   );
+//   return response.data.data;
+// };

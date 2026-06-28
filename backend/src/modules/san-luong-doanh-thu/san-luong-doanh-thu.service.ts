@@ -16,21 +16,11 @@ import {
   DanhMucGiaVeDocument,
 } from '../danh-muc-gia-ve/entities/danh-muc-gia-ve.entity';
 
-/**
- * Mốc thời gian bắt đầu triển khai hệ thống chạy thật (Nhập theo ngày).
- * Định dạng chuẩn: YYYY-MM-DD
- */
 export const START_DATE_REALTIME = '2026-08-01';
-
-/**
- * Ngày quy ước cố định dành cho dữ liệu lịch sử (Nhập theo tháng).
- */
 export const LEGACY_DAY_SNAPSHOT = '20';
 
 @Injectable()
 export class SanLuongDoanhThuService {
-  const;
-
   constructor(
     @InjectModel(SanLuongDoanhThu.name)
     private readonly sanLuongModel: Model<SanLuongDoanhThuDocument>,
@@ -40,104 +30,7 @@ export class SanLuongDoanhThuService {
   ) {}
 
   async create(dto: CreateSanLuongDoanhThuDto, userId: string) {
-    // 🛡️ Tuyến phòng thủ cuối cùng: Đồng bộ mốc START_DATE 01/08/2026
-    const targetDate = new Date(`${dto.ngay_nhap}T12:00:00.000Z`);
-    const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);
-
-    if (targetDate < fenceDate) {
-      const thangNamCat = dto.ngay_nhap.substring(0, 7); // Cắt lấy "YYYY-MM"
-      dto.ngay_nhap = `${thangNamCat}-${LEGACY_DAY_SNAPSHOT}`; // Ép về ngày quy ước tổng
-    }
-
-    const ngayNhapDate = new Date(dto.ngay_nhap);
-
-    // 🛑 PHÒNG TUYẾN 1: Chống nhập trùng dữ liệu (Gõ nhầm/Click đúp)
-    const trungSoLieu = await this.sanLuongModel
-      .findOne({
-        ma_ben: dto.ma_ben,
-        ngay_nhap: ngayNhapDate,
-        ma_loai_ve: dto.ma_loai_ve,
-      })
-      .exec();
-
-    if (trungSoLieu) {
-      throw new ConflictException(
-        `Số liệu của loại vé [${dto.ma_loai_ve}] tại bến ${dto.ma_ben} ngày ${dto.ngay_nhap} đã được nạp trước đó rồi!`,
-      );
-    }
-
-    // 🛑 PHÒNG TUYẾN 2: Kiểm tra loại vé có tồn tại hợp pháp không
-    const danhMucVe = await this.danhMucGiaVeModel
-      .findOne({
-        ma_loai_ve: dto.ma_loai_ve,
-        kich_hoat: true,
-      })
-      .exec();
-
-    if (!danhMucVe) {
-      throw new BadRequestException(
-        `Loại vé mã [${dto.ma_loai_ve}] không tồn tại hoặc đang bị ẩn khỏi hệ thống!`,
-      );
-    }
-
-    // 🛑 PHÒNG TUYẾN 3: Thuật toán mò mảng lồng nhau lấy Đơn giá áp dụng theo Ngày
-    // Lọc lấy danh sách các mức giá có ngày_áp_dụng nhỏ hơn hoặc bằng ngày_nhập
-    const lichSuPhuHop = danhMucVe.lich_su_gia
-      .filter((ls) => new Date(ls.ngay_ap_dung) <= ngayNhapDate)
-      // Sắp xếp ngày giảm dần để ông mới nhất nhảy lên đầu mảng
-      .sort(
-        (a, b) =>
-          new Date(b.ngay_ap_dung).getTime() -
-          new Date(a.ngay_ap_dung).getTime(),
-      )[0];
-
-    if (!lichSuPhuHop) {
-      throw new BadRequestException(
-        `Loại vé này chưa được cấu hình biểu giá cho thời điểm ngày ${dto.ngay_nhap}!`,
-      );
-    }
-
-    // Tìm giá riêng cho bến của anh (Ví dụ: 'TC', 'VC'...). Nếu bến đó dùng giá chung thì bốc cấu hình 'CHUNG'
-    const giaCuaBen =
-      lichSuPhuHop.gia_theo_ben.find((g) => g.ma_nhom_ben === dto.ma_ben) ||
-      lichSuPhuHop.gia_theo_ben.find((g) => g.ma_nhom_ben === 'CHUNG');
-
-    if (!giaCuaBen) {
-      throw new BadRequestException(
-        `Không tìm thấy đơn giá áp dụng cho bến ${dto.ma_ben} trong biểu giá!`,
-      );
-    }
-
-    const giaVeApDung = giaCuaBen.gia_ve;
-
-    // 🧮 PHÒNG TUYẾN 4: Đóng băng Snapshot dữ liệu tài chính
-    const tongDoanhThu = dto.san_luong * giaVeApDung; // Tự nhân tiền, không tin tưởng Frontend
-
-    // Tự động đẻ chuỗi YYYY-MM phục vụ Index làm báo cáo thần tốc
-    const thangNam = `${ngayNhapDate.getFullYear()}-${String(ngayNhapDate.getMonth() + 1).padStart(2, '0')}`;
-
-    // Lưu xuống DB kèm thông tin người nhập (Sau này truyền userId từ JWT Token vào)
-    const newRecord = new this.sanLuongModel({
-      ...dto,
-      ngay_nhap: ngayNhapDate,
-      thang_nam: thangNam,
-      gia_ve_ap_dung: giaVeApDung,
-      tong_doanh_thu: tongDoanhThu,
-      created_by: userId, // Lưu vết ai là người gõ số liệu này vào máy
-    });
-
-    return await newRecord.save();
-  }
-
-  findAll() {
-    return `This action returns all sanLuongDoanhThu`;
-  }
-
-  findOne(id: string) {
-    return `This action returns a #${id} sanLuongDoanhThu`;
-  }
-
-  async update(id: string, dto: UpdateSanLuongDoanhThuDto, userId: string) {
+    // 🛡️ Tuyến phòng thủ 1: Xử lý múi giờ và đồng bộ dữ liệu lịch sử
     if (dto.ngay_nhap) {
       const targetDate = new Date(`${dto.ngay_nhap}T12:00:00.000Z`);
       const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);
@@ -148,6 +41,99 @@ export class SanLuongDoanhThuService {
       }
     }
 
+    const ngayNhapDate = new Date(`${dto.ngay_nhap}T12:00:00.000Z`);
+
+    // 🛑 PHÒNG TUYẾN 2: Chống trùng phiên (Mỗi bến trong 1 ngày chỉ có 1 document tổng)
+    const trungPhien = await this.sanLuongModel
+      .findOne({
+        ma_ben: dto.ma_ben,
+        ngay_nhap: ngayNhapDate,
+      })
+      .exec();
+
+    if (trungPhien) {
+      throw new ConflictException(
+        `Báo cáo sản lượng của bến [${dto.ma_ben}] ngày ${dto.ngay_nhap} đã được nạp trước đó rồi! Hãy dùng tính năng chỉnh sửa.`,
+      );
+    }
+
+    // 🛑 PHÒNG TUYẾN 3: Thuật toán tự động tra cứu biểu giá & nhân tiền cho từng dòng xe
+    const mangChiTietCậpNhật: any[] = [];
+
+    for (const xe of dto.chi_tiet_san_luong) {
+      // Tìm danh mục giá của loại xe này
+      const danhMucVe = await this.danhMucGiaVeModel
+        .findOne({ ma_loai_ve: xe.ma_loai_ve, kich_hoat: true })
+        .exec();
+
+      if (!danhMucVe) {
+        throw new BadRequestException(
+          `Loại xe mã [${xe.ma_loai_ve}] không tồn tại hoặc đã bị ẩn khỏi hệ thống!`,
+        );
+      }
+
+      // Săn tìm mức giá phù hợp với ngày nhập (Lấy ông mới nhất nhỏ hơn hoặc bằng ngày nhập)
+      const lichSuPhuHop = danhMucVe.lich_su_gia
+        .filter((ls) => new Date(ls.ngay_ap_dung) <= ngayNhapDate)
+        .sort(
+          (a, b) =>
+            new Date(b.ngay_ap_dung).getTime() -
+            new Date(a.ngay_ap_dung).getTime(),
+        )[0];
+
+      if (!lichSuPhuHop) {
+        throw new BadRequestException(
+          `Loại xe [${xe.ma_loai_ve}] chưa cấu hình biểu giá cho ngày ${dto.ngay_nhap}!`,
+        );
+      }
+
+      // Lấy giá theo bến hoặc giá CHUNG
+      const giaCuaBen =
+        lichSuPhuHop.gia_theo_ben.find((g) => g.ma_nhom_ben === dto.ma_ben) ||
+        lichSuPhuHop.gia_theo_ben.find((g) => g.ma_nhom_ben === 'CHUNG');
+
+      if (!giaCuaBen) {
+        throw new BadRequestException(
+          `Không tìm thấy đơn giá cho bến ${dto.ma_ben} của loại xe [${xe.ma_loai_ve}]!`,
+        );
+      }
+
+      // Chốt cứng đơn giá và nhân tổng doanh thu dòng xe (Không tin Frontend gửi lên)
+      const giaVeApDung = giaCuaBen.gia_ve;
+      const tongDoanhThuDòngXe = Math.round(xe.so_luot_xe * giaVeApDung);
+
+      mangChiTietCậpNhật.push({
+        ma_loai_ve: xe.ma_loai_ve,
+        so_luot_xe: xe.so_luot_xe,
+        gia_ve_ap_dung: giaVeApDung,
+        tong_doanh_thu: tongDoanhThuDòngXe,
+      });
+    }
+
+    // Tự động sinh chuỗi YYYY-MM làm báo cáo
+    const thangNam = `${ngayNhapDate.getFullYear()}-${String(ngayNhapDate.getMonth() + 1).padStart(2, '0')}`;
+
+    // Tiến hành nạp dữ liệu sạch vào Database
+    const newRecord = new this.sanLuongModel({
+      ...dto,
+      ngay_nhap: ngayNhapDate,
+      thang_nam: thangNam,
+      chi_tiet_san_luong: mangChiTietCậpNhật,
+      nguoi_nhap: userId,
+    });
+
+    return await newRecord.save();
+  }
+
+  findAll() {
+    return this.sanLuongModel.find().sort({ ngay_nhap: -1 }).exec();
+  }
+
+  findOne(id: string) {
+    return this.sanLuongModel.findById(id).exec();
+  }
+
+  async update(id: string, dto: UpdateSanLuongDoanhThuDto, userId: string) {
     const banGhiCu = await this.sanLuongModel.findById(id).exec();
     if (!banGhiCu) {
       throw new BadRequestException(
@@ -155,97 +141,89 @@ export class SanLuongDoanhThuService {
       );
     }
 
-    // 📦 BẬC THẦY BỌC LÓT: Nếu Frontend không gửi, lấy lại giá trị cũ của DB
-    const maBen = dto.ma_ben || banGhiCu.ma_ben;
-    const maLoaiVe = dto.ma_loai_ve || banGhiCu.ma_loai_ve;
-    const sanLuong =
-      dto.san_luong !== undefined ? dto.san_luong : banGhiCu.san_luong;
-
-    let ngayNhapDate = banGhiCu.ngay_nhap;
+    // Tận dụng dữ liệu cũ nếu Frontend không truyền lên đủ
+    let ngayNhapChuẩn = banGhiCu.ngay_nhap;
     if (dto.ngay_nhap) {
-      ngayNhapDate = new Date(`${dto.ngay_nhap}T12:00:00.000Z`); // Chống lệch múi giờ UTC
+      const targetDate = new Date(`${dto.ngay_nhap}T12:00:00.000Z`);
+      const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);
+
+      if (targetDate < fenceDate) {
+        const thangNamCat = dto.ngay_nhap.substring(0, 7);
+        dto.ngay_nhap = `${thangNamCat}-${LEGACY_DAY_SNAPSHOT}`;
+      }
+      ngayNhapChuẩn = new Date(`${dto.ngay_nhap}T12:00:00.000Z`);
     }
 
-    // 🛑 PHÒNG TUYẾN 1: CHECK TRÙNG (NÉ BẢN GHI HIỆN TẠI RA)
-    const trungSoLieu = await this.sanLuongModel
+    const maBenMới = dto.ma_ben || banGhiCu.ma_ben;
+
+    // Kiểm tra trùng lịch với phiên ngày khác (trừ chính nó)
+    const trungLich = await this.sanLuongModel
       .findOne({
         _id: { $ne: id },
-        ma_ben: maBen,
-        ngay_nhap: ngayNhapDate,
-        ma_loai_ve: maLoaiVe,
+        ma_ben: maBenMới,
+        ngay_nhap: ngayNhapChuẩn,
       })
       .exec();
 
-    if (trungSoLieu) {
+    if (trungLich) {
       throw new ConflictException(
-        `Số liệu của loại vé này tại bến ${maBen} vào ngày đó đã tồn tại ở một bản ghi khác rồi!`,
+        `Số liệu bến ${maBenMới} ngày ${ngayNhapChuẩn.toISOString().split('T')[0]} trùng với một phiên khác rồi!`,
       );
     }
 
-    // 🛑 PHÒNG TUYẾN 2: Kiểm tra loại vé (Sửa lại: Dùng biến maLoaiVe)
-    const danhMucVe = await this.danhMucGiaVeModel
-      .findOne({
-        ma_loai_ve: maLoaiVe, // ✨ ĐÃ SỬA: Thay cho dto.ma_loai_ve
-        kich_hoat: true,
-      })
-      .exec();
+    let mangChiTietCậpNhật = banGhiCu.chi_tiet_san_luong;
 
-    if (!danhMucVe) {
-      throw new BadRequestException(
-        `Loại vé mã [${maLoaiVe}] không tồn tại hoặc đang bị ẩn khỏi hệ thống!`,
-      );
+    // Nếu sửa cả mảng danh sách sản lượng, tính toán lại giá tiền y như hàm create
+    if (dto.chi_tiet_san_luong && dto.chi_tiet_san_luong.length > 0) {
+      mangChiTietCậpNhật = [];
+      for (const xe of dto.chi_tiet_san_luong) {
+        const danhMucVe = await this.danhMucGiaVeModel
+          .findOne({ ma_loai_ve: xe.ma_loai_ve, kich_hoat: true })
+          .exec();
+
+        if (!danhMucVe) continue;
+
+        const lichSuPhuHop = danhMucVe.lich_su_gia
+          .filter((ls) => new Date(ls.ngay_ap_dung) <= ngayNhapChuẩn)
+          .sort(
+            (a, b) =>
+              new Date(b.ngay_ap_dung).getTime() -
+              new Date(a.ngay_ap_dung).getTime(),
+          )[0];
+
+        if (!lichSuPhuHop) continue;
+
+        const giaCuaBen =
+          lichSuPhuHop.gia_theo_ben.find((g) => g.ma_nhom_ben === maBenMới) ||
+          lichSuPhuHop.gia_theo_ben.find((g) => g.ma_nhom_ben === 'CHUNG');
+
+        if (!giaCuaBen) continue;
+
+        mangChiTietCậpNhật.push({
+          ma_loai_ve: xe.ma_loai_ve,
+          so_luot_xe: xe.so_luot_xe,
+          gia_ve_ap_dung: giaCuaBen.gia_ve,
+          tong_doanh_thu: Math.round(xe.so_luot_xe * giaCuaBen.gia_ve),
+        });
+      }
     }
 
-    // 🛑 PHÒNG TUYẾN 3: Thuật toán săn đơn giá theo ngày
-    const lichSuPhuHop = danhMucVe.lich_su_gia
-      .filter((ls) => new Date(ls.ngay_ap_dung) <= ngayNhapDate)
-      .sort(
-        (a, b) =>
-          new Date(b.ngay_ap_dung).getTime() -
-          new Date(a.ngay_ap_dung).getTime(),
-      )[0];
+    const thangNam = `${ngayNhapChuẩn.getFullYear()}-${String(ngayNhapChuẩn.getMonth() + 1).padStart(2, '0')}`;
 
-    if (!lichSuPhuHop) {
-      throw new BadRequestException(
-        `Loại vé này chưa được cấu hình biểu giá cho thời điểm này!`,
-      );
-    }
-
-    // Sửa lại: Dùng biến maBen thay cho dto.ma_ben để không bị lỗi khi sửa một phần
-    const giaCuaBen =
-      lichSuPhuHop.gia_theo_ben.find((g) => g.ma_nhom_ben === maBen) || // ✨ ĐÃ SỬA
-      lichSuPhuHop.gia_theo_ben.find((g) => g.ma_nhom_ben === 'CHUNG');
-
-    if (!giaCuaBen) {
-      throw new BadRequestException(
-        `Không tìm thấy đơn giá áp dụng cho bến ${maBen} trong biểu giá!`,
-      );
-    }
-
-    const giaVeApDung = giaCuaBen.gia_ve;
-
-    // 🧮 PHÒNG TUYẾN 4: Tính lại doanh thu tự động chuẩn đét
-    const tongDoanhThu = sanLuong * giaVeApDung;
-
-    const thangNam = `${ngayNhapDate.getFullYear()}-${String(ngayNhapDate.getMonth() + 1).padStart(2, '0')}`;
-
-    const dataCapNhat = {
+    const dataUpdate = {
       ...dto,
-      ma_ben: maBen, // Đảm bảo dữ liệu luôn đầy đủ khi ghi đè
-      ma_loai_ve: maLoaiVe, // Đảm bảo dữ liệu luôn đầy đủ khi ghi đè
-      ngay_nhap: ngayNhapDate,
+      ngay_nhap: ngayNhapChuẩn,
       thang_nam: thangNam,
-      gia_ve_ap_dung: giaVeApDung,
-      tong_doanh_thu: tongDoanhThu,
+      chi_tiet_san_luong: mangChiTietCậpNhật,
       updated_by: userId,
     };
 
     return await this.sanLuongModel
-      .findByIdAndUpdate(id, { $set: dataCapNhat }, { new: true })
+      .findByIdAndUpdate(id, { $set: dataUpdate }, { new: true })
       .exec();
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} sanLuongDoanhThu`;
+  async remove(id: string) {
+    return await this.sanLuongModel.findByIdAndDelete(id).exec();
   }
 }
