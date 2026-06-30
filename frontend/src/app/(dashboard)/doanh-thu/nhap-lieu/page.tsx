@@ -1,10 +1,19 @@
 "use client";
+import { GroupHeader } from "@/components/modules/doanh-thu/GroupHeader";
+import {
+  GroupTotalTag,
+  NhomType,
+} from "@/components/modules/doanh-thu/GroupTotalTag";
 import InputSanLuong from "@/components/modules/doanh-thu/InputComponent";
 import { NhomSanLuongCard } from "@/components/modules/doanh-thu/SanLuongCard";
 import { ThanhTongHopDoanhThu } from "@/components/modules/doanh-thu/TinhDoanhThu";
 import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
+import { MA_GIA_VE } from "@/constants/maDonGia";
 import {
+  createSanLuongDoanhThu,
+  CreateSanLuongDoanhThuDto,
   getAllDanhMuc,
+  MAPPING_NHOM_VE,
   SanLuongFormInputs,
   TicketType,
 } from "@/services/sanLuongService";
@@ -46,14 +55,6 @@ export default function NhapLieuDoanhThuPage() {
         const data = await getAllDanhMuc(ngayApDung);
         setDanhMucVe(data);
         prevNgayRef.current = ngayApDung;
-
-        // if (data && data.length > 0) {
-        //   const defaultValues: SanLuongFormInputs = {};
-        //   data.forEach((ticket) => {
-        //     defaultValues[ticket._id] = 0;
-        //   });
-        //   reset(defaultValues);
-        // }
       } catch (error) {
         console.error("Lỗi khi kết nối API danh mục vé:", error);
       } finally {
@@ -64,6 +65,7 @@ export default function NhapLieuDoanhThuPage() {
     loadDanhMucVePha();
   }, [ngayApDung, reset]);
 
+  
   // Hàm phụ trợ bóc tách giá vé chuẩn theo bến
   const getGiaVe = (ticket: TicketType, benHienTai: string): number => {
     const lichSuGanNhat = ticket.lich_su_gia?.[0];
@@ -91,56 +93,120 @@ export default function NhapLieuDoanhThuPage() {
     return tong;
   };
 
+  const tinhTongDoanhThuNhom = (nhom: string) => {
+    if (!nhom) return 0;
+    let tong = 0;
+
+    danhMucVe.forEach((ticket) => {
+      // 🌟 Kiểm tra: Chỉ cần khớp nhóm cha HOẶC nhóm con là gom tiền vào luôn
+      if (ticket.nhom_cha === nhom || ticket.nhom_con === nhom) {
+        const qty = parseToNumber(String(values[ticket.ma_loai_ve])) || 0;
+        const giaVe = parseToNumber(String(getGiaVe(ticket, maBen))) || 0;
+        tong += qty * giaVe;
+      }
+    });
+
+    return tong;
+  };
+
   // 1. Định nghĩa hàm xử lý khi submit thành công
   const onSubmit = async (formData: SanLuongFormInputs) => {
     try {
       setIsLoading(true);
 
-      // 1. Duyệt qua dữ liệu từ Form để chuyển đổi sang cấu trúc API yêu cầu
-      const recordsToSubmit = Object.keys(formData)
+      // 1. Duyệt qua formData để tạo mảng chi_tiet_san_luong sạch
+      const mangChiTietSanLuong = Object.keys(formData)
         .map((ticketId) => {
           const rawValue = formData[ticketId];
           // Ép chuỗi định dạng text (ví dụ "2.220") về dạng số nguyên (2220)
           const cleanSanLuong = rawValue
             ? Number(String(rawValue).replace(/\D/g, ""))
             : 0;
-
+          const cauHinhNhom = MAPPING_NHOM_VE[
+            ticketId as keyof typeof MA_GIA_VE
+          ] || {
+            nhom_cha: "HANH_KHACH",
+            nhom_con: "HANH_KHACH",
+          };
           return {
-            ngay_nhap: ngayApDung, // Lấy từ state ngày trên giao diện (format YYYY-MM-DD)
-            ma_ben: maBen || "AH", // Mã bến hiện tại (ví dụ: VC, AI, ...)
-            ma_loai_ve: ticketId, // ID hoặc mã loại vé đăng ký trong Form key
-            san_luong: cleanSanLuong,
+            ma_loai_ve: ticketId, // ID hoặc mã loại vé (Vd: "HK", "XK_THO_SO")
+            so_luot_xe: cleanSanLuong,
+            nhom_cha: cauHinhNhom.nhom_cha,
+            nhom_con: cauHinhNhom.nhom_con,
           };
         })
-        // 2. Lọc bỏ các dòng không nhập dữ liệu hoặc sản lượng bằng 0 để tránh rác Database
-        .filter((record) => record.san_luong > 0);
+        // Lọc bỏ các dòng xe có sản lượng bằng 0 (nếu anh muốn gọn DB, hoặc bỏ filter nếu muốn lưu cả số 0)
+        .filter((item) => item.so_luot_xe > 0);
 
-      if (recordsToSubmit.length === 0) {
-        // toast.warning("Vui lòng nhập sản lượng ít nhất cho một loại vé trước khi lưu!");
+      if (mangChiTietSanLuong.length === 0) {
+        alertService.warning("Không có dữ liệu!!");
         return;
       }
 
+      // Tự động trích xuất chuỗi "YYYY-MM" từ ngayApDung để gửi lên (Vd: "2026-06-28" -> "2026-06")
+      const chuoiThangNam = ngayApDung.substring(0, 7);
+      const doanh_thu_theo_ve = {
+        dtt_ve: 0,
+        dt_theo_ve: 0,
+        bhhk: 0,
+        bhhk_thanh_tien: 0,
+        vat: 0,
+        vat_thanh_tien: 0,
+      };
+      const doanh_thu_theo_ve_thang = {
+        dtt_ve: 0,
+        dt_theo_ve: 0,
+        vat: 0,
+        vat_thanh_tien: 0,
+      };
+      const doanh_thu_theo_ve_qui = {
+        dtt_ve: 0,
+        dt_theo_ve: 0,
+        vat: 0,
+        vat_thanh_tien: 0,
+      };
+
+      const doanh_thu_theo_ve_nam = {
+        dtt_ve: 0,
+        dt_theo_ve: 0,
+        vat: 0,
+        vat_thanh_tien: 0,
+      };
+      const loai_du_lieu = "THUC_HIEN";
+      // 2. Gom tất cả thành ĐÚNG 1 OBJECT TỔNG HỢP theo chuẩn DTO mới
+      const payloadToSubmit: CreateSanLuongDoanhThuDto = {
+        ngay_nhap: ngayApDung, // Lấy từ state ngày trên giao diện (format YYYY-MM-DD)
+        thang_nam: chuoiThangNam, // Định dạng "YYYY-MM"
+        ma_ben: maBen || "AH", // Mã bến hiện tại (VC, TC, AH...)
+        chi_tiet_san_luong: mangChiTietSanLuong, // Mảng sản lượng thô vừa gom ở trên
+        doanh_thu_theo_ve: doanh_thu_theo_ve,
+        doanh_thu_ve_thang: doanh_thu_theo_ve_thang,
+        doanh_thu_ve_qui: doanh_thu_theo_ve_qui,
+        doanh_thu_ve_nam: doanh_thu_theo_ve_nam,
+        doanh_thu_hd_tai_chinh: 0,
+        doanh_thu_khac: 0,
+        doanh_thu_thuan_tong_cong: 0,
+        loai_du_lieu: loai_du_lieu,
+      };
+
       console.log(
-        "🚀 Mảng dữ liệu chuẩn theo định dạng API gửi đi:",
-        recordsToSubmit,
+        "🚀 Cục Object tổng hợp chuẩn bị gửi (Request) lên Backend:",
+        payloadToSubmit,
       );
 
-      // 3. Tiến hành gọi API
-      // Trường hợp A: Backend của anh hỗ trợ nhận một Mảng dữ liệu cùng lúc
-      // const response = await sanLuongService.saveMultiple(recordsToSubmit);
+      // 3. Tiến hành gọi API POST (Bản chất là gửi Request đi và hứng Response về)
+      const response = await createSanLuongDoanhThu(payloadToSubmit);
 
-      // Trường hợp B: Backend chỉ nhận từng Object lẻ (Gửi đồng thời bằng Promise.all)
-      /*
-    const apiRequests = recordsToSubmit.map(record => 
-      sanLuongService.createOrUpdateSingle(record)
-    );
-    await Promise.all(apiRequests);
-    */
-
-      alertService.success("Cập nhật sản lượng thành công!");
+      console.log(
+        "🟢 Backend phản hồi (Response) thành công, bản ghi đã lưu:",
+        response,
+      );
+      alertService.success("Cập nhật phiên sản lượng doanh thu thành công!");
     } catch (error) {
       console.error("❌ Lỗi khi lưu sản lượng dữ liệu:", error);
-      // toast.error("Có lỗi xảy ra trong quá trình lưu dữ liệu.");
+      alertService.error(
+        "Cập nhật phiên sản lượng doanh thu thất bại! Vui lòng thử lại",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -198,7 +264,7 @@ export default function NhapLieuDoanhThuPage() {
               <span className="text-2xl">📅</span>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide">
-                  Ngày áp dụng
+                  Ngày nhập liệu
                 </label>
                 <input
                   type="date"
@@ -214,7 +280,7 @@ export default function NhapLieuDoanhThuPage() {
               <span className="text-2xl">🚢</span>
               <div className="w-full sm:w-auto">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide">
-                  Bến phà áp dụng
+                  Bến phà
                 </label>
                 <select
                   value={maBen}
@@ -298,7 +364,11 @@ export default function NhapLieuDoanhThuPage() {
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full">
             {/* CỘT 1: NHÓM HÀNH KHÁCH */}
-            <NhomSanLuongCard title="Nhóm Hành Khách" icon="👥">
+            <NhomSanLuongCard
+              title="Nhóm Hành Khách"
+              icon="👥"
+              total={tinhTongDoanhThuNhom("HANH_KHACH")}
+            >
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
                 {danhSachHanhKhach.map((ticket, index) => {
                   const giaHienTai = getGiaVe(ticket, maBen);
@@ -333,31 +403,36 @@ export default function NhapLieuDoanhThuPage() {
 
               {/* CỘT 2: NHÓM XE CÁC LOẠI */}
               <div className="space-y-4">
-                <h3 className="font-bold text-gray-700 flex items-center gap-2 border-b pb-2 uppercase text-sm tracking-wider">
-                  <span>🚛</span> Nhóm Xe Các Loại
-                </h3>
+                <div className="flex justify-between items-center">
+                  {/* <h3 className="font-bold text-gray-700 flex items-center gap-2 border-b pb-2 uppercase text-sm tracking-wider">
+                    <span>🚛</span> Nhóm Xe Các Loại
+                  </h3> */}
+                  <GroupHeader
+                    icon="🚛"
+                    title="Nhóm Xe Các Loại"
+                    total={tinhTongDoanhThuNhom("XE_CAC_LOAI")}
+                  />
+                </div>
                 {Object.keys(nhomXeGomTheoPhanDoan).map((tenNhomCon) => (
                   <div
                     key={tenNhomCon}
                     className="bg-slate-50/60 p-2 rounded-lg border border-slate-100/80"
                   >
                     <h4 className="text-xs font-bold text-indigo-950 uppercase tracking-wide mb-2 flex items-center gap-1">
-                      {tenNhomCon === "XE_KHACH"
-                        ? "🚌 Xe Khách"
-                        : "🚚 Xe Tải / Xe Máy Chuyên Dùng"}
+                      {tenNhomCon === "XE_KHACH" ? "🚌 Xe Khách" : "🚚 Xe Tải"}
                     </h4>
                     <div className="space-y-1 bg-white p-2 rounded border border-gray-100">
                       {/* 🌟 THÊM ĐOẠN SORT NÀY VÀO TRƯỚC MAP */}
                       {[...nhomXeGomTheoPhanDoan[tenNhomCon]]
                         .sort((a, b) => {
                           const bangThuTu: { [key: string]: number } = {
-                            "XK_THO_SO": 1, // Xe thô sơ lên đầu tiên
-                            "XK_DUOI_7C": 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
-                            "XK_TU_7C_DEN_12C": 3,
-                            "XK_TU_12C_DEN_16C": 4,
-                            "XK_TU_16C_DEN_30C": 5,
-                            "XK_TU_30C_DEN_45C": 6, // Xe từ 30 đến 45 ghế xếp gần cuối
-                            "XK_45C": 7, // Xe từ 45 ghế trở lên bắt buộc nằm đáy (dưới cùng)
+                            XK_THO_SO: 1, // Xe thô sơ lên đầu tiên
+                            XK_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                            XK_TU_7C_DEN_12C: 3,
+                            XK_TU_12C_DEN_16C: 4,
+                            XK_TU_16C_DEN_30C: 5,
+                            XK_TU_30C_DEN_45C: 6, // Xe từ 30 đến 45 ghế xếp gần cuối
+                            XK_45C: 7, // Xe từ 45 ghế trở lên bắt buộc nằm đáy (dưới cùng)
                           };
 
                           // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
@@ -394,13 +469,68 @@ export default function NhapLieuDoanhThuPage() {
                           );
                         })}
                     </div>
+                    <GroupTotalTag
+                      nhom={tenNhomCon as NhomType}
+                      label={
+                        tenNhomCon === "XE_KHACH"
+                          ? "Doanh thu Nhóm Xe Khách"
+                          : "Doanh thu Nhóm Xe Tải"
+                      }
+                      tinhTongFn={tinhTongDoanhThuNhom}
+                    />
                   </div>
                 ))}
               </div>
             </NhomSanLuongCard>
 
-            {/* CỘT 4: NHÓM VÉ THÁNG */}
-            <NhomSanLuongCard title="Nhóm Vé tháng" icon="💳">
+            {/* CỘT 4: NHÓM THUE BAO */}
+            <NhomSanLuongCard
+              title="Nhóm Thuê Bao Phà"
+              icon="⛓️"
+              total={tinhTongDoanhThuNhom("THUE_BAO")}
+            >
+              {/* Nhóm thuê bao */}
+
+              <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
+                {danhSachThueBao.map((ticket, index) => {
+                  const giaHienTai = getGiaVe(ticket, maBen);
+                  const giaMacDinh = getGiaVe(ticket, "AH");
+                  return (
+                    <div
+                      key={ticket.ma_loai_ve}
+                      title={`Mã vé: ${ticket.ten_loai_ve}`}
+                      className="group relative"
+                    >
+                      <InputSanLuong
+                        isFirst={index === 0}
+                        label={ticket.ten_loai_ve}
+                        price={String(giaHienTai)}
+                        isHighlightPrice={giaHienTai !== giaMacDinh}
+                        quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                        maBen={maBen}
+                        error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                        {...register(ticket.ma_loai_ve, {
+                          // 🌟 Đổi sang ma_loai_ve
+                          min: 0,
+                        })}
+                      />
+                    </div>
+                  );
+                })}
+                {danhSachThueBao.length === 0 && (
+                  <p className="text-xs text-gray-400 text-center py-4">
+                    Không có dữ liệu thuê bao
+                  </p>
+                )}
+              </div>
+              {/* Nhóm vé tháng */}
+              <div className="flex justify-between items-center">
+                <GroupHeader
+                  icon="💳"
+                  title="Nhóm Vé Tháng"
+                  total={tinhTongDoanhThuNhom("VE_THANG")}
+                />
+              </div>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
                 {danhSachVeThang.map((ticket, index) => {
                   const giaHienTai = getGiaVe(ticket, maBen);
@@ -435,9 +565,14 @@ export default function NhapLieuDoanhThuPage() {
               </div>
 
               {/* CỘT 5: NHÓM VÉ QUÝ */}
-              <h3 className="font-bold text-gray-700 flex items-center gap-2 border-b pb-2 uppercase text-sm tracking-wider mt-4">
-                <span>📆</span> Nhóm Vé Quý
-              </h3>
+
+              <div className="flex justify-between items-center">
+                <GroupHeader
+                  icon="📆"
+                  title="Nhóm Vé Quý"
+                  total={tinhTongDoanhThuNhom("VE_QUI")}
+                />
+              </div>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
                 {danhSachVeQui.map((ticket, index) => {
                   const giaHienTai = getGiaVe(ticket, maBen);
@@ -472,9 +607,14 @@ export default function NhapLieuDoanhThuPage() {
               </div>
 
               {/* CỘT 6: NHÓM VÉ NĂM */}
-              <h3 className="font-bold text-gray-700 flex items-center gap-2 border-b pb-2 uppercase text-sm tracking-wider mt-4">
-                <span>🎫</span> Nhóm Vé Năm
-              </h3>
+
+              <div className="flex justify-between items-center">
+                <GroupHeader
+                  icon="🎫"
+                  title="Nhóm Vé Năm"
+                  total={tinhTongDoanhThuNhom("VE_NAM")}
+                />
+              </div>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
                 {danhSachVeNam.map((ticket, index) => {
                   const giaHienTai = getGiaVe(ticket, maBen);
@@ -504,41 +644,6 @@ export default function NhapLieuDoanhThuPage() {
                 {danhSachVeNam.length === 0 && (
                   <p className="text-xs text-gray-400 text-center py-4">
                     Không có dữ liệu vé năm
-                  </p>
-                )}
-              </div>
-              <h3 className="font-bold text-gray-700 flex items-center gap-2 border-b pb-2 uppercase text-sm tracking-wider mt-4">
-                <span>⛓️</span> Nhóm Thuê Bao Phà
-              </h3>
-              <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachThueBao.map((ticket, index) => {
-                  const giaHienTai = getGiaVe(ticket, maBen);
-                  const giaMacDinh = getGiaVe(ticket, "AH");
-                  return (
-                    <div
-                      key={ticket.ma_loai_ve}
-                      title={`Mã vé: ${ticket.ten_loai_ve}`}
-                      className="group relative"
-                    >
-                      <InputSanLuong
-                        isFirst={index === 0}
-                        label={ticket.ten_loai_ve}
-                        price={String(giaHienTai)}
-                        isHighlightPrice={giaHienTai !== giaMacDinh}
-                        quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                        maBen={maBen}
-                        error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                        {...register(ticket.ma_loai_ve, {
-                          // 🌟 Đổi sang ma_loai_ve
-                          min: 0,
-                        })}
-                      />
-                    </div>
-                  );
-                })}
-                {danhSachThueBao.length === 0 && (
-                  <p className="text-xs text-gray-400 text-center py-4">
-                    Không có dữ liệu thuê bao
                   </p>
                 )}
               </div>

@@ -99,7 +99,7 @@ const InputSanLuong = forwardRef<HTMLInputElement, InputProps>(
                   onChange={handleInputChange}
                   value={hienThiGiaTri === "0" ? "" : hienThiGiaTri}
                   {...props}
-                  className={`w-full py-1 px-2 border rounded text-right text-sm font-semibold outline-none transition-all
+                  className={`w-full py-1 px-2 border rounded text-right text-sm font-semibold outline-none transition-all pr-3
                   ${error ? "border-red-500 bg-red-50/20 focus:ring-2 focus:ring-red-100" : "border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 shadow-sm"}
                   ${className}
                 `}
@@ -108,14 +108,14 @@ const InputSanLuong = forwardRef<HTMLInputElement, InputProps>(
 
               {/* Đơn giá */}
               <div className="col-span-2 md:col-span-2 text-center md:text-right text-xs md:text-sm text-gray-500 font-semibold">
-                <span className="block md:hidden text-[10px] text-gray-400 font-bold mb-0.5">
+                <span className="block md:hidden text-xs text-gray-400 font-bold mb-0.5">
                   Đơn giá
                 </span>
                 <div
                   className={`text-xs transition-colors duration-200 ${
                     isHighlightPrice
                       ? "text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200"
-                      : "text-gray-400"
+                      : "text-slate-600"
                   }`}
                   title={formatMoney(price)}
                 >
@@ -125,11 +125,11 @@ const InputSanLuong = forwardRef<HTMLInputElement, InputProps>(
 
               {/* Thành tiền */}
               <div className="col-span-2 md:col-span-3 text-right text-sm font-bold text-emerald-500">
-                <span className="block md:hidden text-[10px] text-gray-400 font-bold mb-0.5">
+                <span className="block md:hidden text-xs text-gray-400 font-bold mb-0.5">
                   Thành tiền
                 </span>
                 <div
-                  className="pr-1 truncate"
+                  className="pr-1 truncate "
                   title={formatMoney(String(thanhTien))}
                 >
                   {formatMoney(String(thanhTien))}

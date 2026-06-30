@@ -31,6 +31,14 @@ class ChiTietSanLuongDto {
   @IsNumber()
   @Min(0)
   tong_doanh_thu?: number;
+
+  @IsString({ message: 'Nhóm cha phải là chuỗi chữ' })
+  @IsNotEmpty({ message: 'Không được để trống nhóm cha' })
+  nhom_cha!: string;
+
+  @IsString({ message: 'Nhóm con phải là chuỗi chữ' })
+  @IsNotEmpty({ message: 'Không được để trống nhóm con' })
+  nhom_con!: string;
 }
 
 class ChiTietDoanhThuNhomDto {
@@ -68,6 +76,10 @@ export class CreateSanLuongDoanhThuDto {
   )
   @IsNotEmpty({ message: 'Không được để trống ngày nhập liệu' })
   ngay_nhap!: string;
+
+  @IsString({ message: 'THUC_HIEN | KE_HOACH' })
+  @IsNotEmpty({ message: 'Không được để trống loại dữ liệu' })
+  loai_du_lieu!: string;
 
   // 🌟 ĐÃ SỬA: Thêm @IsOptional() vì Backend tự động cắt chuỗi ngày_nhap để tạo ra "YYYY-MM"
   @IsOptional()

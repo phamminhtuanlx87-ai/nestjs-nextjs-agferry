@@ -127,7 +127,7 @@ export default function QuyetToanForm({ stage }: Props) {
                       <MultiFileControl
                         control={control}
                         // name phải khớp với index của giai đoạn (ví dụ giai đoạn Dự toán thường là index 0)
-                        name="giai_doan.6.file_links"
+                        name="giai_doan.8.file_links"
                         label="Danh sách tài liệu đính kèm"
                       />
                     </div>

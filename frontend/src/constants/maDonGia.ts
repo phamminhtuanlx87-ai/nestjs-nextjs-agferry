@@ -32,4 +32,11 @@ export const MA_GIA_VE = {
 
   VE_NAM_HK: "VE_NAM_HK", //25
   VE_NAM_DUOI_7C: "VE_NAM_DUOI_7C", //26
+  VE_NAM_TU_7C_DEN_12C: "VE_NAM_TU_7C_DEN_12C",
 } as const;
+
+export const LOAI_DU_LIEU = {
+  KE_HOACH: "KE_HOACH",
+  THUC_HIEN: "THUC_HIEN",
+} as const
+

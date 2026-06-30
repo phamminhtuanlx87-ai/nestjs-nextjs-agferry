@@ -36,7 +36,7 @@ import { SanLuongDoanhThuModule } from './modules/san-luong-doanh-thu/san-luong-
       {
         name: 'medium', // Quy tắc 2: Chống spam gửi form/gọi dữ liệu liên tục
         ttl: 60000, // Trong vòng 1 phút (60000ms)
-        limit: 10, // Chỉ được phép gọi tối đa 10 lần
+        limit: 20, // Chỉ được phép gọi tối đa 10 lần
       },
       {
         name: 'longTermSpam',

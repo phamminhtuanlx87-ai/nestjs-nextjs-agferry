@@ -15,6 +15,11 @@ import {
   DanhMucGiaVe,
   DanhMucGiaVeDocument,
 } from '../danh-muc-gia-ve/entities/danh-muc-gia-ve.entity';
+import {
+  ChiTietSanLuong,
+  MA_GIA_VE,
+  MAPPING_NHOM_VE,
+} from './dto/chi_tiet_doanh_thu';
 
 export const START_DATE_REALTIME = '2026-08-01';
 export const LEGACY_DAY_SNAPSHOT = '20';
@@ -58,7 +63,7 @@ export class SanLuongDoanhThuService {
     }
 
     // 🛑 PHÒNG TUYẾN 3: Thuật toán tự động tra cứu biểu giá & nhân tiền cho từng dòng xe
-    const mangChiTietCậpNhật: any[] = [];
+    const mangChiTietCapNhat: ChiTietSanLuong[] = [];
 
     for (const xe of dto.chi_tiet_san_luong) {
       // Tìm danh mục giá của loại xe này
@@ -100,26 +105,98 @@ export class SanLuongDoanhThuService {
 
       // Chốt cứng đơn giá và nhân tổng doanh thu dòng xe (Không tin Frontend gửi lên)
       const giaVeApDung = giaCuaBen.gia_ve;
-      const tongDoanhThuDòngXe = Math.round(xe.so_luot_xe * giaVeApDung);
-
-      mangChiTietCậpNhật.push({
+      const tongDoanhThuDongXe = Math.round(xe.so_luot_xe * giaVeApDung);
+      const cauHinhNhom = MAPPING_NHOM_VE[
+        xe.ma_loai_ve as keyof typeof MA_GIA_VE
+      ] || {
+        nhom_cha: 'HANH_KHACH',
+        nhom_con: 'HANH_KHACH',
+      };
+      mangChiTietCapNhat.push({
         ma_loai_ve: xe.ma_loai_ve,
         so_luot_xe: xe.so_luot_xe,
         gia_ve_ap_dung: giaVeApDung,
-        tong_doanh_thu: tongDoanhThuDòngXe,
+        tong_doanh_thu: tongDoanhThuDongXe,
+        nhom_cha: cauHinhNhom.nhom_cha,
+        nhom_con: cauHinhNhom.nhom_con,
       });
     }
 
+    console.log(mangChiTietCapNhat);
     // Tự động sinh chuỗi YYYY-MM làm báo cáo
     const thangNam = `${ngayNhapDate.getFullYear()}-${String(ngayNhapDate.getMonth() + 1).padStart(2, '0')}`;
+    const dt_theo_ve = mangChiTietCapNhat
+      // 1. Lọc lấy các dòng thuộc nhóm cha cần tính tổng
+      .filter((e) =>
+        ['HANH_KHACH', 'XE_CAC_LOAI', 'THUE_BAO'].includes(e.nhom_cha),
+      )
+      // 2. Cộng dồn trường tong_doanh_thu (bắt đầu từ số 0)
+      .reduce((total, e) => total + (e.tong_doanh_thu || 0), 0);
 
+    const doanhThuTheoVe = {
+      dtt_ve: 0,
+      dt_theo_ve: dt_theo_ve,
+      bhhk: 0,
+      bhhk_thanh_tien: 0,
+      vat: 0,
+      vat_thanh_tien: 0,
+    };
+
+    const dt_theo_ve_thang = mangChiTietCapNhat
+      // 1. Lọc lấy các dòng thuộc nhóm cha cần tính tổng
+      .filter((e) => ['VE_THANG'].includes(e.nhom_cha))
+      // 2. Cộng dồn trường tong_doanh_thu (bắt đầu từ số 0)
+      .reduce((total, e) => total + (e.tong_doanh_thu || 0), 0);
+
+    const doanhThuTheoVeThang = {
+      dtt_ve: 0,
+      dt_theo_ve: dt_theo_ve_thang,
+      vat: 0,
+      vat_thanh_tien: 0,
+    };
+
+    const dt_theo_ve_qui = mangChiTietCapNhat
+      // 1. Lọc lấy các dòng thuộc nhóm cha cần tính tổng
+      .filter((e) => ['VE_QUI'].includes(e.nhom_cha))
+      // 2. Cộng dồn trường tong_doanh_thu (bắt đầu từ số 0)
+      .reduce((total, e) => total + (e.tong_doanh_thu || 0), 0);
+
+    const doanhThuTheoVeQui = {
+      dtt_ve: 0,
+      dt_theo_ve: dt_theo_ve_qui,
+      vat: 0,
+      vat_thanh_tien: 0,
+    };
+
+    const dt_theo_ve_nam = mangChiTietCapNhat
+      // 1. Lọc lấy các dòng thuộc nhóm cha cần tính tổng
+      .filter((e) => ['VE_NAM'].includes(e.nhom_cha))
+      // 2. Cộng dồn trường tong_doanh_thu (bắt đầu từ số 0)
+      .reduce((total, e) => total + (e.tong_doanh_thu || 0), 0);
+
+    const doanhThuTheoVeNam = {
+      dtt_ve: 0,
+      dt_theo_ve: dt_theo_ve_nam,
+      vat: 0,
+      vat_thanh_tien: 0,
+    };
+    const doanhThuKhac = 0;
+    const doanhThuHDTaiChinh = 0;
     // Tiến hành nạp dữ liệu sạch vào Database
+    const loaiDuLieu = 'THUC_HIEN';
     const newRecord = new this.sanLuongModel({
       ...dto,
       ngay_nhap: ngayNhapDate,
       thang_nam: thangNam,
-      chi_tiet_san_luong: mangChiTietCậpNhật,
+      chi_tiet_san_luong: mangChiTietCapNhat,
       nguoi_nhap: userId,
+      doanh_thu_theo_ve: doanhThuTheoVe,
+      doanh_thu_ve_thang: doanhThuTheoVeThang,
+      doanh_thu_ve_qui: doanhThuTheoVeQui,
+      doanh_thu_ve_nam: doanhThuTheoVeNam,
+      doanh_thu_khac: doanhThuKhac,
+      doanh_thu_hd_tai_chinh: doanhThuHDTaiChinh,
+      loai_du_lieu: loaiDuLieu,
     });
 
     return await newRecord.save();
@@ -171,11 +248,11 @@ export class SanLuongDoanhThuService {
       );
     }
 
-    let mangChiTietCậpNhật = banGhiCu.chi_tiet_san_luong;
+    let mangChiTietSanLuong = banGhiCu.chi_tiet_san_luong;
 
     // Nếu sửa cả mảng danh sách sản lượng, tính toán lại giá tiền y như hàm create
     if (dto.chi_tiet_san_luong && dto.chi_tiet_san_luong.length > 0) {
-      mangChiTietCậpNhật = [];
+      mangChiTietSanLuong = [];
       for (const xe of dto.chi_tiet_san_luong) {
         const danhMucVe = await this.danhMucGiaVeModel
           .findOne({ ma_loai_ve: xe.ma_loai_ve, kich_hoat: true })
@@ -199,11 +276,13 @@ export class SanLuongDoanhThuService {
 
         if (!giaCuaBen) continue;
 
-        mangChiTietCậpNhật.push({
+        mangChiTietSanLuong.push({
           ma_loai_ve: xe.ma_loai_ve,
           so_luot_xe: xe.so_luot_xe,
           gia_ve_ap_dung: giaCuaBen.gia_ve,
           tong_doanh_thu: Math.round(xe.so_luot_xe * giaCuaBen.gia_ve),
+          nhom_cha: xe.nhom_cha,
+          nhom_con: xe.nhom_cha,
         });
       }
     }
@@ -214,7 +293,7 @@ export class SanLuongDoanhThuService {
       ...dto,
       ngay_nhap: ngayNhapChuẩn,
       thang_nam: thangNam,
-      chi_tiet_san_luong: mangChiTietCậpNhật,
+      chi_tiet_san_luong: mangChiTietSanLuong,
       updated_by: userId,
     };
 

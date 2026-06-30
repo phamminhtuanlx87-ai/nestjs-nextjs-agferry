@@ -18,6 +18,12 @@ class ChiTietSanLuong {
 
   @Prop({ type: Number, required: true, min: 0 })
   tong_doanh_thu!: number; // so_luot_xe * gia_ve_ap_dung
+
+  @Prop({ type: String, required: true })
+  nhom_cha!: string;
+
+  @Prop({ type: String, required: true })
+  nhom_con!: string;
 }
 
 // ==========================================
@@ -31,10 +37,10 @@ class ChiTietDoanhThuNhom {
   @Prop({ type: Number, required: true, default: 0 })
   dt_theo_ve!: number; // Doanh thu gộp theo vé
 
-  @Prop({ type: Number, default: 0 })
+  @Prop({ type: Number })
   bhhk?: number; // Mức bảo hiểm áp dụng (Ví dụ: 9)
 
-  @Prop({ type: Number, default: 0 })
+  @Prop({ type: Number })
   bhhk_thanh_tien?: number; // Thành tiền bảo hiểm hành khách
 
   @Prop({ type: Number, required: true, default: 0 })
@@ -61,6 +67,9 @@ export class SanLuongDoanhThu {
   @Prop({ type: String, required: true, index: true })
   ma_ben!: string; // Mã bến phà áp dụng (Ví dụ: "VC", "AH")
 
+  @Prop({ type: String, required: true, index: true })
+  loai_du_lieu!: string; // Ví dụ: "THUC_HIEN", "KE_HOACH"
+
   @Prop({ type: String, required: true })
   nguoi_nhap!: string; // Lưu ID người nhập (thay cho nguoi_nhap: { $oid: ... })
 
@@ -70,19 +79,19 @@ export class SanLuongDoanhThu {
 
   // Khối dữ liệu phân rã của Vé Lượt
   @Prop({ type: ChiTietDoanhThuNhom, required: true })
-  doanh_thu_theo_ve!: ChiTietDoanhThuNhom;
+  doanh_thu_theo_ve?: ChiTietDoanhThuNhom;
 
   // Khối dữ liệu phân rã của Vé Tháng
   @Prop({ type: ChiTietDoanhThuNhom, required: true })
-  doanh_thu_ve_thang!: ChiTietDoanhThuNhom;
+  doanh_thu_ve_thang?: ChiTietDoanhThuNhom;
 
   // Khối dữ liệu phân rã của Vé Quý
   @Prop({ type: ChiTietDoanhThuNhom, required: true })
-  doanh_thu_ve_qui!: ChiTietDoanhThuNhom;
+  doanh_thu_ve_qui?: ChiTietDoanhThuNhom;
 
   // Khối dữ liệu phân rã của Vé Năm
   @Prop({ type: ChiTietDoanhThuNhom, required: true })
-  doanh_thu_ve_nam!: ChiTietDoanhThuNhom;
+  doanh_thu_ve_nam?: ChiTietDoanhThuNhom;
 
   @Prop({ type: Number, required: true, default: 0 })
   doanh_thu_dh_tai_chinh!: number; // Doanh thu hoạt động tài chính (Thường cuối tháng mới nhập)
