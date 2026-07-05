@@ -171,7 +171,7 @@ export const ThanhTongHopDoanhThu: React.FC<ThanhTongHopProps> = ({
                 <tr className="hover:bg-slate-50/50">
                   <td className="py-3 px-4">
                     <span className="font-bold ">
-                      Tổng doanh thu (bao gồm VAT, BHHK)
+                      Tổng doanh thu (bao gồm VAT, Bhhk)
                     </span>
                   </td>
                   <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
@@ -190,7 +190,7 @@ export const ThanhTongHopDoanhThu: React.FC<ThanhTongHopProps> = ({
                 </tr>
                 {/* I. Doanh thu vé lượt */}
                 <tr className="hover:bg-slate-50/50">
-                  <td className="py-3 px-4">I. Doanh thu vé lượt (Gồm VAT)</td>
+                  <td className="py-3 px-4">I. Doanh thu vé lượt</td>
                   <td className="py-3 px-4 text-right font-mono text-slate-900">
                     {formatMoney(
                       String(
