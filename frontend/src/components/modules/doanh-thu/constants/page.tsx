@@ -30,6 +30,8 @@ import dayjs from "dayjs";
 import VatSelectComponent from "@/components/modules/doanh-thu/VatSelectComponent";
 import { NGAY_MAC_DINH } from "@/components/modules/doanh-thu/constants/doanhThu";
 
+
+
 export default function NhapLieuDoanhThuPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [danhMucVe, setDanhMucVe] = useState<TicketType[]>([]);
@@ -499,6 +501,7 @@ export default function NhapLieuDoanhThuPage() {
         doanh_thu_thuan_tong_cong: 0,
         loai_du_lieu: "THUC_HIEN",
       };
+      console.log("Kiem tra payload", payloadToSubmit);
       try {
         setIsLoading(true);
 
@@ -527,7 +530,7 @@ export default function NhapLieuDoanhThuPage() {
               ? "Cập nhật bản ghi doanh thu thành công!"
               : "Nạp mới sản lượng doanh thu thành công!",
           );
-          setIsDirty(false)
+
           // 2. Găm lại ID bản ghi để giữ trạng thái sửa (Edit mode)
           // Kiểm tra cả cấu hình lồng data hoặc object phẳng
           const recordId =

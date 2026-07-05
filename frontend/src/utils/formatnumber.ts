@@ -30,3 +30,15 @@ export const formatCurrency = (value: string) => {
     return Number(value).toLocaleString("vi-VN") + " đ";
   };
 
+// 1. Hàm chuyển số thành chuỗi có dấu chấm: 1000000 -> "1.000.000"
+export const formatNumberString = (value: number | string) => {
+  if (!value && value !== 0) return "";
+  const num = String(value).replace(/\D/g, "");
+  return num ? Number(num).toLocaleString("vi-VN") : "";
+};
+
+// 2. Hàm chuyển chuỗi có dấu chấm ngược lại thành số sạch: "1.000.000" -> 1000000
+export const parseStringToNumber = (value: string) => {
+  const cleanNumber = value.replace(/\./g, "");
+  return cleanNumber ? Number(cleanNumber) : 0;
+};

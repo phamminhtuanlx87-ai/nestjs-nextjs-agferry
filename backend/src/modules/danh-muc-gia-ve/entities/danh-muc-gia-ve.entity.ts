@@ -22,6 +22,15 @@ class LichSuGia {
   gia_theo_ben!: GiaTheoBen[];
 }
 
+@Schema({ _id: false })
+class LichSuBHHK {
+  @Prop({ required: true, type: Date })
+  ngay_ap_dung!: Date;
+
+  @Prop({ required: true, type: Number })
+  gia_bhhk!: number;
+}
+
 // ĐÂY CHÍNH LÀ ENTITY ĐỒNG THỜI LÀ SCHEMA GỐC
 @Schema({ collection: 'danh_muc_gia_ve', timestamps: true })
 export class DanhMucGiaVe extends Document {
@@ -39,6 +48,9 @@ export class DanhMucGiaVe extends Document {
 
   @Prop({ required: true, type: [LichSuGia] })
   lich_su_gia!: LichSuGia[];
+
+  @Prop({ required: true, type: [LichSuBHHK] })
+  lich_su_bhhk!: LichSuBHHK[];
 
   @Prop({ default: true })
   kich_hoat!: boolean;

@@ -38,10 +38,19 @@ class LichSuGiaDTO {
   @Type(() => GiaTheoBenDTO)
   @IsNotEmpty({ message: 'Không được để trống giá theo bến' })
   gia_theo_ben!: GiaTheoBenDTO[];
+}
 
-  @IsString()
-  @IsOptional()
-  ghi_chu?: string;
+class LichSuBHHKDto {
+  @IsDateString(
+    {},
+    { message: 'Ngày áp dụng phải là định dạng ngày tháng hợp lệ' },
+  )
+  @IsNotEmpty({ message: 'Không được để trống ngày áp dụng' })
+  ngay_ap_dung!: string | Date;
+
+  @IsNumber({}, { message: 'Giá bhhk phải là số' })
+  @IsNotEmpty({ message: 'Không được để trống Giá bhhk phải là số' })
+  gia_bhhk!: number;
 }
 
 // 2. Class cha chính dùng để nhận dữ liệu từ Frontend truyền lên
@@ -67,6 +76,12 @@ export class CreateDanhMucGiaVeDto {
   @Type(() => LichSuGiaDTO)
   @IsNotEmpty({ message: 'Không được để trống lịch sử giá' })
   lich_su_gia!: LichSuGiaDTO[];
+
+  @IsArray({ message: 'Lịch sử bhhk phải là một mảng' })
+  @ValidateNested({ each: true })
+  @Type(() => LichSuBHHKDto)
+  @IsNotEmpty({ message: 'Không được để trống Lịch sử bhhk' })
+  lich_su_bhhk!: LichSuBHHKDto[];
 
   @IsBoolean({ message: 'Trạng thái kích hoạt phải là true hoặc false' })
   @IsNotEmpty({ message: 'Không được để trống trạng thái kích hoạt' })

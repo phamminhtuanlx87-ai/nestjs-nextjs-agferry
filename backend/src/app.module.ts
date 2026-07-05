@@ -31,17 +31,17 @@ import { SanLuongDoanhThuModule } from './modules/san-luong-doanh-thu/san-luong-
       {
         name: 'short', // Quy tắc 1: Chống click đúp chuột liên tục phá hoại
         ttl: 1000, // Trong vòng 1 giây (1000ms)
-        limit: 2, // Chỉ được phép bấm tối đa 1 lần
+        limit: 4, // Chỉ được phép bấm tối đa 1 lần
       },
       {
         name: 'medium', // Quy tắc 2: Chống spam gửi form/gọi dữ liệu liên tục
         ttl: 60000, // Trong vòng 1 phút (60000ms)
-        limit: 20, // Chỉ được phép gọi tối đa 10 lần
+        limit: 50, // Chỉ được phép gọi tối đa 10 lần
       },
       {
         name: 'longTermSpam',
         ttl: 300000, // 10 phút tính bằng miligiây (10 * 60 * 1000)
-        limit: 30, // Nếu chạm ngưỡng 15 request trong thời gian này, khóa luôn 10 phút
+        limit: 80, // Nếu chạm ngưỡng 15 request trong thời gian này, khóa luôn 10 phút
       },
     ]),
 

@@ -10,9 +10,11 @@ import {
   DanhMucGiaVeSchema,
 } from '../danh-muc-gia-ve/entities/danh-muc-gia-ve.entity';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule,
     MongooseModule.forFeature([
       {
         name: SanLuongDoanhThu.name,

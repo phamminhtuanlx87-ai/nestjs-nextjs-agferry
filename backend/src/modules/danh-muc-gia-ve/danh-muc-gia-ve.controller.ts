@@ -17,6 +17,7 @@ import { UserRole } from '../users/constants/user.constants';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
@@ -34,6 +35,7 @@ export class DanhMucGiaVeController {
     };
   }
 
+  @SkipThrottle({ default: true })
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER, UserRole.GUEST)
   @Get()
   async findAll(@Query('ngay') ngay?: string) {
@@ -45,6 +47,7 @@ export class DanhMucGiaVeController {
     };
   }
 
+  @SkipThrottle({ default: true })
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER, UserRole.GUEST)
   @Get(':id')
   findOne(@Param('id') id: string) {

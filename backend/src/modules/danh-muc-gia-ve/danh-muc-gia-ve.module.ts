@@ -6,9 +6,11 @@ import {
   DanhMucGiaVe,
   DanhMucGiaVeSchema,
 } from './entities/danh-muc-gia-ve.entity';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule,
     // Đăng ký Schema ở đây để InjectModel có thể hoạt động trong Service
     MongooseModule.forFeature([
       {

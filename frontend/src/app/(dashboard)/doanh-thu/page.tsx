@@ -13,6 +13,7 @@ export default function DoanhThuPage() {
   const currentMonth = now.getMonth() + 1;
   const startYear = 2025;
   const router = useRouter();
+
   const getMonthOptions = (selectedYear: number) => {
     const allMonths = [
       { value: 1, label: "Tháng 01" },
@@ -28,132 +29,162 @@ export default function DoanhThuPage() {
       { value: 11, label: "Tháng 11" },
       { value: 12, label: "Tháng 12" },
     ];
-
-    // Nếu năm được chọn là năm hiện tại, lọc lấy các tháng <= tháng hiện tại
     if (Number(selectedYear) === currentYear) {
       return allMonths.filter((month) => month.value <= currentMonth);
     }
-
-    // Nếu là năm khác (ví dụ năm quá khứ), hiện đủ 12 tháng
     return allMonths;
   };
 
-  // 2. Tự động sinh mảng từ năm 2025 đến năm hiện tại
   const YEAR_OPTIONS = Array.from(
     { length: currentYear - startYear + 1 },
     (_, index) => {
       const year = startYear + index;
-      return {
-        value: year,
-        label: `Năm ${year}`,
-      };
+      return { value: year, label: `Năm ${year}` };
     },
   );
 
-  const [selectedMonth, setSelectedMonth] = useState<number>(
-    now.getMonth() + 1,
-  );
+  const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear());
+
   return (
-    <div>
+    <div className="min-h-screen bg-slate-50/50 pb-12">
       <DynamicBreadcrumb />
-      {/* Container Tổng của trang Quản lý Doanh thu */}
-      <div className="w-full  bg-gray-50  mx-auto p-2 md:p-6 space-y-6">
-        <div className="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          {/* Cụm Tiêu Đề bên trái */}
+      
+      <div className="w-full mx-auto p-4 md:p-6 space-y-6">
+        
+        {/* ==========================================
+           PHÂN KHU 1: TIÊU ĐỀ & BỘ LỌC
+           ========================================== */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-gray-200/60 pb-5">
           <div>
-            <div className="flex items-center gap-2 text-blue-600 font-medium text-sm mb-1">
-              <span className="w-8 h-0.5 bg-blue-600"></span>
+            <div className="flex items-center gap-2 text-blue-600 font-medium text-xs uppercase tracking-wider mb-1">
+              <span className="w-6 h-0.5 bg-blue-600"></span>
               Hệ thống quản lý Sản lượng & Doanh thu
             </div>
-            <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">
               Quản lý Sản lượng Doanh thu năm{" "}
               <span className="text-blue-600">{selectedYear}</span>
             </h1>
-            <p className="text-slate-500 text-sm mt-1">
-              Tổng hợp và báo cáo Sản lượng doanh thu từ{" "}
-              <span className="font-semibold text-slate-700">Tháng 01 </span>đến{" "}
+            <p className="text-slate-500 text-xs mt-1">
+              Tổng hợp và báo cáo Sản lượng doanh thu
+              {" "}
               <span className="font-semibold text-slate-700">
                 {`Tháng ${selectedMonth}/${selectedYear}`}
               </span>
             </p>
           </div>
-          {/* Bộ chọn thời gian bên phải (Optionally) */}
-          <div className="flex items-center gap-3">
-            {/* Nút lọc Tháng */}
-            <div className="relative inline-block text-left">
-              <DropDown
-                label="Tháng"
-                items={getMonthOptions(selectedYear)}
-                value={selectedMonth}
-                icon={<BiCalendar className="w-4 h-4" />}
-                onChange={(val) => setSelectedMonth(Number(val))}
-              />
+
+          <div className="flex items-center gap-2">
+            <DropDown
+              label="Tháng"
+              items={getMonthOptions(selectedYear)}
+              value={selectedMonth}
+              icon={<BiCalendar className="w-4 h-4" />}
+              onChange={(val) => setSelectedMonth(Number(val))}
+            />
+            <DropDown
+              label="Năm"
+              items={YEAR_OPTIONS}
+              value={selectedYear}
+              icon={<BiCalendar className="w-4 h-4" />}
+              onChange={(val) => setSelectedYear(Number(val))}
+            />
+          </div>
+        </div>
+
+        {/* ==========================================
+           PHÂN KHU 2: CÁC THÈ KPI TỔNG HỢP (Khung Trống)
+           ========================================== */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white p-5 rounded-xl border border-dashed border-gray-300 flex flex-col justify-between min-h-22.5">
+            <span className="text-[11px] text-gray-400 block uppercase font-bold tracking-wider">
+              Tổng cộng doanh thu 
+            </span>
+            <span className="text-xl font-bold text-slate-400 font-mono mt-2">
+              -- đ
+            </span>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border border-dashed border-gray-300 flex flex-col justify-between min-h-22.5">
+            <span className="text-[11px] text-gray-400 block uppercase font-bold tracking-wider">
+              Tổng sản lượng 
+            </span>
+            <span className="text-xl font-bold text-slate-400 font-mono mt-2">
+              -- Lượt xe
+            </span>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border border-dashed border-gray-300 flex flex-col justify-between min-h-22.5">
+            <span className="text-[11px] text-gray-400 block uppercase font-bold tracking-wider">
+              Trạng thái
+            </span>
+            <span className="text-xl font-bold text-slate-400 font-mono mt-2">
+              -- Bến
+            </span>
+          </div>
+        </div>
+
+        {/* ==========================================
+           PHÂN KHU 3: KHÔNG GIAN BIỂU ĐỒ (Khung Trống)
+           ========================================== */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8 bg-white p-5 rounded-xl border border-dashed border-slate-300 flex flex-col justify-between min-h-70">
+            <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wide">
+              📊 Biểu đồ xu hướng Doanh thu (Đang hoàn thiện)
+            </h3>
+            <div className="flex-1 flex items-center justify-center text-xs text-slate-400 font-medium italic">
+              Không có dữ liệu hiển thị
             </div>
-            {/* Nút lọc Năm */}
-            <div className="relative inline-block text-left">
-              <DropDown
-                label="Năm"
-                items={YEAR_OPTIONS}
-                value={selectedYear}
-                icon={<BiCalendar className="w-4 h-4" />}
-                onChange={(val) => setSelectedYear(Number(val))}
-              />
+          </div>
+
+          <div className="lg:col-span-4 bg-white p-5 rounded-xl border border-dashed border-slate-300 flex flex-col justify-between min-h-70">
+            <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wide">
+              🍩 Biểu đồ tỷ trọng sản lượng (Đang hoàn thiện)
+            </h3>
+            <div className="flex-1 flex items-center justify-center text-xs text-slate-400 font-medium italic">
+              Không có dữ liệu hiển thị
             </div>
           </div>
         </div>
 
-        {/* THANH TỔNG HỢP & NÚT LƯU (Responsive Chặt Chẽ) */}
-        <div className="pt-4 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50 p-4 rounded-md">
-          <div className="text-center sm:text-left">
-            <span className="text-xs text-gray-500 block uppercase font-bold tracking-wider">
-              Tổng cộng doanh thu
-            </span>
-            <span className="text-2xl font-black text-blue-900">
-              397.050.000 VNĐ
-            </span>
-          </div>
-        </div>
         {/* ==========================================
-       KHỐI HẠ TẦNG: BẢNG DỮ LIỆU ĐỐI SOÁT
-       ========================================== */}
-        <div className="bg-white p-4 rounded-lg shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-bold text-gray-800 mb-4">
-              Dữ liệu Sản lượng Doanh thu
+           PHÂN KHU 4: BẢNG DỮ LIỆU ĐỐI SOÁT (Bảng Trống + Nút Thêm)
+           ========================================== */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="p-4 bg-slate-50 border-b border-gray-200 flex items-center justify-between gap-4">
+            <h3 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+              📋 Danh sách lịch sử Sản lượng Doanh thu
             </h3>
-            <Button variant="primary" onClick={() => router.push("/doanh-thu/nhap-lieu")}>
+            <Button 
+              variant="primary" 
+              onClick={() => router.push("/doanh-thu/nhap-lieu")}
+              className="text-xs font-bold py-1.5 px-3.5"
+            >
               + Thêm dữ liệu
             </Button>
           </div>
-          {/* 🛡️ CHỐT CHẶN BỂ TABLE: Sử dụng overflow-x-auto để điện thoại vuốt ngang mượt mà */}
+
           <div className="w-full overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-150">
+            <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-gray-100 text-sm text-gray-600">
-                  <th className="p-3 border-b">Ngày</th>
-                  <th className="p-3 border-b">Bến phà</th>
-                  <th className="p-3 border-b text-right">Tổng doanh thu</th>
-                  <th className="p-3 border-b text-center">Trạng thái</th>
+                <tr className="bg-slate-100 text-slate-500 font-bold border-b border-gray-200">
+                  <th className="p-3.5">Ngày nhập</th>
+                  <th className="p-3.5">Bến phà áp dụng</th>
+                  <th className="p-3.5 text-right">Tổng doanh thu</th>
+                  <th className="p-3.5 text-center">Trạng thái</th>
                 </tr>
               </thead>
-              <tbody className="text-sm text-gray-700">
-                <tr className="hover:bg-gray-50">
-                  <td className="p-3 border-b">15/08/2026</td>
-                  <td className="p-3 border-b">Bến phà Gót</td>
-                  <td className="p-3 border-b text-right font-bold text-green-600">
-                    184,250,000
-                  </td>
-                  <td className="p-3 border-b text-center">
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                      ĐÃ CHỐT
-                    </span>
+              <tbody>
+                <tr>
+                  <td colSpan={4} className="p-8 text-center text-xs text-slate-400 italic font-medium bg-white">
+                    Không có dữ liệu sản lượng trong khoảng thời gian được chọn. Vui lòng bấm nút {`"Thêm dữ liệu"`}.
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
+
       </div>
     </div>
   );

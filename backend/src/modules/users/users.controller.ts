@@ -15,6 +15,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from './constants/user.constants';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN) // Chỉ Admin mới được truy cập vào tất cả API trong Controller này
@@ -23,7 +24,7 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {
     console.log('Khởi tạo UserService');
   }
-
+  @SkipThrottle({ default: true })
   @Get() //users
   async index() {
     // Thêm await ở đây để đợi dữ liệu từ Database trả về
@@ -41,6 +42,7 @@ export class UsersController {
     return this.userService.create(createUserDto, false);
   }
 
+  @SkipThrottle({ default: true })
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const user = await this.userService.findOne(id);

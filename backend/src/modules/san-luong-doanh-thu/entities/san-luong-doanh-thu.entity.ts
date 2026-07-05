@@ -19,6 +19,12 @@ class ChiTietSanLuong {
   @Prop({ type: Number, required: true, min: 0 })
   tong_doanh_thu!: number; // so_luot_xe * gia_ve_ap_dung
 
+  @Prop({ type: Number, required: true, min: 0 })
+  bhhk_don_gia!: number;
+
+  @Prop({ type: Number, required: true, min: 0 })
+  bhhk_thanh_tien!: number;
+
   @Prop({ type: String, required: true })
   nhom_cha!: string;
 
@@ -94,7 +100,7 @@ export class SanLuongDoanhThu {
   doanh_thu_ve_nam?: ChiTietDoanhThuNhom;
 
   @Prop({ type: Number, required: true, default: 0 })
-  doanh_thu_dh_tai_chinh!: number; // Doanh thu hoạt động tài chính (Thường cuối tháng mới nhập)
+  doanh_thu_hd_tai_chinh!: number; // Doanh thu hoạt động tài chính (Thường cuối tháng mới nhập)
 
   @Prop({ type: Number, required: true, default: 0 })
   doanh_thu_khac!: number; // Doanh thu khác phát sinh

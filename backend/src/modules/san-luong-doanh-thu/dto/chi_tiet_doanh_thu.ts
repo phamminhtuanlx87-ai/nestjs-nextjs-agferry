@@ -1,8 +1,6 @@
 export interface ChiTietDoanhThuNhom {
   dtt_ve: number;
   dt_theo_ve: number;
-  bhhk?: number;
-  bhhk_thanh_tien?: number;
   vat: number;
   vat_thanh_tien: number;
 }
@@ -12,6 +10,8 @@ export interface ChiTietSanLuong {
   so_luot_xe: number;
   gia_ve_ap_dung: number;
   tong_doanh_thu?: number;
+  bhhk_don_gia?: number;
+  bhhk_thanh_tien?: number;
   nhom_cha:
     | 'HANH_KHACH'
     | 'XE_CAC_LOAI'

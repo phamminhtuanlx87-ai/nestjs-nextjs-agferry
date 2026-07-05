@@ -9,13 +9,13 @@ export type NhomType =
   | 'VE_QUI' 
   | 'VE_NAM'
   | 'XE_KHACH'
-  | 'XE_TAI';
+  | 'XE_TAI'; // Thêm undefined để xử lý trường hợp không có nhóm
 
 interface GroupTotalTagProps {
   nhom: NhomType;
   label: string;
   // ✨ ĐÃ SỬA: Định nghĩa rõ hàm nhận vào một chuỗi thuộc NhomChaType và trả về số
-  tinhTongFn: (nhom: NhomType) => number;
+  tinhTongFn: (nhom: NhomType) => { tongDoanhThu: number; tongBHHK: number; vatThanhTien: number };
 }
 
 export const GroupTotalTag = ({
@@ -23,7 +23,7 @@ export const GroupTotalTag = ({
   label,
   tinhTongFn,
 }: GroupTotalTagProps) => {
-  const total = tinhTongFn(nhom) || 0;
+  const total = tinhTongFn(nhom).tongDoanhThu || 0;
 
   if (total <= 0) return null;
 
