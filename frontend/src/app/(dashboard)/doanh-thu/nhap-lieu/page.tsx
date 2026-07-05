@@ -302,7 +302,7 @@ export default function NhapLieuDoanhThuPage() {
   const onSubmit = async (formData: SanLuongFormInputs) => {
     try {
       setIsLoading(true);
-
+       console.time("Submit");
       // --- BƯỚC 1: LỌC VÀ ĐÓNG GÓI MẢNG CHI TIẾT SẢN LƯỢNG SẠCH THỦ CÔNG ---
       const mangChiTietSanLuong: ChiTietSanLuongDto[] = [];
 
@@ -527,9 +527,11 @@ export default function NhapLieuDoanhThuPage() {
               ? "Cập nhật bản ghi doanh thu thành công!"
               : "Nạp mới sản lượng doanh thu thành công!",
           );
+
           setIsDirty(false);
           // 2. Găm lại ID bản ghi để giữ trạng thái sửa (Edit mode)
           // Kiểm tra cả cấu hình lồng data hoặc object phẳng
+           console.timeEnd("Submit");
           const recordId =
             dataPhanHoi._id || dataPhanHoi.data?._id || currentRecordId;
           if (recordId) {
@@ -880,7 +882,8 @@ export default function NhapLieuDoanhThuPage() {
                 />
               </div>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachVeThang.sort((a, b) => {
+                {danhSachVeThang
+                  .sort((a, b) => {
                     const bangThuTu: { [key: string]: number } = {
                       VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
                       VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
@@ -893,31 +896,32 @@ export default function NhapLieuDoanhThuPage() {
 
                     // 3. Sắp xếp tăng dần theo trọng số điểm
                     return uuTienA - uuTienB;
-                  }).map((ticket, index) => {
-                  const giaHienTai = getGiaVe(ticket, maBen);
-                  const giaMacDinh = getGiaVe(ticket, "AH");
-                  return (
-                    <div
-                      key={ticket.ma_loai_ve}
-                      title={`Mã vé: ${ticket.ten_loai_ve}`}
-                      className="group relative"
-                    >
-                      <InputSanLuong
-                        isFirst={index === 0}
-                        label={ticket.ten_loai_ve}
-                        price={String(giaHienTai)}
-                        isHighlightPrice={giaHienTai !== giaMacDinh}
-                        quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                        maBen={maBen}
-                        error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                        {...register(ticket.ma_loai_ve, {
-                          // 🌟 Đổi sang ma_loai_ve
-                          min: 0,
-                        })}
-                      />
-                    </div>
-                  );
-                })}
+                  })
+                  .map((ticket, index) => {
+                    const giaHienTai = getGiaVe(ticket, maBen);
+                    const giaMacDinh = getGiaVe(ticket, "AH");
+                    return (
+                      <div
+                        key={ticket.ma_loai_ve}
+                        title={`Mã vé: ${ticket.ten_loai_ve}`}
+                        className="group relative"
+                      >
+                        <InputSanLuong
+                          isFirst={index === 0}
+                          label={ticket.ten_loai_ve}
+                          price={String(giaHienTai)}
+                          isHighlightPrice={giaHienTai !== giaMacDinh}
+                          quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                          maBen={maBen}
+                          error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                          {...register(ticket.ma_loai_ve, {
+                            // 🌟 Đổi sang ma_loai_ve
+                            min: 0,
+                          })}
+                        />
+                      </div>
+                    );
+                  })}
                 {danhSachVeThang.length === 0 && (
                   <p className="text-xs text-gray-400 text-center py-4">
                     Không có dữ liệu vé tháng
@@ -935,7 +939,8 @@ export default function NhapLieuDoanhThuPage() {
                 />
               </div>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachVeQui.sort((a, b) => {
+                {danhSachVeQui
+                  .sort((a, b) => {
                     const bangThuTu: { [key: string]: number } = {
                       VE_QUI_HK: 1, // Xe thô sơ lên đầu tiên
                       VE_QUI_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
@@ -948,31 +953,32 @@ export default function NhapLieuDoanhThuPage() {
 
                     // 3. Sắp xếp tăng dần theo trọng số điểm
                     return uuTienA - uuTienB;
-                  }).map((ticket, index) => {
-                  const giaHienTai = getGiaVe(ticket, maBen);
-                  const giaMacDinh = getGiaVe(ticket, "AH");
-                  return (
-                    <div
-                      key={ticket.ma_loai_ve}
-                      title={`Mã vé: ${ticket.ten_loai_ve}`}
-                      className="group relative"
-                    >
-                      <InputSanLuong
-                        isFirst={index === 0}
-                        label={ticket.ten_loai_ve}
-                        price={String(giaHienTai)}
-                        isHighlightPrice={giaHienTai !== giaMacDinh}
-                        quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                        maBen={maBen}
-                        error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                        {...register(ticket.ma_loai_ve, {
-                          // 🌟 Đổi sang ma_loai_ve
-                          min: 0,
-                        })}
-                      />
-                    </div>
-                  );
-                })}
+                  })
+                  .map((ticket, index) => {
+                    const giaHienTai = getGiaVe(ticket, maBen);
+                    const giaMacDinh = getGiaVe(ticket, "AH");
+                    return (
+                      <div
+                        key={ticket.ma_loai_ve}
+                        title={`Mã vé: ${ticket.ten_loai_ve}`}
+                        className="group relative"
+                      >
+                        <InputSanLuong
+                          isFirst={index === 0}
+                          label={ticket.ten_loai_ve}
+                          price={String(giaHienTai)}
+                          isHighlightPrice={giaHienTai !== giaMacDinh}
+                          quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                          maBen={maBen}
+                          error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                          {...register(ticket.ma_loai_ve, {
+                            // 🌟 Đổi sang ma_loai_ve
+                            min: 0,
+                          })}
+                        />
+                      </div>
+                    );
+                  })}
                 {danhSachVeQui.length === 0 && (
                   <p className="text-xs text-gray-400 text-center py-4">
                     Không có dữ liệu vé quý
@@ -990,7 +996,8 @@ export default function NhapLieuDoanhThuPage() {
                 />
               </div>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachVeNam.sort((a, b) => {
+                {danhSachVeNam
+                  .sort((a, b) => {
                     const bangThuTu: { [key: string]: number } = {
                       VE_NAM_HK: 1, // Xe thô sơ lên đầu tiên
                       VE_NAM_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
@@ -1003,31 +1010,32 @@ export default function NhapLieuDoanhThuPage() {
 
                     // 3. Sắp xếp tăng dần theo trọng số điểm
                     return uuTienA - uuTienB;
-                  }).map((ticket, index) => {
-                  const giaHienTai = getGiaVe(ticket, maBen);
-                  const giaMacDinh = getGiaVe(ticket, "AH");
-                  return (
-                    <div
-                      key={ticket.ma_loai_ve}
-                      title={`Mã vé: ${ticket.ten_loai_ve}`}
-                      className="group relative"
-                    >
-                      <InputSanLuong
-                        isFirst={index === 0}
-                        label={ticket.ten_loai_ve}
-                        price={String(giaHienTai)}
-                        isHighlightPrice={giaHienTai !== giaMacDinh}
-                        quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                        maBen={maBen}
-                        error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                        {...register(ticket.ma_loai_ve, {
-                          // 🌟 Đổi sang ma_loai_ve
-                          min: 0,
-                        })}
-                      />
-                    </div>
-                  );
-                })}
+                  })
+                  .map((ticket, index) => {
+                    const giaHienTai = getGiaVe(ticket, maBen);
+                    const giaMacDinh = getGiaVe(ticket, "AH");
+                    return (
+                      <div
+                        key={ticket.ma_loai_ve}
+                        title={`Mã vé: ${ticket.ten_loai_ve}`}
+                        className="group relative"
+                      >
+                        <InputSanLuong
+                          isFirst={index === 0}
+                          label={ticket.ten_loai_ve}
+                          price={String(giaHienTai)}
+                          isHighlightPrice={giaHienTai !== giaMacDinh}
+                          quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                          maBen={maBen}
+                          error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                          {...register(ticket.ma_loai_ve, {
+                            // 🌟 Đổi sang ma_loai_ve
+                            min: 0,
+                          })}
+                        />
+                      </div>
+                    );
+                  })}
                 {danhSachVeNam.length === 0 && (
                   <p className="text-xs text-gray-400 text-center py-4">
                     Không có dữ liệu vé năm

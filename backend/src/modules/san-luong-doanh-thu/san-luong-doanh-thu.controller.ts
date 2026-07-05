@@ -36,7 +36,6 @@ export class SanLuongDoanhThuController {
     const userId = (req.user?.userId || 'SYSTEM_AN_GIANG') as string;
     // Đẩy cả DTO thô và ID người dùng xuống tầng Service giải quyết
     const result = await this.sanLuongDoanhThuService.create(createDto, userId);
-
     return {
       statusCode: HttpStatus.CREATED,
       message:

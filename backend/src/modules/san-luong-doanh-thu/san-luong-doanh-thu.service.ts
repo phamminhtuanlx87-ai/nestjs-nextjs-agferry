@@ -39,6 +39,7 @@ export class SanLuongDoanhThuService {
 
   async create(dto: CreateSanLuongDoanhThuDto, userId: string) {
     // 🛡️ Tuyến phòng thủ 1: Xử lý múi giờ và đồng bộ dữ liệu lịch sử
+
     if (dto.ngay_nhap) {
       const targetDate = new Date(`${dto.ngay_nhap}T12:00:00.000Z`);
       const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);

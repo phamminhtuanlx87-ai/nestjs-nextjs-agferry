@@ -135,8 +135,6 @@ export const sanLuongService = {
       const response = await api.post<
         NestApiResponse<CreateSanLuongDoanhThuDto>
       >("/san-luong-doanh-thu", sanluong);
-      console.log("sanluong:", sanluong);
-      console.log("response:", response);
       return response.data;
     } catch (error) {
       console.error("Lỗi gọi API thêm mới sản lượng:", error);
