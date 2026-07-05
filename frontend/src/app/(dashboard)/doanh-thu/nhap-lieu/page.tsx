@@ -53,7 +53,7 @@ export default function NhapLieuDoanhThuPage() {
   });
   const values = useWatch<SanLuongFormInputs>({ control }) || {};
   const prevNgayRef = useRef<string>("");
- 
+
   const [isCollapseVeLuot, setIsCollapseVeLuot] = useState<boolean>(false);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   // Gọi API lấy danh mục vé khi ngày áp dụng thay đổi
@@ -527,7 +527,7 @@ export default function NhapLieuDoanhThuPage() {
               ? "Cập nhật bản ghi doanh thu thành công!"
               : "Nạp mới sản lượng doanh thu thành công!",
           );
-          setIsDirty(false)
+          setIsDirty(false);
           // 2. Găm lại ID bản ghi để giữ trạng thái sửa (Edit mode)
           // Kiểm tra cả cấu hình lồng data hoặc object phẳng
           const recordId =
@@ -625,7 +625,11 @@ export default function NhapLieuDoanhThuPage() {
       </div>
 
       {/* FORM NHẬP LIỆU CHÍNH */}
-      <form onSubmit={handleSubmit(onSubmit)} onChange={() => setIsDirty(true)} className="space-y-6 w-full">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        onChange={() => setIsDirty(true)}
+        className="space-y-6 w-full"
+      >
         {/* BỘ ĐIỀU KHIỂN TRÊN ĐẦU: CHỌN NGÀY VÀ CHỌN BẾN PHÀ */}
         <div className="w-full bg-slate-100 p-4 rounded-xl border border-slate-200 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 shadow-sm">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
@@ -754,6 +758,14 @@ export default function NhapLieuDoanhThuPage() {
                             XK_TU_16C_DEN_30C: 5,
                             XK_TU_30C_DEN_45C: 6, // Xe từ 30 đến 45 ghế xếp gần cuối
                             XK_45C: 7, // Xe từ 45 ghế trở lên bắt buộc nằm đáy (dưới cùng)
+
+                            XT_DUOI_3T: 8,
+                            XT_TU_3T_DEN_5T: 9,
+                            XT_TU_5T_DEN_7T: 10,
+                            XT_TU_7T_DEN_10T: 11,
+                            XT_TU_10T_DEN_15T: 12,
+                            XT_TU_15T_DEN_20T: 13,
+                            XT_20T_TRO_LEN: 14,
                           };
 
                           // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
@@ -812,31 +824,47 @@ export default function NhapLieuDoanhThuPage() {
             >
               {/* Nhóm thuê bao */}
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachThueBao.map((ticket, index) => {
-                  const giaHienTai = getGiaVe(ticket, maBen);
-                  const giaMacDinh = getGiaVe(ticket, "AH");
-                  return (
-                    <div
-                      key={ticket.ma_loai_ve}
-                      title={`Mã vé: ${ticket.ten_loai_ve}`}
-                      className="group relative"
-                    >
-                      <InputSanLuong
-                        isFirst={index === 0}
-                        label={ticket.ten_loai_ve}
-                        price={String(giaHienTai)}
-                        isHighlightPrice={giaHienTai !== giaMacDinh}
-                        quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                        maBen={maBen}
-                        error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                        {...register(ticket.ma_loai_ve, {
-                          // 🌟 Đổi sang ma_loai_ve
-                          min: 0,
-                        })}
-                      />
-                    </div>
-                  );
-                })}
+                {danhSachThueBao
+                  .sort((a, b) => {
+                    const bangThuTu: { [key: string]: number } = {
+                      TB_PHA_30T: 1, // Xe thô sơ lên đầu tiên
+                      TB_PHA_60T: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                      TB_PHA_100T: 3,
+                      TB_PHA_200T: 4,
+                    };
+
+                    // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                    const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                    const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                    // 3. Sắp xếp tăng dần theo trọng số điểm
+                    return uuTienA - uuTienB;
+                  })
+                  .map((ticket, index) => {
+                    const giaHienTai = getGiaVe(ticket, maBen);
+                    const giaMacDinh = getGiaVe(ticket, "AH");
+                    return (
+                      <div
+                        key={ticket.ma_loai_ve}
+                        title={`Mã vé: ${ticket.ten_loai_ve}`}
+                        className="group relative"
+                      >
+                        <InputSanLuong
+                          isFirst={index === 0}
+                          label={ticket.ten_loai_ve}
+                          price={String(giaHienTai)}
+                          isHighlightPrice={giaHienTai !== giaMacDinh}
+                          quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                          maBen={maBen}
+                          error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                          {...register(ticket.ma_loai_ve, {
+                            // 🌟 Đổi sang ma_loai_ve
+                            min: 0,
+                          })}
+                        />
+                      </div>
+                    );
+                  })}
                 {danhSachThueBao.length === 0 && (
                   <p className="text-xs text-gray-400 text-center py-4">
                     Không có dữ liệu thuê bao
@@ -852,7 +880,20 @@ export default function NhapLieuDoanhThuPage() {
                 />
               </div>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachVeThang.map((ticket, index) => {
+                {danhSachVeThang.sort((a, b) => {
+                    const bangThuTu: { [key: string]: number } = {
+                      VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
+                      VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                      VE_THANG_TU_7C_DEN_12C: 3,
+                    };
+
+                    // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                    const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                    const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                    // 3. Sắp xếp tăng dần theo trọng số điểm
+                    return uuTienA - uuTienB;
+                  }).map((ticket, index) => {
                   const giaHienTai = getGiaVe(ticket, maBen);
                   const giaMacDinh = getGiaVe(ticket, "AH");
                   return (
@@ -894,7 +935,20 @@ export default function NhapLieuDoanhThuPage() {
                 />
               </div>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachVeQui.map((ticket, index) => {
+                {danhSachVeQui.sort((a, b) => {
+                    const bangThuTu: { [key: string]: number } = {
+                      VE_QUI_HK: 1, // Xe thô sơ lên đầu tiên
+                      VE_QUI_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                      VE_QUI_TU_7C_DEN_12C: 3,
+                    };
+
+                    // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                    const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                    const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                    // 3. Sắp xếp tăng dần theo trọng số điểm
+                    return uuTienA - uuTienB;
+                  }).map((ticket, index) => {
                   const giaHienTai = getGiaVe(ticket, maBen);
                   const giaMacDinh = getGiaVe(ticket, "AH");
                   return (
@@ -936,7 +990,20 @@ export default function NhapLieuDoanhThuPage() {
                 />
               </div>
               <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachVeNam.map((ticket, index) => {
+                {danhSachVeNam.sort((a, b) => {
+                    const bangThuTu: { [key: string]: number } = {
+                      VE_NAM_HK: 1, // Xe thô sơ lên đầu tiên
+                      VE_NAM_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                      VE_NAM_TU_7C_DEN_12C: 3,
+                    };
+
+                    // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                    const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                    const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                    // 3. Sắp xếp tăng dần theo trọng số điểm
+                    return uuTienA - uuTienB;
+                  }).map((ticket, index) => {
                   const giaHienTai = getGiaVe(ticket, maBen);
                   const giaMacDinh = getGiaVe(ticket, "AH");
                   return (
