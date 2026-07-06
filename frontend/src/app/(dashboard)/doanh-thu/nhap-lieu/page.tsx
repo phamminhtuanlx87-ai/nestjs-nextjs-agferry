@@ -29,6 +29,8 @@ import { useForm, useWatch } from "react-hook-form";
 import dayjs from "dayjs";
 import VatSelectComponent from "@/components/modules/doanh-thu/VatSelectComponent";
 import { NGAY_MAC_DINH } from "@/components/modules/doanh-thu/constants/doanhThu";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function NhapLieuDoanhThuPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -302,7 +304,7 @@ export default function NhapLieuDoanhThuPage() {
   const onSubmit = async (formData: SanLuongFormInputs) => {
     try {
       setIsLoading(true);
-       console.time("Submit");
+      console.time("Submit");
       // --- BƯỚC 1: LỌC VÀ ĐÓNG GÓI MẢNG CHI TIẾT SẢN LƯỢNG SẠCH THỦ CÔNG ---
       const mangChiTietSanLuong: ChiTietSanLuongDto[] = [];
 
@@ -531,7 +533,7 @@ export default function NhapLieuDoanhThuPage() {
           setIsDirty(false);
           // 2. Găm lại ID bản ghi để giữ trạng thái sửa (Edit mode)
           // Kiểm tra cả cấu hình lồng data hoặc object phẳng
-           console.timeEnd("Submit");
+          console.timeEnd("Submit");
           const recordId =
             dataPhanHoi._id || dataPhanHoi.data?._id || currentRecordId;
           if (recordId) {
@@ -627,713 +629,755 @@ export default function NhapLieuDoanhThuPage() {
       </div>
 
       {/* FORM NHẬP LIỆU CHÍNH */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        onChange={() => setIsDirty(true)}
-        className="space-y-6 w-full"
-      >
-        {/* BỘ ĐIỀU KHIỂN TRÊN ĐẦU: CHỌN NGÀY VÀ CHỌN BẾN PHÀ */}
-        <div className="w-full bg-slate-100 p-4 rounded-xl border border-slate-200 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 shadow-sm">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
-            {/* Bộ chọn Ngày */}
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">📅</span>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide">
-                  Ngày nhập liệu
-                </label>
-                <input
+
+      {/* BỘ ĐIỀU KHIỂN TRÊN ĐẦU: CHỌN NGÀY VÀ CHỌN BẾN PHÀ */}
+      <div className="w-full bg-slate-100 p-4 rounded-xl border border-slate-200 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
+          {/* Bộ chọn Ngày */}
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">📅</span>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide">
+                Ngày nhập liệu
+              </label>
+              {/* <input
                   type="date"
                   value={ngayApDung}
                   onChange={(e) => setNgayApDung(e.target.value)}
                   className="font-bold text-base text-blue-600 border border-blue-300 rounded-lg px-3 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner mt-0.5"
-                />
-              </div>
+                /> */}
+              <DatePicker
+                selected={dayjs(ngayApDung).toDate()}
+                onChange={(date: Date | null) => {
+                  if (date) {
+                    setNgayApDung(dayjs(date).format("YYYY-MM-DD"));
+                  }
+                }}
+                dateFormat="dd/MM/yyyy"
+                // onChangeRaw={(e) => {
+                //   e?.preventDefault();
+                // }}
+                minDate={dayjs("2025-01-01").toDate()}
+                maxDate={dayjs().endOf("year").toDate()}
+                className="font-bold text-base text-blue-600 border border-blue-300 rounded-lg px-3 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner mt-0.5"
+              />
             </div>
+          </div>
 
-            {/* Bộ chọn Bến Phà */}
-            <div className="flex items-center gap-3 border-t sm:border-t-0 sm:border-l border-slate-300 pt-3 sm:pt-0 sm:pl-4 w-full sm:w-auto">
-              <span className="text-2xl">🚢</span>
-              <div className="w-full sm:w-auto">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide">
-                  Bến phà
-                </label>
-                <select
-                  value={maBen}
-                  onChange={(e) => setMaBen(e.target.value)}
-                  className="font-bold text-base text-teal-700 border border-teal-300 rounded-lg px-3 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-inner mt-0.5 min-w-40"
-                >
-                  <option value="AH">Bến Phà An Hoà</option>
-                  <option value="OM">Bến Phà Ô Môi</option>
-                  <option value="TO">Bến Phà Trà Ôn</option>
-                  <option value="VC">Bến Phà Vàm Cống</option>
-                  <option value="MR">Bến Phà Mương Ranh</option>
-                  <option value="NG">Bến Phà Năng Gù</option>
-                  <option value="TG">Bến Phà Thuận Giang</option>
-                  <option value="TC">Bến Phà Tân Châu</option>
-                </select>
-              </div>
+          {/* Bộ chọn Bến Phà */}
+          <div className="flex items-center gap-3 border-t sm:border-t-0 sm:border-l border-slate-300 pt-3 sm:pt-0 sm:pl-4 w-full sm:w-auto">
+            <span className="text-2xl">🚢</span>
+            <div className="w-full sm:w-auto">
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide">
+                Bến phà
+              </label>
+              <select
+                value={maBen}
+                onChange={(e) => setMaBen(e.target.value)}
+                className="font-bold text-base text-teal-700 border border-teal-300 rounded-lg px-3 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-inner mt-0.5 min-w-40"
+              >
+                <option value="AH">Bến Phà An Hoà</option>
+                <option value="OM">Bến Phà Ô Môi</option>
+                <option value="TO">Bến Phà Trà Ôn</option>
+                <option value="VC">Bến Phà Vàm Cống</option>
+                <option value="MR">Bến Phà Mương Ranh</option>
+                <option value="NG">Bến Phà Năng Gù</option>
+                <option value="TG">Bến Phà Thuận Giang</option>
+                <option value="TC">Bến Phà Tân Châu</option>
+              </select>
             </div>
           </div>
         </div>
+      </div>
 
-        {isLoading ? (
-          <div className="text-center py-10 text-sm text-gray-500">
-            Đang tải danh mục vé...
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full">
-            {/* CỘT 1: NHÓM HÀNH KHÁCH */}
-            <NhomSanLuongCard
-              title="Nhóm Hành Khách"
-              icon="👥"
-              total={tinhTongDoanhThuNhom("HANH_KHACH")?.tongDoanhThu || 0}
-            >
-              <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachHanhKhach.map((ticket, index) => {
-                  const giaHienTai = getGiaVe(ticket, maBen);
-                  const giaMacDinh = getGiaVe(ticket, "AH");
-                  return (
-                    <div
-                      key={ticket.ma_loai_ve}
-                      title={`Mã vé: ${ticket.ma_loai_ve}`}
-                      className="group relative"
-                    >
-                      <InputSanLuong
-                        isFirst={index === 0}
-                        label={ticket.ten_loai_ve}
-                        price={String(giaHienTai)}
-                        isHighlightPrice={giaHienTai !== giaMacDinh}
-                        quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                        maBen={maBen}
-                        error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                        {...register(ticket.ma_loai_ve, {
-                          min: 0,
-                        })}
-                      />
-                    </div>
-                  );
-                })}
-                {danhSachHanhKhach.length === 0 && (
-                  <p className="text-xs text-gray-400 text-center py-4">
-                    Không có dữ liệu hành khách
-                  </p>
-                )}
-                <div
-                  key="vat_hanh_khach"
-                  title={`Thuế VAT Hành Khách`}
-                  className="group relative"
-                ></div>
-              </div>
+      {isLoading ? (
+        <div className="text-center py-10 text-sm text-gray-500">
+          Đang tải danh mục vé...
+        </div>
+      ) : (
+        <>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            onChange={() => setIsDirty(true)}
+            className="space-y-6 w-full"
+          >
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full">
+              {/* CỘT 1: NHÓM HÀNH KHÁCH */}
+              <NhomSanLuongCard
+                title="Nhóm Hành Khách"
+                icon="👥"
+                total={tinhTongDoanhThuNhom("HANH_KHACH")?.tongDoanhThu || 0}
+              >
+                <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
+                  {danhSachHanhKhach.map((ticket, index) => {
+                    const giaHienTai = getGiaVe(ticket, maBen);
+                    const giaMacDinh = getGiaVe(ticket, "AH");
+                    return (
+                      <div
+                        key={ticket.ma_loai_ve}
+                        title={`Mã vé: ${ticket.ma_loai_ve}`}
+                        className="group relative"
+                      >
+                        <InputSanLuong
+                          isFirst={index === 0}
+                          label={ticket.ten_loai_ve}
+                          price={String(giaHienTai)}
+                          isHighlightPrice={giaHienTai !== giaMacDinh}
+                          quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                          maBen={maBen}
+                          error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                          {...register(ticket.ma_loai_ve, {
+                            min: 0,
+                          })}
+                        />
+                      </div>
+                    );
+                  })}
+                  {danhSachHanhKhach.length === 0 && (
+                    <p className="text-xs text-gray-400 text-center py-4">
+                      Không có dữ liệu hành khách
+                    </p>
+                  )}
+                  <div
+                    key="vat_hanh_khach"
+                    title={`Thuế VAT Hành Khách`}
+                    className="group relative"
+                  ></div>
+                </div>
 
-              {/* CỘT 2: NHÓM XE CÁC LOẠI */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  {/* <h3 className="font-bold text-gray-700 flex items-center gap-2 border-b pb-2 uppercase text-sm tracking-wider">
+                {/* CỘT 2: NHÓM XE CÁC LOẠI */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    {/* <h3 className="font-bold text-gray-700 flex items-center gap-2 border-b pb-2 uppercase text-sm tracking-wider">
                     <span>🚛</span> Nhóm Xe Các Loại
                   </h3> */}
+                    <GroupHeader
+                      icon="🚛"
+                      title="Nhóm Xe Các Loại"
+                      total={
+                        tinhTongDoanhThuNhom("XE_CAC_LOAI")?.tongDoanhThu || 0
+                      }
+                    />
+                  </div>
+                  {Object.keys(nhomXeGomTheoPhanDoan).map((tenNhomCon) => (
+                    <div
+                      key={tenNhomCon}
+                      className="bg-slate-50/60 p-2 rounded-lg border border-slate-100/80"
+                    >
+                      <h4 className="text-xs font-bold text-indigo-950 uppercase tracking-wide mb-2 flex items-center gap-1">
+                        {tenNhomCon === "XE_KHACH"
+                          ? "🚌 Xe Khách"
+                          : "🚚 Xe Tải"}
+                      </h4>
+                      <div className="space-y-1 bg-white p-2 rounded border border-gray-100">
+                        {/* 🌟 THÊM ĐOẠN SORT NÀY VÀO TRƯỚC MAP */}
+                        {[...nhomXeGomTheoPhanDoan[tenNhomCon]]
+                          .sort((a, b) => {
+                            const bangThuTu: { [key: string]: number } = {
+                              XK_THO_SO: 1, // Xe thô sơ lên đầu tiên
+                              XK_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                              XK_TU_7C_DEN_12C: 3,
+                              XK_TU_12C_DEN_16C: 4,
+                              XK_TU_16C_DEN_30C: 5,
+                              XK_TU_30C_DEN_45C: 6, // Xe từ 30 đến 45 ghế xếp gần cuối
+                              XK_45C: 7, // Xe từ 45 ghế trở lên bắt buộc nằm đáy (dưới cùng)
+
+                              XT_DUOI_3T: 8,
+                              XT_TU_3T_DEN_5T: 9,
+                              XT_TU_5T_DEN_7T: 10,
+                              XT_TU_7T_DEN_10T: 11,
+                              XT_TU_10T_DEN_15T: 12,
+                              XT_TU_15T_DEN_20T: 13,
+                              XT_20T_TRO_LEN: 14,
+                            };
+
+                            // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                            const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                            const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                            // 3. Sắp xếp tăng dần theo trọng số điểm
+                            return uuTienA - uuTienB;
+                          })
+                          .map((ticket, index) => {
+                            const giaHienTai = getGiaVe(ticket, maBen);
+                            const giaMacDinh = getGiaVe(ticket, "AH");
+                            return (
+                              <div
+                                key={ticket.ma_loai_ve}
+                                title={`Mã vé: ${ticket.ten_loai_ve}`}
+                                className="group relative"
+                              >
+                                <InputSanLuong
+                                  isFirst={index === 0}
+                                  label={ticket.ten_loai_ve}
+                                  price={String(giaHienTai)}
+                                  isHighlightPrice={giaHienTai !== giaMacDinh}
+                                  quantity={String(
+                                    values[ticket.ma_loai_ve] ?? "0",
+                                  )}
+                                  maBen={maBen}
+                                  error={errors[ticket.ma_loai_ve]?.message}
+                                  {...register(ticket.ma_loai_ve, {
+                                    min: 0,
+                                  })}
+                                />
+                              </div>
+                            );
+                          })}
+                      </div>
+                      <GroupTotalTag
+                        nhom={tenNhomCon as NhomType}
+                        label={
+                          tenNhomCon === "XE_KHACH"
+                            ? "Doanh thu Nhóm Xe Khách"
+                            : "Doanh thu Nhóm Xe Tải"
+                        }
+                        tinhTongFn={tinhTongDoanhThuNhom}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </NhomSanLuongCard>
+
+              {/* CỘT 4: NHÓM THUE BAO */}
+              <NhomSanLuongCard
+                title="Nhóm Thuê Bao Phà"
+                icon="⛓️"
+                total={tinhTongDoanhThuNhom("THUE_BAO")?.tongDoanhThu || 0}
+              >
+                {/* Nhóm thuê bao */}
+                <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
+                  {danhSachThueBao
+                    .sort((a, b) => {
+                      const bangThuTu: { [key: string]: number } = {
+                        TB_PHA_30T: 1, // Xe thô sơ lên đầu tiên
+                        TB_PHA_60T: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        TB_PHA_100T: 3,
+                        TB_PHA_200T: 4,
+                      };
+
+                      // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                      const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                      const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                      // 3. Sắp xếp tăng dần theo trọng số điểm
+                      return uuTienA - uuTienB;
+                    })
+                    .map((ticket, index) => {
+                      const giaHienTai = getGiaVe(ticket, maBen);
+                      const giaMacDinh = getGiaVe(ticket, "AH");
+                      return (
+                        <div
+                          key={ticket.ma_loai_ve}
+                          title={`Mã vé: ${ticket.ten_loai_ve}`}
+                          className="group relative"
+                        >
+                          <InputSanLuong
+                            isFirst={index === 0}
+                            label={ticket.ten_loai_ve}
+                            price={String(giaHienTai)}
+                            isHighlightPrice={giaHienTai !== giaMacDinh}
+                            quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                            maBen={maBen}
+                            error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                            {...register(ticket.ma_loai_ve, {
+                              // 🌟 Đổi sang ma_loai_ve
+                              min: 0,
+                            })}
+                          />
+                        </div>
+                      );
+                    })}
+                  {danhSachThueBao.length === 0 && (
+                    <p className="text-xs text-gray-400 text-center py-4">
+                      Không có dữ liệu thuê bao
+                    </p>
+                  )}
+                </div>
+                {/* Nhóm vé tháng */}
+                <div className="flex justify-between items-center">
                   <GroupHeader
-                    icon="🚛"
-                    title="Nhóm Xe Các Loại"
-                    total={
-                      tinhTongDoanhThuNhom("XE_CAC_LOAI")?.tongDoanhThu || 0
-                    }
+                    icon="💳"
+                    title="Nhóm Vé Tháng"
+                    total={tinhTongDoanhThuNhom("VE_THANG")?.tongDoanhThu || 0}
                   />
                 </div>
-                {Object.keys(nhomXeGomTheoPhanDoan).map((tenNhomCon) => (
+                <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
+                  {danhSachVeThang
+                    .sort((a, b) => {
+                      const bangThuTu: { [key: string]: number } = {
+                        VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
+                        VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        VE_THANG_TU_7C_DEN_12C: 3,
+                      };
+
+                      // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                      const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                      const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                      // 3. Sắp xếp tăng dần theo trọng số điểm
+                      return uuTienA - uuTienB;
+                    })
+                    .map((ticket, index) => {
+                      const giaHienTai = getGiaVe(ticket, maBen);
+                      const giaMacDinh = getGiaVe(ticket, "AH");
+                      return (
+                        <div
+                          key={ticket.ma_loai_ve}
+                          title={`Mã vé: ${ticket.ten_loai_ve}`}
+                          className="group relative"
+                        >
+                          <InputSanLuong
+                            isFirst={index === 0}
+                            label={ticket.ten_loai_ve}
+                            price={String(giaHienTai)}
+                            isHighlightPrice={giaHienTai !== giaMacDinh}
+                            quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                            maBen={maBen}
+                            error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                            {...register(ticket.ma_loai_ve, {
+                              // 🌟 Đổi sang ma_loai_ve
+                              min: 0,
+                            })}
+                          />
+                        </div>
+                      );
+                    })}
+                  {danhSachVeThang.length === 0 && (
+                    <p className="text-xs text-gray-400 text-center py-4">
+                      Không có dữ liệu vé tháng
+                    </p>
+                  )}
+                </div>
+
+                {/* CỘT 5: NHÓM VÉ QUÝ */}
+
+                <div className="flex justify-between items-center">
+                  <GroupHeader
+                    icon="📆"
+                    title="Nhóm Vé Quý"
+                    total={tinhTongDoanhThuNhom("VE_QUI")?.tongDoanhThu || 0}
+                  />
+                </div>
+                <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
+                  {danhSachVeQui
+                    .sort((a, b) => {
+                      const bangThuTu: { [key: string]: number } = {
+                        VE_QUI_HK: 1, // Xe thô sơ lên đầu tiên
+                        VE_QUI_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        VE_QUI_TU_7C_DEN_12C: 3,
+                      };
+
+                      // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                      const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                      const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                      // 3. Sắp xếp tăng dần theo trọng số điểm
+                      return uuTienA - uuTienB;
+                    })
+                    .map((ticket, index) => {
+                      const giaHienTai = getGiaVe(ticket, maBen);
+                      const giaMacDinh = getGiaVe(ticket, "AH");
+                      return (
+                        <div
+                          key={ticket.ma_loai_ve}
+                          title={`Mã vé: ${ticket.ten_loai_ve}`}
+                          className="group relative"
+                        >
+                          <InputSanLuong
+                            isFirst={index === 0}
+                            label={ticket.ten_loai_ve}
+                            price={String(giaHienTai)}
+                            isHighlightPrice={giaHienTai !== giaMacDinh}
+                            quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                            maBen={maBen}
+                            error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                            {...register(ticket.ma_loai_ve, {
+                              // 🌟 Đổi sang ma_loai_ve
+                              min: 0,
+                            })}
+                          />
+                        </div>
+                      );
+                    })}
+                  {danhSachVeQui.length === 0 && (
+                    <p className="text-xs text-gray-400 text-center py-4">
+                      Không có dữ liệu vé quý
+                    </p>
+                  )}
+                </div>
+
+                {/* CỘT 6: NHÓM VÉ NĂM */}
+
+                <div className="flex justify-between items-center">
+                  <GroupHeader
+                    icon="🎫"
+                    title="Nhóm Vé Năm"
+                    total={tinhTongDoanhThuNhom("VE_NAM")?.tongDoanhThu || 0}
+                  />
+                </div>
+                <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
+                  {danhSachVeNam
+                    .sort((a, b) => {
+                      const bangThuTu: { [key: string]: number } = {
+                        VE_NAM_HK: 1, // Xe thô sơ lên đầu tiên
+                        VE_NAM_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        VE_NAM_TU_7C_DEN_12C: 3,
+                      };
+
+                      // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
+                      const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                      const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                      // 3. Sắp xếp tăng dần theo trọng số điểm
+                      return uuTienA - uuTienB;
+                    })
+                    .map((ticket, index) => {
+                      const giaHienTai = getGiaVe(ticket, maBen);
+                      const giaMacDinh = getGiaVe(ticket, "AH");
+                      return (
+                        <div
+                          key={ticket.ma_loai_ve}
+                          title={`Mã vé: ${ticket.ten_loai_ve}`}
+                          className="group relative"
+                        >
+                          <InputSanLuong
+                            isFirst={index === 0}
+                            label={ticket.ten_loai_ve}
+                            price={String(giaHienTai)}
+                            isHighlightPrice={giaHienTai !== giaMacDinh}
+                            quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
+                            maBen={maBen}
+                            error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
+                            {...register(ticket.ma_loai_ve, {
+                              // 🌟 Đổi sang ma_loai_ve
+                              min: 0,
+                            })}
+                          />
+                        </div>
+                      );
+                    })}
+                  {danhSachVeNam.length === 0 && (
+                    <p className="text-xs text-gray-400 text-center py-4">
+                      Không có dữ liệu vé năm
+                    </p>
+                  )}
+                </div>
+
+                {/* 📝 KHỐI NHẬP LIỆU DOANH THU */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* 📝 KHỐI NHẬP LIỆU DOANH THU HĐ TÀI CHÍNH */}
+                  <div>
+                    <div className="flex justify-between items-center">
+                      <GroupHeader
+                        icon="📈"
+                        title="Doanh thu hoạt động tài chính"
+                      />
+                    </div>
+                    <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
+                      <div
+                        title="Doanh thu hoạt động tài chính"
+                        className="group relative max-w-80"
+                      >
+                        <input
+                          type="text"
+                          placeholder="0"
+                          className="w-full input-primary text-right"
+                          value={
+                            values["doanh_thu_hd_tai_chinh"]
+                              ? formatNumberString(
+                                  String(values["doanh_thu_hd_tai_chinh"]),
+                                )
+                              : ""
+                          }
+                          onChange={(e) => {
+                            const rawNum = e.target.value.replace(/\D/g, "");
+                            const numValue = rawNum ? Number(rawNum) : 0;
+                            setValue("doanh_thu_hd_tai_chinh", numValue, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {/* 📝 KHỐI NHẬP LIỆU DOANH THU KHÁC */}
+                  <div>
+                    <div className="flex justify-between items-center">
+                      <GroupHeader icon="💰" title="Doanh thu khác" />
+                    </div>
+                    <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
+                      <div
+                        title="Doanh thu khác"
+                        className="group relative max-w-80"
+                      >
+                        <input
+                          type="text"
+                          placeholder="0"
+                          className="w-full input-primary text-right"
+                          value={
+                            values["doanh_thu_khac"]
+                              ? formatNumberString(
+                                  String(values["doanh_thu_khac"]),
+                                )
+                              : ""
+                          }
+                          onChange={(e) => {
+                            const rawNum = e.target.value.replace(/\D/g, "");
+                            const numValue = rawNum ? Number(rawNum) : 0;
+                            setValue("doanh_thu_khac", numValue, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </NhomSanLuongCard>
+            </div>
+            {/* 🧾 CARD LỚN: CẤU HÌNH THUẾ VAT & BẢO HIỂM HÀNH KHÁCH */}
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* ---------------- CỘT TRÁI: KHU VỰC THUẾ VAT ---------------- */}
+              <div className="space-y-4 border-r border-gray-100 pr-0 lg:pr-6">
+                <div className="flex justify-between items-center">
+                  <GroupHeader
+                    icon="💰"
+                    title="Cấu hình & Thành tiền Thuế VAT"
+                  />
+                </div>
+
+                {/* ================= NHÓM 1: VAT THEO VÉ LƯỢT ================= */}
+                <div className="bg-slate-50/60 p-3 rounded-xl border border-gray-200/50 space-y-2">
                   <div
-                    key={tenNhomCon}
-                    className="bg-slate-50/60 p-2 rounded-lg border border-slate-100/80"
+                    onClick={() => setIsCollapseVeLuot(!isCollapseVeLuot)}
+                    className="flex items-center justify-between pb-1 border-b border-gray-200/60 cursor-pointer hover:opacity-80 select-none transition-opacity"
                   >
-                    <h4 className="text-xs font-bold text-indigo-950 uppercase tracking-wide mb-2 flex items-center gap-1">
-                      {tenNhomCon === "XE_KHACH" ? "🚌 Xe Khách" : "🚚 Xe Tải"}
-                    </h4>
-                    <div className="space-y-1 bg-white p-2 rounded border border-gray-100">
-                      {/* 🌟 THÊM ĐOẠN SORT NÀY VÀO TRƯỚC MAP */}
-                      {[...nhomXeGomTheoPhanDoan[tenNhomCon]]
-                        .sort((a, b) => {
-                          const bangThuTu: { [key: string]: number } = {
-                            XK_THO_SO: 1, // Xe thô sơ lên đầu tiên
-                            XK_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
-                            XK_TU_7C_DEN_12C: 3,
-                            XK_TU_12C_DEN_16C: 4,
-                            XK_TU_16C_DEN_30C: 5,
-                            XK_TU_30C_DEN_45C: 6, // Xe từ 30 đến 45 ghế xếp gần cuối
-                            XK_45C: 7, // Xe từ 45 ghế trở lên bắt buộc nằm đáy (dưới cùng)
-
-                            XT_DUOI_3T: 8,
-                            XT_TU_3T_DEN_5T: 9,
-                            XT_TU_5T_DEN_7T: 10,
-                            XT_TU_7T_DEN_10T: 11,
-                            XT_TU_10T_DEN_15T: 12,
-                            XT_TU_15T_DEN_20T: 13,
-                            XT_20T_TRO_LEN: 14,
-                          };
-
-                          // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
-                          const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
-                          const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
-
-                          // 3. Sắp xếp tăng dần theo trọng số điểm
-                          return uuTienA - uuTienB;
-                        })
-                        .map((ticket, index) => {
-                          const giaHienTai = getGiaVe(ticket, maBen);
-                          const giaMacDinh = getGiaVe(ticket, "AH");
-                          return (
-                            <div
-                              key={ticket.ma_loai_ve}
-                              title={`Mã vé: ${ticket.ten_loai_ve}`}
-                              className="group relative"
-                            >
-                              <InputSanLuong
-                                isFirst={index === 0}
-                                label={ticket.ten_loai_ve}
-                                price={String(giaHienTai)}
-                                isHighlightPrice={giaHienTai !== giaMacDinh}
-                                quantity={String(
-                                  values[ticket.ma_loai_ve] ?? "0",
-                                )}
-                                maBen={maBen}
-                                error={errors[ticket.ma_loai_ve]?.message}
-                                {...register(ticket.ma_loai_ve, {
-                                  min: 0,
-                                })}
-                              />
-                            </div>
-                          );
-                        })}
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`text-[10px] text-slate-400 transition-transform duration-200 block ${isCollapseVeLuot ? "" : "rotate-90"}`}
+                      >
+                        ▶
+                      </span>
+                      <span className="text-xs">🎟️</span>
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        VAT theo vé lượt
+                      </h4>
                     </div>
-                    <GroupTotalTag
-                      nhom={tenNhomCon as NhomType}
-                      label={
-                        tenNhomCon === "XE_KHACH"
-                          ? "Doanh thu Nhóm Xe Khách"
-                          : "Doanh thu Nhóm Xe Tải"
+                    <div className="text-sm font-extrabold text-amber-600 font-mono pr-1 bg-amber-50/60 px-2 py-0.5 rounded border border-amber-100 shadow-sm">
+                      Tổng VAT:{" "}
+                      {formatMoney(
+                        String(
+                          (tinhTongDoanhThuNhom("HANH_KHACH")?.vatThanhTien ||
+                            0) +
+                            (tinhTongDoanhThuNhom("XE_CAC_LOAI")
+                              ?.vatThanhTien || 0) +
+                            (tinhTongDoanhThuNhom("THUE_BAO")?.vatThanhTien ||
+                              0),
+                        ),
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    className={`space-y-1 bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden transition-all duration-200 ${
+                      isCollapseVeLuot
+                        ? "max-h-0 p-0 border-0 shadow-none"
+                        : "max-h-125 p-2"
+                    }`}
+                  >
+                    <VatSelectComponent
+                      label="Thuế VAT nhóm Hành Khách"
+                      value={Number(values?.thue_vat_hanh_khach) || 8}
+                      {...register("thue_vat_hanh_khach", {
+                        valueAsNumber: true,
+                      })}
+                      vatThanhTien={
+                        tinhTongDoanhThuNhom("HANH_KHACH")?.vatThanhTien || 0
                       }
-                      tinhTongFn={tinhTongDoanhThuNhom}
+                    />
+                    <VatSelectComponent
+                      label="Thuế VAT nhóm Xe Các Loại"
+                      value={Number(values?.thue_vat_xe_cac_loai) || 8}
+                      {...register("thue_vat_xe_cac_loai", {
+                        valueAsNumber: true,
+                      })}
+                      vatThanhTien={
+                        tinhTongDoanhThuNhom("XE_CAC_LOAI")?.vatThanhTien || 0
+                      }
+                    />
+                    <VatSelectComponent
+                      label="Thuế VAT nhóm Thuê Bao"
+                      value={Number(values?.thue_vat_thue_bao) || 8}
+                      {...register("thue_vat_thue_bao", {
+                        valueAsNumber: true,
+                      })}
+                      vatThanhTien={
+                        tinhTongDoanhThuNhom("THUE_BAO")?.vatThanhTien || 0
+                      }
                     />
                   </div>
-                ))}
-              </div>
-            </NhomSanLuongCard>
+                </div>
 
-            {/* CỘT 4: NHÓM THUE BAO */}
-            <NhomSanLuongCard
-              title="Nhóm Thuê Bao Phà"
-              icon="⛓️"
-              total={tinhTongDoanhThuNhom("THUE_BAO")?.tongDoanhThu || 0}
-            >
-              {/* Nhóm thuê bao */}
-              <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachThueBao
-                  .sort((a, b) => {
-                    const bangThuTu: { [key: string]: number } = {
-                      TB_PHA_30T: 1, // Xe thô sơ lên đầu tiên
-                      TB_PHA_60T: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
-                      TB_PHA_100T: 3,
-                      TB_PHA_200T: 4,
-                    };
+                {/* ================= NHÓM 2: VAT THEO VÉ ĐỊNH KỲ ================= */}
+                <div className="bg-slate-50/60 p-3 rounded-xl border border-gray-200/50 space-y-2">
+                  <div className="flex items-center justify-between pb-1 border-b border-gray-200/60">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs">📅</span>
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        VAT theo vé định kỳ
+                      </h4>
+                    </div>
+                    <div className="text-sm font-extrabold text-amber-600 font-mono pr-1 bg-amber-50/60 px-2 py-0.5 rounded border border-amber-100 shadow-sm">
+                      Tổng VAT:{" "}
+                      {formatMoney(
+                        String(
+                          (tinhTongDoanhThuNhom("VE_THANG")?.vatThanhTien ||
+                            0) +
+                            (tinhTongDoanhThuNhom("VE_QUI")?.vatThanhTien ||
+                              0) +
+                            (tinhTongDoanhThuNhom("VE_NAM")?.vatThanhTien || 0),
+                        ),
+                      )}
+                    </div>
+                  </div>
 
-                    // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
-                    const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
-                    const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
-
-                    // 3. Sắp xếp tăng dần theo trọng số điểm
-                    return uuTienA - uuTienB;
-                  })
-                  .map((ticket, index) => {
-                    const giaHienTai = getGiaVe(ticket, maBen);
-                    const giaMacDinh = getGiaVe(ticket, "AH");
-                    return (
-                      <div
-                        key={ticket.ma_loai_ve}
-                        title={`Mã vé: ${ticket.ten_loai_ve}`}
-                        className="group relative"
-                      >
-                        <InputSanLuong
-                          isFirst={index === 0}
-                          label={ticket.ten_loai_ve}
-                          price={String(giaHienTai)}
-                          isHighlightPrice={giaHienTai !== giaMacDinh}
-                          quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                          maBen={maBen}
-                          error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                          {...register(ticket.ma_loai_ve, {
-                            // 🌟 Đổi sang ma_loai_ve
-                            min: 0,
-                          })}
-                        />
-                      </div>
-                    );
-                  })}
-                {danhSachThueBao.length === 0 && (
-                  <p className="text-xs text-gray-400 text-center py-4">
-                    Không có dữ liệu thuê bao
-                  </p>
-                )}
-              </div>
-              {/* Nhóm vé tháng */}
-              <div className="flex justify-between items-center">
-                <GroupHeader
-                  icon="💳"
-                  title="Nhóm Vé Tháng"
-                  total={tinhTongDoanhThuNhom("VE_THANG")?.tongDoanhThu || 0}
-                />
-              </div>
-              <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachVeThang
-                  .sort((a, b) => {
-                    const bangThuTu: { [key: string]: number } = {
-                      VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
-                      VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
-                      VE_THANG_TU_7C_DEN_12C: 3,
-                    };
-
-                    // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
-                    const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
-                    const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
-
-                    // 3. Sắp xếp tăng dần theo trọng số điểm
-                    return uuTienA - uuTienB;
-                  })
-                  .map((ticket, index) => {
-                    const giaHienTai = getGiaVe(ticket, maBen);
-                    const giaMacDinh = getGiaVe(ticket, "AH");
-                    return (
-                      <div
-                        key={ticket.ma_loai_ve}
-                        title={`Mã vé: ${ticket.ten_loai_ve}`}
-                        className="group relative"
-                      >
-                        <InputSanLuong
-                          isFirst={index === 0}
-                          label={ticket.ten_loai_ve}
-                          price={String(giaHienTai)}
-                          isHighlightPrice={giaHienTai !== giaMacDinh}
-                          quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                          maBen={maBen}
-                          error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                          {...register(ticket.ma_loai_ve, {
-                            // 🌟 Đổi sang ma_loai_ve
-                            min: 0,
-                          })}
-                        />
-                      </div>
-                    );
-                  })}
-                {danhSachVeThang.length === 0 && (
-                  <p className="text-xs text-gray-400 text-center py-4">
-                    Không có dữ liệu vé tháng
-                  </p>
-                )}
-              </div>
-
-              {/* CỘT 5: NHÓM VÉ QUÝ */}
-
-              <div className="flex justify-between items-center">
-                <GroupHeader
-                  icon="📆"
-                  title="Nhóm Vé Quý"
-                  total={tinhTongDoanhThuNhom("VE_QUI")?.tongDoanhThu || 0}
-                />
-              </div>
-              <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachVeQui
-                  .sort((a, b) => {
-                    const bangThuTu: { [key: string]: number } = {
-                      VE_QUI_HK: 1, // Xe thô sơ lên đầu tiên
-                      VE_QUI_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
-                      VE_QUI_TU_7C_DEN_12C: 3,
-                    };
-
-                    // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
-                    const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
-                    const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
-
-                    // 3. Sắp xếp tăng dần theo trọng số điểm
-                    return uuTienA - uuTienB;
-                  })
-                  .map((ticket, index) => {
-                    const giaHienTai = getGiaVe(ticket, maBen);
-                    const giaMacDinh = getGiaVe(ticket, "AH");
-                    return (
-                      <div
-                        key={ticket.ma_loai_ve}
-                        title={`Mã vé: ${ticket.ten_loai_ve}`}
-                        className="group relative"
-                      >
-                        <InputSanLuong
-                          isFirst={index === 0}
-                          label={ticket.ten_loai_ve}
-                          price={String(giaHienTai)}
-                          isHighlightPrice={giaHienTai !== giaMacDinh}
-                          quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                          maBen={maBen}
-                          error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                          {...register(ticket.ma_loai_ve, {
-                            // 🌟 Đổi sang ma_loai_ve
-                            min: 0,
-                          })}
-                        />
-                      </div>
-                    );
-                  })}
-                {danhSachVeQui.length === 0 && (
-                  <p className="text-xs text-gray-400 text-center py-4">
-                    Không có dữ liệu vé quý
-                  </p>
-                )}
-              </div>
-
-              {/* CỘT 6: NHÓM VÉ NĂM */}
-
-              <div className="flex justify-between items-center">
-                <GroupHeader
-                  icon="🎫"
-                  title="Nhóm Vé Năm"
-                  total={tinhTongDoanhThuNhom("VE_NAM")?.tongDoanhThu || 0}
-                />
-              </div>
-              <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                {danhSachVeNam
-                  .sort((a, b) => {
-                    const bangThuTu: { [key: string]: number } = {
-                      VE_NAM_HK: 1, // Xe thô sơ lên đầu tiên
-                      VE_NAM_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
-                      VE_NAM_TU_7C_DEN_12C: 3,
-                    };
-
-                    // 2. Lấy trọng số dựa vào ma_loai_ve. Nếu mã lạ chưa cấu hình, mặc định cho điểm là 99 (nằm cuối)
-                    const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
-                    const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
-
-                    // 3. Sắp xếp tăng dần theo trọng số điểm
-                    return uuTienA - uuTienB;
-                  })
-                  .map((ticket, index) => {
-                    const giaHienTai = getGiaVe(ticket, maBen);
-                    const giaMacDinh = getGiaVe(ticket, "AH");
-                    return (
-                      <div
-                        key={ticket.ma_loai_ve}
-                        title={`Mã vé: ${ticket.ten_loai_ve}`}
-                        className="group relative"
-                      >
-                        <InputSanLuong
-                          isFirst={index === 0}
-                          label={ticket.ten_loai_ve}
-                          price={String(giaHienTai)}
-                          isHighlightPrice={giaHienTai !== giaMacDinh}
-                          quantity={String(values[ticket.ma_loai_ve] ?? "0")} // 🌟 Đổi sang ma_loai_ve
-                          maBen={maBen}
-                          error={errors[ticket.ma_loai_ve]?.message} // 🌟 Đổi sang ma_loai_ve
-                          {...register(ticket.ma_loai_ve, {
-                            // 🌟 Đổi sang ma_loai_ve
-                            min: 0,
-                          })}
-                        />
-                      </div>
-                    );
-                  })}
-                {danhSachVeNam.length === 0 && (
-                  <p className="text-xs text-gray-400 text-center py-4">
-                    Không có dữ liệu vé năm
-                  </p>
-                )}
-              </div>
-
-              {/* 📝 KHỐI NHẬP LIỆU DOANH THU */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* 📝 KHỐI NHẬP LIỆU DOANH THU HĐ TÀI CHÍNH */}
-                <div>
-                  <div className="flex justify-between items-center">
-                    <GroupHeader
-                      icon="📈"
-                      title="Doanh thu hoạt động tài chính"
+                  <div className="space-y-1 bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
+                    <VatSelectComponent
+                      label="Thuế VAT nhóm Vé Tháng"
+                      value={Number(values?.thue_vat_ve_thang) || 8}
+                      {...register("thue_vat_ve_thang", {
+                        valueAsNumber: true,
+                      })}
+                      vatThanhTien={
+                        tinhTongDoanhThuNhom("VE_THANG")?.vatThanhTien || 0
+                      }
+                    />
+                    <VatSelectComponent
+                      label="Thuế VAT nhóm Vé Quí"
+                      value={Number(values?.thue_vat_ve_qui) || 8}
+                      {...register("thue_vat_ve_qui", { valueAsNumber: true })}
+                      vatThanhTien={
+                        tinhTongDoanhThuNhom("VE_QUI")?.vatThanhTien || 0
+                      }
+                    />
+                    <VatSelectComponent
+                      label="Thuế VAT nhóm Vé Năm"
+                      value={Number(values?.thue_vat_ve_nam) || 8}
+                      {...register("thue_vat_ve_nam", { valueAsNumber: true })}
+                      vatThanhTien={
+                        tinhTongDoanhThuNhom("VE_NAM")?.vatThanhTien || 0
+                      }
                     />
                   </div>
-                  <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                    <div
-                      title="Doanh thu hoạt động tài chính"
-                      className="group relative max-w-80"
-                    >
-                      <input
-                        type="text"
-                        placeholder="0"
-                        className="w-full input-primary text-right"
-                        value={
-                          values["doanh_thu_hd_tai_chinh"]
-                            ? formatNumberString(
-                                String(values["doanh_thu_hd_tai_chinh"]),
-                              )
-                            : ""
-                        }
-                        onChange={(e) => {
-                          const rawNum = e.target.value.replace(/\D/g, "");
-                          const numValue = rawNum ? Number(rawNum) : 0;
-                          setValue("doanh_thu_hd_tai_chinh", numValue, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                          });
-                        }}
-                      />
-                    </div>
-                  </div>
                 </div>
-                {/* 📝 KHỐI NHẬP LIỆU DOANH THU KHÁC */}
-                <div>
-                  <div className="flex justify-between items-center">
-                    <GroupHeader icon="💰" title="Doanh thu khác" />
-                  </div>
-                  <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                    <div
-                      title="Doanh thu khác"
-                      className="group relative max-w-80"
-                    >
-                      <input
-                        type="text"
-                        placeholder="0"
-                        className="w-full input-primary text-right"
-                        value={
-                          values["doanh_thu_khac"]
-                            ? formatNumberString(
-                                String(values["doanh_thu_khac"]),
-                              )
-                            : ""
-                        }
-                        onChange={(e) => {
-                          const rawNum = e.target.value.replace(/\D/g, "");
-                          const numValue = rawNum ? Number(rawNum) : 0;
-                          setValue("doanh_thu_khac", numValue, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                          });
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </NhomSanLuongCard>
-          </div>
-        )}
-
-        {/* 🧾 CARD LỚN: CẤU HÌNH THUẾ VAT & BẢO HIỂM HÀNH KHÁCH */}
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* ---------------- CỘT TRÁI: KHU VỰC THUẾ VAT ---------------- */}
-          <div className="space-y-4 border-r border-gray-100 pr-0 lg:pr-6">
-            <div className="flex justify-between items-center">
-              <GroupHeader icon="💰" title="Cấu hình & Thành tiền Thuế VAT" />
-            </div>
-
-            {/* ================= NHÓM 1: VAT THEO VÉ LƯỢT ================= */}
-            <div className="bg-slate-50/60 p-3 rounded-xl border border-gray-200/50 space-y-2">
-              <div
-                onClick={() => setIsCollapseVeLuot(!isCollapseVeLuot)}
-                className="flex items-center justify-between pb-1 border-b border-gray-200/60 cursor-pointer hover:opacity-80 select-none transition-opacity"
-              >
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className={`text-[10px] text-slate-400 transition-transform duration-200 block ${isCollapseVeLuot ? "" : "rotate-90"}`}
-                  >
-                    ▶
+                {/* Tổng cộng toàn bộ tiền BHHK phiên làm việc */}
+                <div className="bg-blue-50/60 border border-blue-100 p-3 rounded-lg flex justify-between items-center mt-4 shadow-sm">
+                  <span className="text-xs font-bold uppercase  text-amber-600 tracking-wider flex items-center gap-1">
+                    <span>💰</span> Tổng cộng tiền VAT phiên:
                   </span>
-                  <span className="text-xs">🎟️</span>
-                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                    VAT theo vé lượt
-                  </h4>
-                </div>
-                <div className="text-sm font-extrabold text-amber-600 font-mono pr-1 bg-amber-50/60 px-2 py-0.5 rounded border border-amber-100 shadow-sm">
-                  Tổng VAT:{" "}
-                  {formatMoney(
-                    String(
-                      (tinhTongDoanhThuNhom("HANH_KHACH")?.vatThanhTien || 0) +
-                        (tinhTongDoanhThuNhom("XE_CAC_LOAI")?.vatThanhTien ||
-                          0) +
-                        (tinhTongDoanhThuNhom("THUE_BAO")?.vatThanhTien || 0),
-                    ),
-                  )}
-                </div>
-              </div>
-
-              <div
-                className={`space-y-1 bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden transition-all duration-200 ${
-                  isCollapseVeLuot
-                    ? "max-h-0 p-0 border-0 shadow-none"
-                    : "max-h-125 p-2"
-                }`}
-              >
-                <VatSelectComponent
-                  label="Thuế VAT nhóm Hành Khách"
-                  value={Number(values?.thue_vat_hanh_khach) || 8}
-                  {...register("thue_vat_hanh_khach", { valueAsNumber: true })}
-                  vatThanhTien={
-                    tinhTongDoanhThuNhom("HANH_KHACH")?.vatThanhTien || 0
-                  }
-                />
-                <VatSelectComponent
-                  label="Thuế VAT nhóm Xe Các Loại"
-                  value={Number(values?.thue_vat_xe_cac_loai) || 8}
-                  {...register("thue_vat_xe_cac_loai", { valueAsNumber: true })}
-                  vatThanhTien={
-                    tinhTongDoanhThuNhom("XE_CAC_LOAI")?.vatThanhTien || 0
-                  }
-                />
-                <VatSelectComponent
-                  label="Thuế VAT nhóm Thuê Bao"
-                  value={Number(values?.thue_vat_thue_bao) || 8}
-                  {...register("thue_vat_thue_bao", { valueAsNumber: true })}
-                  vatThanhTien={
-                    tinhTongDoanhThuNhom("THUE_BAO")?.vatThanhTien || 0
-                  }
-                />
-              </div>
-            </div>
-
-            {/* ================= NHÓM 2: VAT THEO VÉ ĐỊNH KỲ ================= */}
-            <div className="bg-slate-50/60 p-3 rounded-xl border border-gray-200/50 space-y-2">
-              <div className="flex items-center justify-between pb-1 border-b border-gray-200/60">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs">📅</span>
-                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                    VAT theo vé định kỳ
-                  </h4>
-                </div>
-                <div className="text-sm font-extrabold text-amber-600 font-mono pr-1 bg-amber-50/60 px-2 py-0.5 rounded border border-amber-100 shadow-sm">
-                  Tổng VAT:{" "}
-                  {formatMoney(
-                    String(
-                      (tinhTongDoanhThuNhom("VE_THANG")?.vatThanhTien || 0) +
-                        (tinhTongDoanhThuNhom("VE_QUI")?.vatThanhTien || 0) +
-                        (tinhTongDoanhThuNhom("VE_NAM")?.vatThanhTien || 0),
-                    ),
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-1 bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
-                <VatSelectComponent
-                  label="Thuế VAT nhóm Vé Tháng"
-                  value={Number(values?.thue_vat_ve_thang) || 8}
-                  {...register("thue_vat_ve_thang", { valueAsNumber: true })}
-                  vatThanhTien={
-                    tinhTongDoanhThuNhom("VE_THANG")?.vatThanhTien || 0
-                  }
-                />
-                <VatSelectComponent
-                  label="Thuế VAT nhóm Vé Quí"
-                  value={Number(values?.thue_vat_ve_qui) || 8}
-                  {...register("thue_vat_ve_qui", { valueAsNumber: true })}
-                  vatThanhTien={
-                    tinhTongDoanhThuNhom("VE_QUI")?.vatThanhTien || 0
-                  }
-                />
-                <VatSelectComponent
-                  label="Thuế VAT nhóm Vé Năm"
-                  value={Number(values?.thue_vat_ve_nam) || 8}
-                  {...register("thue_vat_ve_nam", { valueAsNumber: true })}
-                  vatThanhTien={
-                    tinhTongDoanhThuNhom("VE_NAM")?.vatThanhTien || 0
-                  }
-                />
-              </div>
-            </div>
-            {/* Tổng cộng toàn bộ tiền BHHK phiên làm việc */}
-            <div className="bg-blue-50/60 border border-blue-100 p-3 rounded-lg flex justify-between items-center mt-4 shadow-sm">
-              <span className="text-xs font-bold uppercase  text-amber-600 tracking-wider flex items-center gap-1">
-                <span>💰</span> Tổng cộng tiền VAT phiên:
-              </span>
-              <span className="text-base font-black  text-amber-600 font-mono bg-white px-3 py-1 rounded-md border border-blue-200 shadow-sm">
-                {formatMoney(
-                  String(
-                    (tinhTongDoanhThuNhom("HANH_KHACH")?.vatThanhTien || 0) +
-                      (tinhTongDoanhThuNhom("XE_CAC_LOAI")?.vatThanhTien || 0) +
-                      (tinhTongDoanhThuNhom("THUE_BAO")?.vatThanhTien || 0) +
-                      (tinhTongDoanhThuNhom("VE_THANG")?.vatThanhTien || 0) +
-                      (tinhTongDoanhThuNhom("VE_QUI")?.vatThanhTien || 0) +
-                      (tinhTongDoanhThuNhom("VE_NAM")?.vatThanhTien || 0),
-                  ),
-                )}{" "}
-              </span>
-            </div>
-          </div>
-
-          {/* ---------------- CỘT PHẢI: KHU VỰC BẢO HIỂM HÀNH KHÁCH (BHHK) ---------------- */}
-          <div className="space-y-4 flex flex-col justify-between">
-            <div className="flex justify-between items-center">
-              <GroupHeader icon="🛡️" title="Bảo hiểm hành khách (BHHK)" />
-            </div>
-
-            <div className="bg-slate-50/60 p-3 rounded-xl border border-gray-200/50 flex-1 flex flex-col justify-between min-h-77.5">
-              {/* Danh sách các nhóm BHHK theo Vé lượt */}
-              <div className="space-y-1 bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
-                {/* 1. Nhóm Hành Khách */}
-                <div className="flex justify-between items-center px-3 py-2.5 border-b border-gray-100 hover:bg-slate-50/50 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs">🔹</span>
-                    <span className="text-sm text-gray-600 font-medium">
-                      BHHK nhóm Hành Khách
-                    </span>
-                  </div>
-                  <span className="font-mono font-bold text-sm text-blue-600 bg-blue-50/40 px-2 py-0.5 rounded border border-blue-100/50">
-                    {formatMoney(
-                      String(tinhTongDoanhThuNhom("HANH_KHACH")?.tongBHHK || 0),
-                    )}
-                  </span>
-                </div>
-
-                {/* 2. Nhóm Xe Các Loại */}
-                <div className="flex justify-between items-center px-3 py-2.5 border-b border-gray-100 hover:bg-slate-50/50 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs">🔹</span>
-                    <span className="text-sm text-gray-600 font-medium">
-                      BHHK nhóm Xe Các Loại
-                    </span>
-                  </div>
-                  <span className="font-mono font-bold text-sm text-blue-600 bg-blue-50/40 px-2 py-0.5 rounded border border-blue-100/50">
+                  <span className="text-base font-black  text-amber-600 font-mono bg-white px-3 py-1 rounded-md border border-blue-200 shadow-sm">
                     {formatMoney(
                       String(
-                        tinhTongDoanhThuNhom("XE_CAC_LOAI")?.tongBHHK || 0,
+                        (tinhTongDoanhThuNhom("HANH_KHACH")?.vatThanhTien ||
+                          0) +
+                          (tinhTongDoanhThuNhom("XE_CAC_LOAI")?.vatThanhTien ||
+                            0) +
+                          (tinhTongDoanhThuNhom("THUE_BAO")?.vatThanhTien ||
+                            0) +
+                          (tinhTongDoanhThuNhom("VE_THANG")?.vatThanhTien ||
+                            0) +
+                          (tinhTongDoanhThuNhom("VE_QUI")?.vatThanhTien || 0) +
+                          (tinhTongDoanhThuNhom("VE_NAM")?.vatThanhTien || 0),
                       ),
-                    )}
+                    )}{" "}
                   </span>
                 </div>
+              </div>
 
-                {/* 3. Nhóm Thuê Bao */}
-                <div className="flex justify-between items-center px-3 py-2.5 hover:bg-slate-50/50 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs">🔹</span>
-                    <span className="text-sm text-gray-600 font-medium">
-                      BHHK nhóm Thuê Bao
-                    </span>
+              {/* ---------------- CỘT PHẢI: KHU VỰC BẢO HIỂM HÀNH KHÁCH (BHHK) ---------------- */}
+              <div className="space-y-4 flex flex-col justify-between">
+                <div className="flex justify-between items-center">
+                  <GroupHeader icon="🛡️" title="Bảo hiểm hành khách (BHHK)" />
+                </div>
+
+                <div className="bg-slate-50/60 p-3 rounded-xl border border-gray-200/50 flex-1 flex flex-col justify-between min-h-77.5">
+                  {/* Danh sách các nhóm BHHK theo Vé lượt */}
+                  <div className="space-y-1 bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
+                    {/* 1. Nhóm Hành Khách */}
+                    <div className="flex justify-between items-center px-3 py-2.5 border-b border-gray-100 hover:bg-slate-50/50 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">🔹</span>
+                        <span className="text-sm text-gray-600 font-medium">
+                          BHHK nhóm Hành Khách
+                        </span>
+                      </div>
+                      <span className="font-mono font-bold text-sm text-blue-600 bg-blue-50/40 px-2 py-0.5 rounded border border-blue-100/50">
+                        {formatMoney(
+                          String(
+                            tinhTongDoanhThuNhom("HANH_KHACH")?.tongBHHK || 0,
+                          ),
+                        )}
+                      </span>
+                    </div>
+
+                    {/* 2. Nhóm Xe Các Loại */}
+                    <div className="flex justify-between items-center px-3 py-2.5 border-b border-gray-100 hover:bg-slate-50/50 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">🔹</span>
+                        <span className="text-sm text-gray-600 font-medium">
+                          BHHK nhóm Xe Các Loại
+                        </span>
+                      </div>
+                      <span className="font-mono font-bold text-sm text-blue-600 bg-blue-50/40 px-2 py-0.5 rounded border border-blue-100/50">
+                        {formatMoney(
+                          String(
+                            tinhTongDoanhThuNhom("XE_CAC_LOAI")?.tongBHHK || 0,
+                          ),
+                        )}
+                      </span>
+                    </div>
+
+                    {/* 3. Nhóm Thuê Bao */}
+                    <div className="flex justify-between items-center px-3 py-2.5 hover:bg-slate-50/50 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">🔹</span>
+                        <span className="text-sm text-gray-600 font-medium">
+                          BHHK nhóm Thuê Bao
+                        </span>
+                      </div>
+                      <span className="font-mono font-bold text-sm text-blue-600 bg-blue-50/40 px-2 py-0.5 rounded border border-blue-100/50">
+                        {formatMoney(
+                          String(
+                            tinhTongDoanhThuNhom("THUE_BAO")?.tongBHHK || 0,
+                          ),
+                        )}
+                      </span>
+                    </div>
                   </div>
-                  <span className="font-mono font-bold text-sm text-blue-600 bg-blue-50/40 px-2 py-0.5 rounded border border-blue-100/50">
+                </div>
+                {/* Tổng cộng toàn bộ tiền BHHK phiên làm việc */}
+                <div className="bg-blue-50/60 border border-blue-100 p-3 rounded-lg flex justify-between items-center mt-4 shadow-sm">
+                  <span className="text-xs font-bold uppercase text-blue-700 tracking-wider flex items-center gap-1">
+                    <span>🛡️</span> Tổng cộng tiền BHHK phiên:
+                  </span>
+                  <span className="text-base font-black text-blue-700 font-mono bg-white px-3 py-1 rounded-md border border-blue-200 shadow-sm">
                     {formatMoney(
-                      String(tinhTongDoanhThuNhom("THUE_BAO")?.tongBHHK || 0),
-                    )}
+                      String(
+                        (tinhTongDoanhThuNhom("HANH_KHACH")?.tongBHHK || 0) +
+                          (tinhTongDoanhThuNhom("XE_CAC_LOAI")?.tongBHHK || 0) +
+                          (tinhTongDoanhThuNhom("THUE_BAO")?.tongBHHK || 0),
+                      ),
+                    )}{" "}
                   </span>
                 </div>
               </div>
             </div>
-            {/* Tổng cộng toàn bộ tiền BHHK phiên làm việc */}
-            <div className="bg-blue-50/60 border border-blue-100 p-3 rounded-lg flex justify-between items-center mt-4 shadow-sm">
-              <span className="text-xs font-bold uppercase text-blue-700 tracking-wider flex items-center gap-1">
-                <span>🛡️</span> Tổng cộng tiền BHHK phiên:
-              </span>
-              <span className="text-base font-black text-blue-700 font-mono bg-white px-3 py-1 rounded-md border border-blue-200 shadow-sm">
-                {formatMoney(
-                  String(
-                    (tinhTongDoanhThuNhom("HANH_KHACH")?.tongBHHK || 0) +
-                      (tinhTongDoanhThuNhom("XE_CAC_LOAI")?.tongBHHK || 0) +
-                      (tinhTongDoanhThuNhom("THUE_BAO")?.tongBHHK || 0),
-                  ),
-                )}{" "}
-              </span>
-            </div>
-          </div>
-        </div>
-      </form>
+          </form>
+        </>
+      )}
 
       {/* THANH TỔNG HỢP DOANH THU & NÚT SUBMIT */}
       <ThanhTongHopDoanhThu
