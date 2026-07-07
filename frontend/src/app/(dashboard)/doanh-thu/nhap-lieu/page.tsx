@@ -1182,7 +1182,7 @@ export default function NhapLieuDoanhThuPage() {
                     const sortedThueBao = [...danhSachVeQui].sort((a, b) => {
                       const bangThuTu: { [key: string]: number } = {
                         VE_QUI_HK: 1, // Xe thô sơ lên đầu tiên
-                        VE_QUI_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        VE_QUI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
                         VE_QUI_TU_7C_DEN_12C: 3,
                       };
 
