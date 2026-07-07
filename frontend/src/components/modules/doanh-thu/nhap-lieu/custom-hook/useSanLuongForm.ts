@@ -14,7 +14,7 @@ import { BEN_MAC_DINH, THUE_SUAT_MAC_DINH } from "../constants/doanhThu";
 import dayjs from "dayjs";
 
 // ✨ BÍ QUYẾT: Dùng Type định nghĩa bằng phép giao và bắt buộc kiểu number (không dùng ?)
-type SanLuongFormCustomInputs = SanLuongFormInputs & {
+export type SanLuongFormCustomInputs = SanLuongFormInputs & {
   doanh_thu_hd_tai_chinh: number;
   doanh_thu_khac: number;
   thue_vat_hanh_khach: number;

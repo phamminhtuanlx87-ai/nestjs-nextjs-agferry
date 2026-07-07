@@ -25,7 +25,7 @@ class GiaTheoBenDTO {
   ghi_chu?: string;
 }
 
-class LichSuGiaDTO {
+export class LichSuGiaDTO {
   @IsDateString(
     {},
     { message: 'Ngày áp dụng phải là định dạng ngày tháng hợp lệ' },

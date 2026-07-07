@@ -157,7 +157,8 @@ export class SanLuongDoanhThuService {
     // Thuế suất lấy từ FE gửi lên, mặc định là 8 nếu rỗng
     const vat_ve_luot = dto.doanh_thu_theo_ve?.vat ?? 8;
     const vat_thanh_tien_luot =
-      ((dt_theo_ve - bhhk_thanh_tien) / 1.08) * (vat_ve_luot / 100);
+      ((dt_theo_ve - bhhk_thanh_tien) / (1 + vat_ve_luot / 100)) *
+      (vat_ve_luot / 100);
     const dtt_ve_luot = dt_theo_ve - bhhk_thanh_tien - vat_thanh_tien_luot;
     const doanhThuTheoVe = {
       dtt_ve: dtt_ve_luot,
@@ -175,8 +176,9 @@ export class SanLuongDoanhThuService {
       .reduce((total, e) => total + (e.tong_doanh_thu || 0), 0);
     const vat_ve_thang = dto.doanh_thu_ve_thang?.vat ?? 8;
 
-    const vat_thanh_tien_ve_thang =
-      (dt_theo_ve_thang / 1.08) * (vat_ve_luot / 100);
+    const vat_thanh_tien_ve_thang = Math.round(
+      (dt_theo_ve_thang / (1 + vat_ve_thang / 100)) * (vat_ve_thang / 100),
+    );
     const dtt_ve_thang = dt_theo_ve_thang - vat_thanh_tien_ve_thang;
     const doanhThuTheoVeThang = {
       dtt_ve: dtt_ve_thang,
@@ -195,7 +197,9 @@ export class SanLuongDoanhThuService {
 
     const vat_ve_qui = dto.doanh_thu_ve_thang?.vat ?? 8;
 
-    const vat_thanh_tien_ve_qui = (dt_theo_ve_qui / 1.08) * (vat_ve_luot / 100);
+    const vat_thanh_tien_ve_qui = Math.round(
+      (dt_theo_ve_qui / (1 + vat_ve_qui / 100)) * (vat_ve_qui / 100),
+    );
     const dtt_ve_qui = dt_theo_ve_qui - vat_thanh_tien_ve_qui;
     const doanhThuTheoVeQui = {
       dtt_ve: dtt_ve_qui,
@@ -213,7 +217,9 @@ export class SanLuongDoanhThuService {
 
     const vat_ve_nam = dto.doanh_thu_ve_thang?.vat ?? 8;
 
-    const vat_thanh_tien_ve_nam = (dt_theo_ve_nam / 1.08) * (vat_ve_luot / 100);
+    const vat_thanh_tien_ve_nam = Math.round(
+      (dt_theo_ve_nam / (1 + vat_ve_nam / 100)) * (vat_ve_nam / 100),
+    );
     const dtt_ve_nam = dt_theo_ve_nam - vat_thanh_tien_ve_nam;
     const doanhThuTheoVeNam = {
       dtt_ve: dtt_ve_nam,
@@ -412,7 +418,7 @@ export class SanLuongDoanhThuService {
     const doanhThuGocTinhThueLuot = dt_theo_ve - bhhk_thanh_tien;
     // Làm tròn 1 lần duy nhất trên tổng khối để triệt tiêu sai số lẻ
     const vat_thanh_tien_luot = Math.round(
-      (doanhThuGocTinhThueLuot / 1.08) * (vat_ve_luot / 100),
+      (doanhThuGocTinhThueLuot / (1 + vat_ve_luot / 100)) * (vat_ve_luot / 100),
     );
     const dtt_ve_luot = doanhThuGocTinhThueLuot - vat_thanh_tien_luot;
 
@@ -432,7 +438,7 @@ export class SanLuongDoanhThuService {
     const vat_ve_thang =
       dto.doanh_thu_ve_thang?.vat ?? banGhiCu.doanh_thu_ve_thang?.vat ?? 8;
     const vat_thanh_tien_thang = Math.round(
-      (dt_theo_ve_thang / 1.08) * (vat_ve_thang / 100),
+      (dt_theo_ve_thang / (1 + vat_ve_thang / 100)) * (vat_ve_thang / 100),
     );
     const dtt_ve_thang = dt_theo_ve_thang - vat_thanh_tien_thang;
 
@@ -451,7 +457,7 @@ export class SanLuongDoanhThuService {
     const vat_ve_qui =
       dto.doanh_thu_ve_qui?.vat ?? banGhiCu.doanh_thu_ve_qui?.vat ?? 8;
     const vat_thanh_tien_qui = Math.round(
-      (dt_theo_ve_qui / 1.08) * (vat_ve_qui / 100),
+      (dt_theo_ve_qui / (1 + vat_ve_qui / 100)) * (vat_ve_qui / 100),
     );
     const dtt_ve_qui = dt_theo_ve_qui - vat_thanh_tien_qui;
 
@@ -470,7 +476,7 @@ export class SanLuongDoanhThuService {
     const vat_ve_nam =
       dto.doanh_thu_ve_nam?.vat ?? banGhiCu.doanh_thu_ve_nam?.vat ?? 8;
     const vat_thanh_tien_nam = Math.round(
-      (dt_theo_ve_nam / 1.08) * (vat_ve_nam / 100),
+      (dt_theo_ve_nam / (1 + vat_ve_nam / 100)) * (vat_ve_nam / 100),
     );
     const dtt_ve_nam = dt_theo_ve_nam - vat_thanh_tien_nam;
 

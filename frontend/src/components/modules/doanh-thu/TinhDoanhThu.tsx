@@ -6,7 +6,7 @@ import { formatMoney } from "@/utils/formatnumber";
 import { formatDate } from "date-fns";
 import dayjs from "dayjs";
 import React from "react";
-import { NGAY_MAC_DINH } from "./constants/doanhThu";
+import { NGAY_MAC_DINH } from "./nhap-lieu/constants/doanhThu";
 
 interface ThanhTongHopProps {
   doanhThuNhomHanhKhach?: {
@@ -90,6 +90,7 @@ export const ThanhTongHopDoanhThu: React.FC<ThanhTongHopProps> = ({
     ((doanhThuNhomHanhKhach?.vatThanhTien || 0) +
       (doanhThuNhomXeCacLoai?.vatThanhTien || 0) +
       (doanhThuNhomThueBao?.vatThanhTien || 0));
+
   const ddtVeThang =
     (doanhThuNhomVeThang.tongDoanhThu || 0) -
     (doanhThuNhomVeThang.vatThanhTien || 0);
@@ -101,8 +102,10 @@ export const ThanhTongHopDoanhThu: React.FC<ThanhTongHopProps> = ({
   const ddtVeNam =
     (doanhThuNhomVeNam.tongDoanhThu || 0) -
     (doanhThuNhomVeNam.vatThanhTien || 0);
-  const doanhThuThuanTongCong =
-    dttVeLuot + ddtVeThang + ddtVeQui + ddtVeNam + doanhThuHoatDongTaiChinh;
+    
+  const doanhThuThuanTongCong = Math.round(
+    dttVeLuot + ddtVeThang + ddtVeQui + ddtVeNam + doanhThuHoatDongTaiChinh,
+  );
   // --- BƯỚC 2: XỬ LÝ MỐC THỜI GIAN THEO QUY ĐỊNH ---
   let ngayGhiNhan = dayjs(ngayApDung);
   const mocGioiHan = dayjs(NGAY_MAC_DINH); // Mốc quy định ngày 01/08/2026

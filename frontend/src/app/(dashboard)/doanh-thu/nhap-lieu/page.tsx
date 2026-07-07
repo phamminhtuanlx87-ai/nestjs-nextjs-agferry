@@ -28,9 +28,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import dayjs from "dayjs";
 import VatSelectComponent from "@/components/modules/doanh-thu/VatSelectComponent";
-import { NGAY_MAC_DINH } from "@/components/modules/doanh-thu/constants/doanhThu";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { NGAY_MAC_DINH } from "@/components/modules/doanh-thu/nhap-lieu/constants/doanhThu";
 
 export default function NhapLieuDoanhThuPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -78,39 +78,6 @@ export default function NhapLieuDoanhThuPage() {
     loadDanhMucVePha();
   }, [ngayApDung, reset]);
 
-  // Hàm xử lý gọi API kiểm tra dữ liệu
-  // const fetchAndCheckData = async (ngay: string, ben: string) => {
-  //   try {
-  //     // 1. Gọi API Backend (Axios trả về response bọc trong trường data gốc)
-  //     const response = await sanLuongService.checkDataSanLuong(ngay, ben);
-
-  //     // 2. Kiểm tra dựa trên cấu trúc mới: statusCode === 200 và có object dữ liệu bên trong
-  //     if (response && response.statusCode === 200 && response.data) {
-  //       // 👉 TRƯỜNG HỢP 1: CÓ DỮ LIỆU -> Chuyển sang chế độ CẬP NHẬT
-  //       setIsEditMode(true);
-
-  //       const dataSanLuong = response.data; // Đây chính là object chứa chi_tiet_san_luong
-
-  //       // 3. Khớp mảng chi tiết an toàn không lo bug ngầm
-  //       dataSanLuong.chi_tiet_san_luong.forEach((item: ChiTietSanLuongDto) => {
-  //         setValue(item.ma_loai_ve, item.so_luot_xe);
-  //       });
-  //       setValue(
-  //         "doanh_thu_hd_tai_chinh",
-  //         dataSanLuong.doanh_thu_hd_tai_chinh || 0,
-  //       );
-  //       setValue("doanh_thu_khac", dataSanLuong.doanh_thu_khac || 0);
-
-  //       // Điền chính xác trường dữ liệu vào form
-  //     } else {
-  //       // 👉 TRƯỜNG HỢP 2: KHÔNG CÓ DỮ LIỆU -> Chuyển sang chế độ THÊM MỚI
-  //       setIsEditMode(false);
-  //       // resetFormVeMacDinh();
-  //     }
-  //   } catch (error) {
-  //     console.error("Lỗi xử lý đồng bộ dữ liệu form:", error);
-  //   }
-  // };
   // 🌟 3. Cấu hình useEffect để lắng nghe sự thay đổi của Ngày và Bến
   useEffect(() => {
     const fetchAndCheckData = async () => {
@@ -259,9 +226,12 @@ export default function NhapLieuDoanhThuPage() {
         // Tính VAT theo nhóm cha hoặc nhóm con
       }
     });
+    const heSoThueVAT = getVAT(nhom);
     vatThanhTien += Math.round(
-      (((tongDoanhThu - tongBHHK) / 1.08) * getVAT(nhom) || 0) / 100,
+      ((tongDoanhThu - tongBHHK) / (1 + heSoThueVAT / 100)) *
+        (heSoThueVAT / 100),
     );
+
     if (tongDoanhThu === 0 && tongBHHK === 0) {
       return { tongDoanhThu: 0, tongBHHK: 0, vatThanhTien: 0 };
     }

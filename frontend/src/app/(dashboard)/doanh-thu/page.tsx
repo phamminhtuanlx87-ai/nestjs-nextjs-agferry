@@ -2,49 +2,13 @@
 
 import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
 import Button from "@/components/ui/Button";
-import DropDown from "@/components/ui/DropDown";
+import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { BiCalendar } from "react-icons/bi";
+import React from "react";
 
 export default function DoanhThuPage() {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-  const startYear = 2025;
   const router = useRouter();
 
-  const getMonthOptions = (selectedYear: number) => {
-    const allMonths = [
-      { value: 1, label: "Tháng 01" },
-      { value: 2, label: "Tháng 02" },
-      { value: 3, label: "Tháng 03" },
-      { value: 4, label: "Tháng 04" },
-      { value: 5, label: "Tháng 05" },
-      { value: 6, label: "Tháng 06" },
-      { value: 7, label: "Tháng 07" },
-      { value: 8, label: "Tháng 08" },
-      { value: 9, label: "Tháng 09" },
-      { value: 10, label: "Tháng 10" },
-      { value: 11, label: "Tháng 11" },
-      { value: 12, label: "Tháng 12" },
-    ];
-    if (Number(selectedYear) === currentYear) {
-      return allMonths.filter((month) => month.value <= currentMonth);
-    }
-    return allMonths;
-  };
-
-  const YEAR_OPTIONS = Array.from(
-    { length: currentYear - startYear + 1 },
-    (_, index) => {
-      const year = startYear + index;
-      return { value: year, label: `Năm ${year}` };
-    },
-  );
-
-  const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth() + 1);
-  const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear());
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-12">
@@ -63,32 +27,8 @@ export default function DoanhThuPage() {
             </div>
             <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">
               Quản lý Sản lượng Doanh thu năm{" "}
-              <span className="text-blue-600">{selectedYear}</span>
+              <span className="text-blue-600">{dayjs(new Date().toISOString().split("T")[0]).year()}</span>
             </h1>
-            <p className="text-slate-500 text-xs mt-1">
-              Tổng hợp và báo cáo Sản lượng doanh thu
-              {" "}
-              <span className="font-semibold text-slate-700">
-                {`Tháng ${selectedMonth}/${selectedYear}`}
-              </span>
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <DropDown
-              label="Tháng"
-              items={getMonthOptions(selectedYear)}
-              value={selectedMonth}
-              icon={<BiCalendar className="w-4 h-4" />}
-              onChange={(val) => setSelectedMonth(Number(val))}
-            />
-            <DropDown
-              label="Năm"
-              items={YEAR_OPTIONS}
-              value={selectedYear}
-              icon={<BiCalendar className="w-4 h-4" />}
-              onChange={(val) => setSelectedYear(Number(val))}
-            />
           </div>
         </div>
 
