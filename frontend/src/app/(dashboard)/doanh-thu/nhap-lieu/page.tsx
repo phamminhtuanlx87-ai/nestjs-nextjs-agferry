@@ -31,6 +31,7 @@ import VatSelectComponent from "@/components/modules/doanh-thu/VatSelectComponen
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { NGAY_MAC_DINH } from "@/components/modules/doanh-thu/nhap-lieu/constants/doanhThu";
+import { ClipboardUtil } from "@/components/modules/doanh-thu/utils/clipboard.util";
 
 export default function NhapLieuDoanhThuPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -741,7 +742,7 @@ export default function NhapLieuDoanhThuPage() {
                       </h4>
                       <div className="space-y-1 bg-white p-2 rounded border border-gray-100">
                         {/* 🌟 THÊM ĐOẠN SORT NÀY VÀO TRƯỚC MAP */}
-                        {[...nhomXeGomTheoPhanDoan[tenNhomCon]]
+                        {/* {[...nhomXeGomTheoPhanDoan[tenNhomCon]]
                           .sort((a, b) => {
                             const bangThuTu: { [key: string]: number } = {
                               XK_THO_SO: 1, // Xe thô sơ lên đầu tiên
@@ -790,10 +791,91 @@ export default function NhapLieuDoanhThuPage() {
                                   {...register(ticket.ma_loai_ve, {
                                     min: 0,
                                   })}
+                                  onPaste={(e) => {
+                                    ClipboardUtil.pasteExcelColumn(
+                                      e,
+                                      ticket.ma_loai_ve, // Mã ô hiện tại đang đứng để tính điểm bắt đầu dán
+                                      danhSachMaLoaiVeInGroup, // Toàn bộ mảng thứ tự loại vé trong nhóm
+                                      setValue, // Hàm cập nhật của react-hook-form
+                                    );
+                                  }}
                                 />
                               </div>
                             );
-                          })}
+                          })} */}
+
+                        {(() => {
+                          // 🌟 1. ĐÃ CÓ THỂ KHAI BÁO CONST: Tiến hành sort mảng trước để lấy đúng thứ tự hiển thị
+                          const sortedTickets = [
+                            ...nhomXeGomTheoPhanDoan[tenNhomCon],
+                          ].sort((a, b) => {
+                            const bangThuTu: { [key: string]: number } = {
+                              XK_THO_SO: 1,
+                              XK_DUOI_7C: 2,
+                              XK_TU_7C_DEN_12C: 3,
+                              XK_TU_12C_DEN_16C: 4,
+                              XK_TU_16C_DEN_30C: 5,
+                              XK_TU_30C_DEN_45C: 6,
+                              XK_45C: 7,
+
+                              XT_DUOI_3T: 8,
+                              XT_TU_3T_DEN_5T: 9,
+                              XT_TU_5T_DEN_7T: 10,
+                              XT_TU_7T_DEN_10T: 11,
+                              XT_TU_10T_DEN_15T: 12,
+                              XT_TU_15T_DEN_20T: 13,
+                              XT_20T_TRO_LEN: 14,
+                            };
+
+                            const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                            const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                            return uuTienA - uuTienB;
+                          });
+
+                          // 🌟 2. Tạo danh sách mã loại vé đồng bộ 100% với thứ tự hiển thị trên cột UI
+                          const danhSachMaLoaiVeInGroup = sortedTickets.map(
+                            (t) => t.ma_loai_ve,
+                          );
+
+                          // 🌟 3. Trả về và map danh sách đã sort ra giao diện (Giữ nguyên logic gốc của anh)
+                          return sortedTickets.map((ticket, index) => {
+                            const giaHienTai = getGiaVe(ticket, maBen);
+                            const giaMacDinh = getGiaVe(ticket, "AH");
+
+                            return (
+                              <div
+                                key={ticket.ma_loai_ve}
+                                title={`Mã vé: ${ticket.ten_loai_ve}`}
+                                className="group relative"
+                              >
+                                <InputSanLuong
+                                  isFirst={index === 0}
+                                  label={ticket.ten_loai_ve}
+                                  price={String(giaHienTai)}
+                                  isHighlightPrice={giaHienTai !== giaMacDinh}
+                                  quantity={String(
+                                    values[ticket.ma_loai_ve] ?? "0",
+                                  )}
+                                  maBen={maBen}
+                                  error={errors[ticket.ma_loai_ve]?.message}
+                                  {...register(ticket.ma_loai_ve, {
+                                    min: 0,
+                                  })}
+                                  // 🌟 Hàm dán Excel thần thánh chạy mượt mà không lo báo lỗi biến chưa định nghĩa
+                                  onPaste={(e) => {
+                                    ClipboardUtil.pasteExcelColumn(
+                                      e,
+                                      ticket.ma_loai_ve,
+                                      danhSachMaLoaiVeInGroup,
+                                      setValue,
+                                    );
+                                  }}
+                                />
+                              </div>
+                            );
+                          });
+                        })()}
                       </div>
                       <GroupTotalTag
                         nhom={tenNhomCon as NhomType}
@@ -817,7 +899,7 @@ export default function NhapLieuDoanhThuPage() {
               >
                 {/* Nhóm thuê bao */}
                 <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                  {danhSachThueBao
+                  {/* {danhSachThueBao
                     .sort((a, b) => {
                       const bangThuTu: { [key: string]: number } = {
                         TB_PHA_30T: 1, // Xe thô sơ lên đầu tiên
@@ -857,7 +939,70 @@ export default function NhapLieuDoanhThuPage() {
                           />
                         </div>
                       );
-                    })}
+                    })} */}
+                  {(() => {
+                    // 1. Sắp xếp danh sách thuê bao theo đúng thứ tự ưu tiên hiển thị trên UI
+                    const sortedThueBao = [...danhSachThueBao].sort((a, b) => {
+                      const bangThuTu: { [key: string]: number } = {
+                        TB_PHA_30T: 1,
+                        TB_PHA_60T: 2,
+                        TB_PHA_100T: 3,
+                        TB_PHA_200T: 4,
+                      };
+
+                      const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                      const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                      return uuTienA - uuTienB;
+                    });
+
+                    // 2. Tạo danh sách mã loại vé của nhóm thuê bao đồng bộ 100% với thứ tự hiển thị
+                    const danhSachMaLoaiVeInGroup = sortedThueBao.map(
+                      (t) => t.ma_loai_ve,
+                    );
+
+                    // 3. Trả về cấu trúc JSX để render ra các Input
+                    return sortedThueBao.map((ticket, index) => {
+                      const giaHienTai = getGiaVe(ticket, maBen);
+                      const giaMacDinh = getGiaVe(ticket, "AH");
+
+                      // Ép kiểu chuẩn cho key của ticket tránh lỗi TypeScript
+                      const currentFieldKey = ticket.ma_loai_ve as Extract<
+                        keyof SanLuongFormInputs,
+                        string
+                      >;
+
+                      return (
+                        <div
+                          key={ticket.ma_loai_ve}
+                          title={`Mã vé: ${ticket.ten_loai_ve}`}
+                          className="group relative"
+                        >
+                          <InputSanLuong
+                            isFirst={index === 0}
+                            label={ticket.ten_loai_ve}
+                            price={String(giaHienTai)}
+                            isHighlightPrice={giaHienTai !== giaMacDinh}
+                            quantity={String(values[currentFieldKey] ?? "0")}
+                            maBen={maBen}
+                            error={errors[currentFieldKey]?.message}
+                            {...register(currentFieldKey, {
+                              min: 0,
+                            })}
+                            // 🌟 Hàm dán dữ liệu Excel dành riêng cho khối Thuê Bao
+                            onPaste={(e) => {
+                              ClipboardUtil.pasteExcelColumn(
+                                e,
+                                currentFieldKey,
+                                danhSachMaLoaiVeInGroup,
+                                setValue,
+                              );
+                            }}
+                          />
+                        </div>
+                      );
+                    });
+                  })()}
                   {danhSachThueBao.length === 0 && (
                     <p className="text-xs text-gray-400 text-center py-4">
                       Không có dữ liệu thuê bao
@@ -873,7 +1018,7 @@ export default function NhapLieuDoanhThuPage() {
                   />
                 </div>
                 <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                  {danhSachVeThang
+                  {/* {danhSachVeThang
                     .sort((a, b) => {
                       const bangThuTu: { [key: string]: number } = {
                         VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
@@ -912,7 +1057,69 @@ export default function NhapLieuDoanhThuPage() {
                           />
                         </div>
                       );
-                    })}
+                    })} */}
+                  {(() => {
+                    // 1. Sắp xếp danh sách thuê bao theo đúng thứ tự ưu tiên hiển thị trên UI
+                    const sortedThueBao = [...danhSachVeThang].sort((a, b) => {
+                      const bangThuTu: { [key: string]: number } = {
+                         VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
+                        VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        VE_THANG_TU_7C_DEN_12C: 3,
+                      };
+
+                      const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                      const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                      return uuTienA - uuTienB;
+                    });
+
+                    // 2. Tạo danh sách mã loại vé của nhóm thuê bao đồng bộ 100% với thứ tự hiển thị
+                    const danhSachMaLoaiVeInGroup = sortedThueBao.map(
+                      (t) => t.ma_loai_ve,
+                    );
+
+                    // 3. Trả về cấu trúc JSX để render ra các Input
+                    return sortedThueBao.map((ticket, index) => {
+                      const giaHienTai = getGiaVe(ticket, maBen);
+                      const giaMacDinh = getGiaVe(ticket, "AH");
+
+                      // Ép kiểu chuẩn cho key của ticket tránh lỗi TypeScript
+                      const currentFieldKey = ticket.ma_loai_ve as Extract<
+                        keyof SanLuongFormInputs,
+                        string
+                      >;
+
+                      return (
+                        <div
+                          key={ticket.ma_loai_ve}
+                          title={`Mã vé: ${ticket.ten_loai_ve}`}
+                          className="group relative"
+                        >
+                          <InputSanLuong
+                            isFirst={index === 0}
+                            label={ticket.ten_loai_ve}
+                            price={String(giaHienTai)}
+                            isHighlightPrice={giaHienTai !== giaMacDinh}
+                            quantity={String(values[currentFieldKey] ?? "0")}
+                            maBen={maBen}
+                            error={errors[currentFieldKey]?.message}
+                            {...register(currentFieldKey, {
+                              min: 0,
+                            })}
+                            // 🌟 Hàm dán dữ liệu Excel dành riêng cho khối Thuê Bao
+                            onPaste={(e) => {
+                              ClipboardUtil.pasteExcelColumn(
+                                e,
+                                currentFieldKey,
+                                danhSachMaLoaiVeInGroup,
+                                setValue,
+                              );
+                            }}
+                          />
+                        </div>
+                      );
+                    });
+                  })()}
                   {danhSachVeThang.length === 0 && (
                     <p className="text-xs text-gray-400 text-center py-4">
                       Không có dữ liệu vé tháng
@@ -930,7 +1137,7 @@ export default function NhapLieuDoanhThuPage() {
                   />
                 </div>
                 <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                  {danhSachVeQui
+                  {/* {danhSachVeQui
                     .sort((a, b) => {
                       const bangThuTu: { [key: string]: number } = {
                         VE_QUI_HK: 1, // Xe thô sơ lên đầu tiên
@@ -969,7 +1176,69 @@ export default function NhapLieuDoanhThuPage() {
                           />
                         </div>
                       );
-                    })}
+                    })} */}
+                    {(() => {
+                    // 1. Sắp xếp danh sách thuê bao theo đúng thứ tự ưu tiên hiển thị trên UI
+                    const sortedThueBao = [...danhSachVeQui].sort((a, b) => {
+                      const bangThuTu: { [key: string]: number } = {
+                         VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
+                        VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        VE_THANG_TU_7C_DEN_12C: 3,
+                      };
+
+                      const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                      const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                      return uuTienA - uuTienB;
+                    });
+
+                    // 2. Tạo danh sách mã loại vé của nhóm thuê bao đồng bộ 100% với thứ tự hiển thị
+                    const danhSachMaLoaiVeInGroup = sortedThueBao.map(
+                      (t) => t.ma_loai_ve,
+                    );
+
+                    // 3. Trả về cấu trúc JSX để render ra các Input
+                    return sortedThueBao.map((ticket, index) => {
+                      const giaHienTai = getGiaVe(ticket, maBen);
+                      const giaMacDinh = getGiaVe(ticket, "AH");
+
+                      // Ép kiểu chuẩn cho key của ticket tránh lỗi TypeScript
+                      const currentFieldKey = ticket.ma_loai_ve as Extract<
+                        keyof SanLuongFormInputs,
+                        string
+                      >;
+
+                      return (
+                        <div
+                          key={ticket.ma_loai_ve}
+                          title={`Mã vé: ${ticket.ten_loai_ve}`}
+                          className="group relative"
+                        >
+                          <InputSanLuong
+                            isFirst={index === 0}
+                            label={ticket.ten_loai_ve}
+                            price={String(giaHienTai)}
+                            isHighlightPrice={giaHienTai !== giaMacDinh}
+                            quantity={String(values[currentFieldKey] ?? "0")}
+                            maBen={maBen}
+                            error={errors[currentFieldKey]?.message}
+                            {...register(currentFieldKey, {
+                              min: 0,
+                            })}
+                            // 🌟 Hàm dán dữ liệu Excel dành riêng cho khối Thuê Bao
+                            onPaste={(e) => {
+                              ClipboardUtil.pasteExcelColumn(
+                                e,
+                                currentFieldKey,
+                                danhSachMaLoaiVeInGroup,
+                                setValue,
+                              );
+                            }}
+                          />
+                        </div>
+                      );
+                    });
+                  })()}
                   {danhSachVeQui.length === 0 && (
                     <p className="text-xs text-gray-400 text-center py-4">
                       Không có dữ liệu vé quý
@@ -987,7 +1256,7 @@ export default function NhapLieuDoanhThuPage() {
                   />
                 </div>
                 <div className="space-y-1 bg-white p-2 rounded border border-gray-100/60">
-                  {danhSachVeNam
+                  {/* {danhSachVeNam
                     .sort((a, b) => {
                       const bangThuTu: { [key: string]: number } = {
                         VE_NAM_HK: 1, // Xe thô sơ lên đầu tiên
@@ -1026,7 +1295,69 @@ export default function NhapLieuDoanhThuPage() {
                           />
                         </div>
                       );
-                    })}
+                    })} */}
+                    {(() => {
+                    // 1. Sắp xếp danh sách thuê bao theo đúng thứ tự ưu tiên hiển thị trên UI
+                    const sortedThueBao = [...danhSachVeNam].sort((a, b) => {
+                      const bangThuTu: { [key: string]: number } = {
+                         VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
+                        VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        VE_THANG_TU_7C_DEN_12C: 3,
+                      };
+
+                      const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
+                      const uuTienB = bangThuTu[b.ma_loai_ve] || 99;
+
+                      return uuTienA - uuTienB;
+                    });
+
+                    // 2. Tạo danh sách mã loại vé của nhóm thuê bao đồng bộ 100% với thứ tự hiển thị
+                    const danhSachMaLoaiVeInGroup = sortedThueBao.map(
+                      (t) => t.ma_loai_ve,
+                    );
+
+                    // 3. Trả về cấu trúc JSX để render ra các Input
+                    return sortedThueBao.map((ticket, index) => {
+                      const giaHienTai = getGiaVe(ticket, maBen);
+                      const giaMacDinh = getGiaVe(ticket, "AH");
+
+                      // Ép kiểu chuẩn cho key của ticket tránh lỗi TypeScript
+                      const currentFieldKey = ticket.ma_loai_ve as Extract<
+                        keyof SanLuongFormInputs,
+                        string
+                      >;
+
+                      return (
+                        <div
+                          key={ticket.ma_loai_ve}
+                          title={`Mã vé: ${ticket.ten_loai_ve}`}
+                          className="group relative"
+                        >
+                          <InputSanLuong
+                            isFirst={index === 0}
+                            label={ticket.ten_loai_ve}
+                            price={String(giaHienTai)}
+                            isHighlightPrice={giaHienTai !== giaMacDinh}
+                            quantity={String(values[currentFieldKey] ?? "0")}
+                            maBen={maBen}
+                            error={errors[currentFieldKey]?.message}
+                            {...register(currentFieldKey, {
+                              min: 0,
+                            })}
+                            // 🌟 Hàm dán dữ liệu Excel dành riêng cho khối Thuê Bao
+                            onPaste={(e) => {
+                              ClipboardUtil.pasteExcelColumn(
+                                e,
+                                currentFieldKey,
+                                danhSachMaLoaiVeInGroup,
+                                setValue,
+                              );
+                            }}
+                          />
+                        </div>
+                      );
+                    });
+                  })()}
                   {danhSachVeNam.length === 0 && (
                     <p className="text-xs text-gray-400 text-center py-4">
                       Không có dữ liệu vé năm
