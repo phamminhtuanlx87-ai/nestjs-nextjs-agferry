@@ -3,7 +3,7 @@
 import React from "react";
 import { TicketType, SanLuongFormInputs } from "@/services/sanLuongService";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
-import InputSanLuong from "../InputComponent";
+import InputSanLuong from "../../InputComponent";
 
 // Giả định NhomType từ hệ thống của anh, nếu chưa có hãy import đúng file định nghĩa của nó
 type NhomType = "XE_KHACH" | "XE_TAI" | string;

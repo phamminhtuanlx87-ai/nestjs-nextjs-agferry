@@ -28,7 +28,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import dayjs from "dayjs";
 import VatSelectComponent from "@/components/modules/doanh-thu/VatSelectComponent";
-import { NGAY_MAC_DINH } from "@/components/modules/doanh-thu/constants/doanhThu";
+import { NGAY_MAC_DINH } from "./doanhThu";
 
 
 

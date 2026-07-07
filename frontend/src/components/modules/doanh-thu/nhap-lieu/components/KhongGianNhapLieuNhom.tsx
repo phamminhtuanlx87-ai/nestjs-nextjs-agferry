@@ -3,8 +3,8 @@
 import React from "react";
 import { SanLuongFormInputs, TicketType } from "@/services/sanLuongService";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
-import InputSanLuong from "../InputComponent";
-import { GroupHeader } from "../GroupHeader";
+import { GroupHeader } from "../../GroupHeader";
+import InputSanLuong from "../../InputComponent";
 
 // Định nghĩa Interface Props chuẩn hóa Strict Type 100%
 interface KhongGianNhapLieuNhomProps {
