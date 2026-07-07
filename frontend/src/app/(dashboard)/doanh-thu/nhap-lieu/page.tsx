@@ -1062,7 +1062,7 @@ export default function NhapLieuDoanhThuPage() {
                     // 1. Sắp xếp danh sách thuê bao theo đúng thứ tự ưu tiên hiển thị trên UI
                     const sortedThueBao = [...danhSachVeThang].sort((a, b) => {
                       const bangThuTu: { [key: string]: number } = {
-                         VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
+                        VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
                         VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
                         VE_THANG_TU_7C_DEN_12C: 3,
                       };
@@ -1177,13 +1177,13 @@ export default function NhapLieuDoanhThuPage() {
                         </div>
                       );
                     })} */}
-                    {(() => {
+                  {(() => {
                     // 1. Sắp xếp danh sách thuê bao theo đúng thứ tự ưu tiên hiển thị trên UI
                     const sortedThueBao = [...danhSachVeQui].sort((a, b) => {
                       const bangThuTu: { [key: string]: number } = {
-                         VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
-                        VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
-                        VE_THANG_TU_7C_DEN_12C: 3,
+                        VE_QUI_HK: 1, // Xe thô sơ lên đầu tiên
+                        VE_QUI_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        VE_QUI_TU_7C_DEN_12C: 3,
                       };
 
                       const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
@@ -1296,13 +1296,13 @@ export default function NhapLieuDoanhThuPage() {
                         </div>
                       );
                     })} */}
-                    {(() => {
+                  {(() => {
                     // 1. Sắp xếp danh sách thuê bao theo đúng thứ tự ưu tiên hiển thị trên UI
                     const sortedThueBao = [...danhSachVeNam].sort((a, b) => {
                       const bangThuTu: { [key: string]: number } = {
-                         VE_THANG_HK: 1, // Xe thô sơ lên đầu tiên
-                        VE_THANG_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
-                        VE_THANG_TU_7C_DEN_12C: 3,
+                        VE_NAM_HK: 1, // Xe thô sơ lên đầu tiên
+                        VE_NAM_DUOI_7C: 2, // Xe dưới 7 chỗ tiếp theo (Anh thay mã ma_loai_ve cho đúng với DB của anh)
+                        VE_NAM_TU_7C_DEN_12C: 3,
                       };
 
                       const uuTienA = bangThuTu[a.ma_loai_ve] || 99;
