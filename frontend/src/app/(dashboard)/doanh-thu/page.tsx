@@ -1,5 +1,9 @@
 "use client";
 
+import SanLuongCard from "@/components/modules/doanh-thu/tong-quan/components/SanLuongCard";
+import SanLuongToolbar from "@/components/modules/doanh-thu/tong-quan/components/SanLuongToolbar";
+import useSanLuongFilter from "@/components/modules/doanh-thu/tong-quan/custom-hook/useSanLuongFilter";
+import { useTQSanLuong } from "@/components/modules/doanh-thu/tong-quan/custom-hook/useTQSanLuong";
 import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
 import Button from "@/components/ui/Button";
 import dayjs from "dayjs";
@@ -9,13 +13,16 @@ import React from "react";
 export default function DoanhThuPage() {
   const router = useRouter();
 
+  const { filters, xuLyThayDoiBoLoc } = useSanLuongFilter();
+  const { dulieu, isLoading, error } = useTQSanLuong(filters);
+
+  // 1. Quản lý bộ lọc thời gian tập trung tại đây
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-12">
       <DynamicBreadcrumb />
-      
+
       <div className="w-full mx-auto p-4 md:p-6 space-y-6">
-        
         {/* ==========================================
            PHÂN KHU 1: TIÊU ĐỀ & BỘ LỌC
            ========================================== */}
@@ -27,43 +34,20 @@ export default function DoanhThuPage() {
             </div>
             <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">
               Quản lý Sản lượng Doanh thu năm{" "}
-              <span className="text-blue-600">{dayjs(new Date().toISOString().split("T")[0]).year()}</span>
+              <span className="text-blue-600">
+                {dayjs(new Date().toISOString().split("T")[0]).year()}
+              </span>
             </h1>
           </div>
         </div>
-
-        {/* ==========================================
+        {/* Toolber */}
+        <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 card-soft ">
+          <SanLuongToolbar onFilters={xuLyThayDoiBoLoc} filters={filters} />
+          {/* ==========================================
            PHÂN KHU 2: CÁC THÈ KPI TỔNG HỢP (Khung Trống)
            ========================================== */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-5 rounded-xl border border-dashed border-gray-300 flex flex-col justify-between min-h-22.5">
-            <span className="text-[11px] text-gray-400 block uppercase font-bold tracking-wider">
-              Tổng cộng doanh thu 
-            </span>
-            <span className="text-xl font-bold text-slate-400 font-mono mt-2">
-              -- đ
-            </span>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl border border-dashed border-gray-300 flex flex-col justify-between min-h-22.5">
-            <span className="text-[11px] text-gray-400 block uppercase font-bold tracking-wider">
-              Tổng sản lượng 
-            </span>
-            <span className="text-xl font-bold text-slate-400 font-mono mt-2">
-              -- Lượt xe
-            </span>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl border border-dashed border-gray-300 flex flex-col justify-between min-h-22.5">
-            <span className="text-[11px] text-gray-400 block uppercase font-bold tracking-wider">
-              Trạng thái
-            </span>
-            <span className="text-xl font-bold text-slate-400 font-mono mt-2">
-              -- Bến
-            </span>
-          </div>
+          <SanLuongCard isLoading={isLoading} dulieu={dulieu} error={error} />
         </div>
-
         {/* ==========================================
            PHÂN KHU 3: KHÔNG GIAN BIỂU ĐỒ (Khung Trống)
            ========================================== */}
@@ -95,8 +79,8 @@ export default function DoanhThuPage() {
             <h3 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
               📋 Danh sách lịch sử Sản lượng Doanh thu
             </h3>
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               onClick={() => router.push("/doanh-thu/nhap-lieu")}
               className="text-xs font-bold py-1.5 px-3.5"
             >
@@ -116,15 +100,18 @@ export default function DoanhThuPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-xs text-slate-400 italic font-medium bg-white">
-                    Không có dữ liệu sản lượng trong khoảng thời gian được chọn. Vui lòng bấm nút {`"Thêm dữ liệu"`}.
+                  <td
+                    colSpan={4}
+                    className="p-8 text-center text-xs text-slate-400 italic font-medium bg-white"
+                  >
+                    Không có dữ liệu sản lượng trong khoảng thời gian được chọn.
+                    Vui lòng bấm nút {`"Thêm dữ liệu"`}.
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-
       </div>
     </div>
   );

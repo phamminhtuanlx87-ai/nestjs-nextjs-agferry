@@ -20,6 +20,7 @@ import { UserRole } from '../users/constants/user.constants';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { GetSanLuongDto } from './dto/get-san-luong-doanh-thi.dto';
 import { SkipThrottle } from '@nestjs/throttler';
+import { FilterToolbarDto } from './dto/filter-toolbar.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -48,6 +49,7 @@ export class SanLuongDoanhThuController {
   @Get('check-data')
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER)
   async checkData(@Query() query: GetSanLuongDto, @Res() res) {
+    console.log('Dang chay checkData()');
     const result = await this.sanLuongDoanhThuService.checkVaLayDuLieu(query);
 
     // Trả về response chuẩn JSON
@@ -58,16 +60,22 @@ export class SanLuongDoanhThuController {
     });
   }
 
-  // @Get()
-  // @SkipThrottle()
-  // findAll() {
-  //   const result = this.sanLuongDoanhThuService.findAll();
-  //   return {
-  //     statusCode: HttpStatus.OK,
-  //     message: 'Lấy dữ liệu thàng công',
-  //     data: result,
-  //   };
-  // }
+  @Get()
+  @SkipThrottle({ default: true })
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER)
+  async findAll(@Query() filters: FilterToolbarDto) {
+    console.log('Dang chay findAll()');
+    console.log('--- Đang chạy findAll() tại Controller ---');
+
+    // 🌟 PHẢI CÓ chữ "await" ở đây để đợi dữ liệu từ MongoDB Aggregate quét xong
+    const result = await this.sanLuongDoanhThuService.findAll(filters);
+    console.log(result);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Lấy dữ liệu thàng công',
+      data: result,
+    };
+  }
 
   // @Get(':id')
   // @SkipThrottle()

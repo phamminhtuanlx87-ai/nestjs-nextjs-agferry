@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateSanLuongDoanhThuDto } from './dto/create-san-luong-doanh-thu.dto';
@@ -23,9 +24,16 @@ import {
 } from './dto/chi_tiet_doanh_thu';
 import dayjs from 'dayjs';
 import { GetSanLuongDto } from './dto/get-san-luong-doanh-thi.dto';
+import { FilterToolbarDto } from './dto/filter-toolbar.dto';
+import { getCompareDateRange, getDateRange } from './utils/date-range.helper';
+import { MAP_TEN_BEN } from './constants/mapping_ben_pha';
 
 export const START_DATE_REALTIME = '2026-08-01';
 export const LEGACY_DAY_SNAPSHOT = '20';
+// interface BenCaoNhatAggregateResult {
+//   _id: string | null; // ma ben
+//   tongDoanhThuBen: number;
+// }
 
 @Injectable()
 export class SanLuongDoanhThuService {
@@ -253,8 +261,342 @@ export class SanLuongDoanhThuService {
     return await newRecord.save();
   }
 
-  findAll() {
-    return this.sanLuongModel.find().sort({ ngay_nhap: -1 }).exec();
+  async findAll(filters: FilterToolbarDto) {
+    try {
+      // ==========================================
+      // BƯỚC 1: XỬ LÝ KHOẢNG THỜI GIAN (DATE RANGE)
+      // ==========================================
+      const effectiveTimeType = filters.time || 'THANG_NAY';
+      const currentRange = getDateRange(effectiveTimeType);
+      const compareRange = getCompareDateRange(
+        effectiveTimeType,
+        filters.compare || 'KY_TRUOC',
+      );
+
+      // ==========================================
+      // BƯỚC 2: TỐI ƯU HÓA TRUY VẤN SONG SONG VỚI PROMISE.ALL
+      // (Gom toàn bộ lệnh đếm Doanh thu, Xe, Khách, Vé ĐK về làm 1 câu lệnh chung)
+      // ==========================================
+      const [currentData, compareData] = await Promise.all([
+        this.executeAggregation(
+          currentRange.fromDate,
+          currentRange.toDate,
+          filters.location,
+          filters.search,
+        ),
+        compareRange.compareFromDate && compareRange.compareToDate
+          ? this.executeAggregation(
+              compareRange.compareFromDate,
+              compareRange.compareToDate,
+              filters.location,
+              filters.search,
+            )
+          : null,
+      ]);
+
+      // ==========================================
+      // BƯỚC 3: TÌM BẾN CÓ DOANH THU CAO NHẤT (GIỮ NGUYÊN BLOCK LOGIC CHUẨN)
+      // ==========================================
+      const dbDateExpr = {
+        $cond: [
+          { $eq: [{ $type: '$ngay_nhap' }, 'date'] },
+          '$ngay_nhap',
+          { $dateFromString: { dateString: '$ngay_nhap' } },
+        ],
+      };
+
+      const matchConditions: any = {
+        $expr: {
+          $and: [
+            { $gte: [dbDateExpr, currentRange.fromDate] },
+            { $lte: [dbDateExpr, currentRange.toDate] },
+          ],
+        },
+      };
+
+      if (filters.location && filters.location !== 'ALL') {
+        matchConditions.ma_ben = filters.location;
+      }
+
+      // 3.2. Chạy aggregate tìm bến cao nhất kỳ hiện tại
+      const benCaoNhatResult = await this.sanLuongModel
+        .aggregate([
+          { $match: matchConditions },
+          {
+            $group: {
+              _id: '$ma_ben',
+              tongDoanhThuBen: { $sum: '$doanh_thu_thuan_tong_cong' },
+            },
+          },
+          { $sort: { tongDoanhThuBen: -1 } },
+          { $limit: 1 },
+        ])
+        .exec();
+      const topBenRaw = benCaoNhatResult[0];
+      const maBenCaoNhat = topBenRaw?._id || '';
+      const doanhThuBenCaoNhat = topBenRaw?.tongDoanhThuBen || 0;
+
+      const tenBenHienThi = maBenCaoNhat
+        ? MAP_TEN_BEN[maBenCaoNhat] || `Bến ${maBenCaoNhat}`
+        : 'Không có dữ liệu';
+
+      let doanhThuBenCaoNhatQuaKhu = 0;
+      if (
+        maBenCaoNhat &&
+        compareRange.compareFromDate &&
+        compareRange.compareToDate
+      ) {
+        const matchCompareConditions: any = {
+          ma_ben: maBenCaoNhat, // Ép cứng tìm theo đúng mã bến cao nhất vừa tìm được
+          $expr: {
+            $and: [
+              { $gte: [dbDateExpr, compareRange.compareFromDate] },
+              { $lte: [dbDateExpr, compareRange.compareToDate] },
+            ],
+          },
+        };
+
+        const compareBenResult = await this.sanLuongModel
+          .aggregate([
+            { $match: matchCompareConditions },
+            {
+              $group: {
+                _id: '$ma_ben',
+                tongDoanhThuBen: { $sum: '$doanh_thu_thuan_tong_cong' },
+              },
+            },
+          ])
+          .exec();
+
+        doanhThuBenCaoNhatQuaKhu = compareBenResult[0]?.tongDoanhThuBen || 0;
+      }
+      // ==========================================
+      // BƯỚC 4: TÍNH XU HƯỚNG TĂNG TRƯỞNG (TREND) RIÊNG BIỆT CHO TỪNG CARD
+      // ==========================================
+      const tinhTrend = (hienTai: number, quaKhu: number) => {
+        const numHienTai = Number(hienTai) || 0;
+        const numQuaKhu = Number(quaKhu) || 0;
+
+        if (!compareData || numQuaKhu === 0) {
+          return { type: 'flat', percentage: '0%' };
+        }
+
+        const phanTram = ((numHienTai - numQuaKhu) / numQuaKhu) * 100;
+        return {
+          type: phanTram > 0 ? 'up' : phanTram < 0 ? 'down' : 'flat',
+          percentage: `${Math.abs(phanTram).toFixed(2).replace('.', ',')}%`,
+        };
+      };
+
+      const bieuThucText =
+        filters.compare === 'KY_TRUOC'
+          ? 'so với kỳ trước'
+          : filters.compare === 'CUNG_KY_NAM_TRUOC'
+            ? 'so với cùng kỳ năm trước'
+            : '';
+
+      // ==========================================
+      // BƯỚC 5: TRẢ DỮ LIỆU ĐÃ ĐƯỢC CHUẨN HÓA SẠCH VỀ FRONTEND
+      // ==========================================
+      return {
+        // Dữ liệu số thô từ executeAggregation được định dạng hiển thị Tiếng Việt (.toLocaleString)
+        tongDoanhThu: (currentData?.tongDoanhThu || 0).toLocaleString('vi-VN'),
+        tongLuotXeCacLoai: (currentData?.tongLuotXeCacLoai || 0).toLocaleString(
+          'vi-VN',
+        ),
+        tongLuotHanhKhach: (currentData?.tongLuotHanhKhach || 0).toLocaleString(
+          'vi-VN',
+        ),
+        tongLuotVeDinhKy: (currentData?.tongLuotVeDinhKy || 0).toLocaleString(
+          'vi-VN',
+        ),
+        tongLuotThueBao: (currentData?.tongLuotThueBao || 0).toLocaleString(
+          'vi-VN',
+        ),
+        benCaoNhat: {
+          ma_ben: tenBenHienThi,
+          doanh_thu: doanhThuBenCaoNhat.toLocaleString('vi-VN'),
+        },
+
+        // Phân tách object trends theo từng key tương ứng, không nhét chung mảng
+        trends:
+          filters.compare !== 'KHONG_DOI_CHIEU'
+            ? {
+                tongDoanhThu: {
+                  ...tinhTrend(
+                    currentData?.tongDoanhThu as number,
+                    compareData?.tongDoanhThu as number,
+                  ),
+                  text: bieuThucText,
+                },
+                tongLuotXeCacLoai: {
+                  ...tinhTrend(
+                    currentData?.tongLuotXeCacLoai as number,
+                    compareData?.tongLuotXeCacLoai as number,
+                  ),
+                  text: bieuThucText,
+                },
+                tongLuotHanhKhach: {
+                  ...tinhTrend(
+                    currentData?.tongLuotHanhKhach as number,
+                    compareData?.tongLuotHanhKhach as number,
+                  ),
+                  text: bieuThucText,
+                },
+                tongLuotThueBao: {
+                  ...tinhTrend(
+                    currentData?.tongLuotThueBao as number,
+                    compareData?.tongLuotThueBao as number,
+                  ),
+                  text: bieuThucText,
+                },
+                tongLuotVeDinhKy: {
+                  ...tinhTrend(
+                    currentData?.tongVeDinhKy as number,
+                    compareData?.tongVeDinhKy as number,
+                  ),
+                  text: bieuThucText,
+                },
+                // BỔ SUNG TẠI ĐÂY: Tính trend riêng cho bến cao nhất
+                benCaoNhat: {
+                  ...tinhTrend(
+                    doanhThuBenCaoNhat as number,
+                    doanhThuBenCaoNhatQuaKhu,
+                  ),
+                  text: bieuThucText,
+                },
+              }
+            : null,
+      };
+    } catch (error) {
+      console.error('Lỗi tại hàm findAll tối ưu hóa:', error);
+      throw new InternalServerErrorException('Lỗi tính toán dữ liệu tổng hợp.');
+    }
+  }
+
+  private async executeAggregation(
+    fromDate: Date,
+    toDate: Date,
+    location?: string,
+    search?: string,
+  ) {
+    const matchStage: any = {
+      ngay_nhap: { $gte: fromDate, $lte: toDate },
+    };
+
+    if (location && location !== 'ALL') {
+      matchStage.ma_ben = location;
+    }
+
+    if (search) {
+      matchStage.$or = [{ ma_ben: { $regex: search, $options: 'i' } }];
+    }
+
+    // 2. Thực hiện tính toán tổng hợp nâng cao cho mảng lồng nhau
+    const result = await this.sanLuongModel
+      .aggregate([
+        { $match: matchStage },
+        {
+          $group: {
+            _id: null,
+            // Chỉ tiêu 1: Doanh thu thuần nằm ở tầng gốc (Root), tính tổng bình thường
+            tongDoanhThu: { $sum: '$doanh_thu_thuan_tong_cong' },
+
+            // Chỉ tiêu 2: Duyệt mảng chi_tiet_san_luong, nếu nhom_cha là "LUOT_XE" thì cộng dồn so_luot_xe
+            tongLuotXeCacLoai: {
+              $sum: {
+                $sum: {
+                  $map: {
+                    input: '$chi_tiet_san_luong',
+                    as: 'item',
+                    in: {
+                      $cond: [
+                        { $eq: ['$$item.nhom_cha', 'XE_CAC_LOAI'] }, // Có thể db lưu là "LUOT_XE" hoặc chữ thường, bạn check lại hoa/thường nhé
+                        '$$item.so_luot_xe',
+                        0,
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+
+            // Chỉ tiêu 3: Duyệt mảng chi_tiet_san_luong, nếu nhom_cha là "HANH_KHACH" thì cộng dồn so_luot_xe
+            tongLuotHanhKhach: {
+              $sum: {
+                $sum: {
+                  $map: {
+                    input: '$chi_tiet_san_luong',
+                    as: 'item',
+                    in: {
+                      $cond: [
+                        { $eq: ['$$item.nhom_cha', 'HANH_KHACH'] }, // Khớp đúng nhom_cha trong DB của bạn
+                        '$$item.so_luot_xe', // Trong DB trường lưu số lượng của hành khách vẫn tên là so_luot_xe
+                        0,
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+            // Chỉ tiêu 3: Duyệt mảng chi_tiet_san_luong, nếu nhom_cha là "HANH_KHACH" thì cộng dồn so_luot_xe
+            tongLuotThueBao: {
+              $sum: {
+                $sum: {
+                  $map: {
+                    input: '$chi_tiet_san_luong',
+                    as: 'item',
+                    in: {
+                      $cond: [
+                        { $eq: ['$$item.nhom_cha', 'THUE_BAO'] }, // Khớp đúng nhom_cha trong DB của bạn
+                        '$$item.so_luot_xe', // Trong DB trường lưu số lượng của hành khách vẫn tên là so_luot_xe
+                        0,
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+
+            // Chỉ tiêu 4: Tính tổng vé định kỳ (Vé tháng/Vé quý)
+            // Nếu DB của bạn có lưu trường tổng cộng sẵn ở đáy như doanh_thu_ve_thang thì cộng trường đó,
+            // còn nếu lưu trong mảng chi_tiet_san_luong với nhom_cha là "VE_DINH_KY" thì sửa điều kiện dưới đây:
+            tongLuotVeDinhKy: {
+              $sum: {
+                $sum: {
+                  $map: {
+                    input: '$chi_tiet_san_luong',
+                    as: 'item',
+                    in: {
+                      $cond: [
+                        {
+                          $in: [
+                            '$$item.nhom_cha',
+                            ['VE_THANG', 'VE_QUI', 'VE_NAM'],
+                          ],
+                        },
+                        '$$item.so_luot_xe',
+                        0,
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      ])
+      .exec();
+    // Trả về dữ liệu sạch cho hàm findAll sử dụng, nếu rỗng trả về mặc định bằng 0
+    return (
+      result[0] || {
+        tongDoanhThu: 0,
+        tongLuotXeCacLoai: 0,
+        tongLuotHanhKhach: 0,
+        tongLuotVeDinhKy: 0,
+        tongLuotThueBao: 0,
+      }
+    );
   }
 
   findOne(id: string) {

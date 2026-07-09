@@ -161,6 +161,23 @@ export const sanLuongService = {
   },
 
   /**
+   * 🌟 Cập nhật dữ liệu sản lượng doanh thu (Đã gạt bỏ an toàn 'any')
+   */
+  getAllSanLuong: async (): Promise<
+    NestApiResponse<CreateSanLuongDoanhThuDto>
+  > => {
+    try {
+      const response =
+        await api.get<NestApiResponse<CreateSanLuongDoanhThuDto>>(
+          `/san-luong-doanh-thu`,
+        );
+      return response.data;
+    } catch (error) {
+      console.error("Lỗi gọi API cập nhật sản lượng:", error);
+      throw error;
+    }
+  },
+  /**
    * 🎫 Hàm phụ trợ bóc tách giá vé chuẩn theo bến (An toàn 100% Strict Type)
    */
   getGiaVe: (ticket: TicketType, benHienTai: string): number => {
@@ -251,6 +268,7 @@ export const MAPPING_VAT_FIELD = {
 } as const;
 
 export const MAPPING_BEN_PHA_FIELD = {
+  ALL: "Tất cả bến phà",
   AH: "Bến phà An Hoà",
   OM: "Bến phà Ô Môi",
   TO: "Bến phà Trà Ôn",
@@ -259,5 +277,41 @@ export const MAPPING_BEN_PHA_FIELD = {
   TG: "Bến phà Thuận Giang",
   TC: "Bến phà Tân Châu",
   VC: "Bến phà Vàm Cống",
-  undefined: "Bến phà khác",
 } as const;
+export type ma_ben = keyof typeof MAPPING_BEN_PHA_FIELD;
+export const DANH_SACH_BEN_PHA_OPTIONS = Object.entries(
+  MAPPING_BEN_PHA_FIELD,
+).map(([key, value]) => ({
+  value: key as ma_ben, // Ép kiểu chặt chẽ, không dùng any
+  label: value,
+}));
+
+export const MAPPING_THOI_GIAN_FIELD = {
+  HOM_NAY: "Hôm nay",
+  BAY_NGAY_GAN_NHAT: "7 ngày gần nhất",
+  BA_MUOI_NGAY_GAN_NHAT: "30 ngày gần nhất",
+  THANG_NAY: "Tháng này",
+  QUI_NAY: "Quý này",
+  NAM_NAY: "Năm nay",
+  TUY_CHON: "Tùy chọn",
+} as const;
+export type ngay_nhap = keyof typeof MAPPING_THOI_GIAN_FIELD;
+export const DANH_SACH_THOI_GIAN_OPTIONS = Object.entries(
+  MAPPING_THOI_GIAN_FIELD,
+).map(([key, value]) => ({
+  value: key as ngay_nhap, // Ép kiểu chặt chẽ, không dùng any
+  label: value,
+}));
+
+export const MAPPING_SO_SANH_FIELD = {
+  KHONG_DOI_CHIEU: "Không đối chiếu",
+  KY_TRUOC: "Kỳ trước",
+  CUNG_KY_NAM_TRUOC: "Cùng kỳ năm trước",
+} as const;
+export type so_sanh = keyof typeof MAPPING_SO_SANH_FIELD;
+export const DANH_SACH_SO_SANH_OPTIONS = Object.entries(
+  MAPPING_SO_SANH_FIELD,
+).map(([key, value]) => ({
+  value: key as so_sanh, // Ép kiểu chặt chẽ, không dùng any
+  label: value,
+}));
