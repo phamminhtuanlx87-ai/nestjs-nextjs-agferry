@@ -127,7 +127,7 @@ export const ThanhTongHopDoanhThu: React.FC<ThanhTongHopProps> = ({
             <span>📊</span> Tổng hợp số liệu{" "}
             {MAPPING_BEN_PHA_FIELD[
               maBen as keyof typeof MAPPING_BEN_PHA_FIELD
-            ] || MAPPING_BEN_PHA_FIELD.undefined}{" "}
+            ] || MAPPING_BEN_PHA_FIELD.ALL}{" "}
             - phiên ngày{" "}
             {formatDate(
               finalNgayNhapStr ? new Date(finalNgayNhapStr) : new Date(),
@@ -143,7 +143,7 @@ export const ThanhTongHopDoanhThu: React.FC<ThanhTongHopProps> = ({
               <span className="text-emerald-400">
                 {MAPPING_BEN_PHA_FIELD[
                   maBen as keyof typeof MAPPING_BEN_PHA_FIELD
-                ] || MAPPING_BEN_PHA_FIELD.undefined}
+                ] || MAPPING_BEN_PHA_FIELD.ALL}
               </span>{" "}
               - PHIÊN NGÀY{" "}
               <span className="text-emerald-400">
