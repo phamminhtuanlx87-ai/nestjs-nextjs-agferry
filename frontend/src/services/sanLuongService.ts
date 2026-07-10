@@ -296,6 +296,8 @@ export const MAPPING_THOI_GIAN_FIELD = {
   TUY_CHON: "Tùy chọn",
 } as const;
 export type ngay_nhap = keyof typeof MAPPING_THOI_GIAN_FIELD;
+
+
 export const DANH_SACH_THOI_GIAN_OPTIONS = Object.entries(
   MAPPING_THOI_GIAN_FIELD,
 ).map(([key, value]) => ({
@@ -315,3 +317,15 @@ export const DANH_SACH_SO_SANH_OPTIONS = Object.entries(
   value: key as so_sanh, // Ép kiểu chặt chẽ, không dùng any
   label: value,
 }));
+
+
+//map cho combochart hiển thị nhãn dễ hiểu hơn.
+export const MAPPING_THOI_GIAN_COMBO_CHART = {
+  HOM_NAY: "Dữ liệu theo Ngày",
+  BAY_NGAY_GAN_NHAT: "7 ngày gần nhất",
+  BA_MUOI_NGAY_GAN_NHAT: "30 ngày gần nhất",
+  THANG_NAY: "Dữ liệu theo Tháng",
+  QUI_NAY: "Dữ liệu theo Quí",
+  NAM_NAY: "Dữ liệu theo Năm",
+  TUY_CHON: "Tùy chọn",
+} as const;

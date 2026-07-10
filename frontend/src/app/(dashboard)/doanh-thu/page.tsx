@@ -1,7 +1,9 @@
 "use client";
 
+import SanLuongChartSection from "@/components/modules/doanh-thu/tong-quan/components/charts/SanLuongChartSection";
 import SanLuongCard from "@/components/modules/doanh-thu/tong-quan/components/SanLuongCard";
 import SanLuongToolbar from "@/components/modules/doanh-thu/tong-quan/components/SanLuongToolbar";
+import { useDuLieuComboChart } from "@/components/modules/doanh-thu/tong-quan/custom-hook/charts/useDuLieuComboChart";
 import useSanLuongFilter from "@/components/modules/doanh-thu/tong-quan/custom-hook/useSanLuongFilter";
 import { useTQSanLuong } from "@/components/modules/doanh-thu/tong-quan/custom-hook/useTQSanLuong";
 import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
@@ -14,8 +16,8 @@ export default function DoanhThuPage() {
   const router = useRouter();
 
   const { filters, xuLyThayDoiBoLoc } = useSanLuongFilter();
-  const { dulieu, isLoading, error } = useTQSanLuong(filters);
-
+  const { duLieuKPI } = useTQSanLuong(filters);
+  const {duLieuComboChart } = useDuLieuComboChart(filters);
   // 1. Quản lý bộ lọc thời gian tập trung tại đây
 
   return (
@@ -46,30 +48,12 @@ export default function DoanhThuPage() {
           {/* ==========================================
            PHÂN KHU 2: CÁC THÈ KPI TỔNG HỢP (Khung Trống)
            ========================================== */}
-          <SanLuongCard isLoading={isLoading} dulieu={dulieu} error={error} />
+          <SanLuongCard duLieuKPI={duLieuKPI} />
         </div>
         {/* ==========================================
            PHÂN KHU 3: KHÔNG GIAN BIỂU ĐỒ (Khung Trống)
            ========================================== */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-8 bg-white p-5 rounded-xl border border-dashed border-slate-300 flex flex-col justify-between min-h-70">
-            <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wide">
-              📊 Biểu đồ xu hướng Doanh thu (Đang hoàn thiện)
-            </h3>
-            <div className="flex-1 flex items-center justify-center text-xs text-slate-400 font-medium italic">
-              Không có dữ liệu hiển thị
-            </div>
-          </div>
-
-          <div className="lg:col-span-4 bg-white p-5 rounded-xl border border-dashed border-slate-300 flex flex-col justify-between min-h-70">
-            <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wide">
-              🍩 Biểu đồ tỷ trọng sản lượng (Đang hoàn thiện)
-            </h3>
-            <div className="flex-1 flex items-center justify-center text-xs text-slate-400 font-medium italic">
-              Không có dữ liệu hiển thị
-            </div>
-          </div>
-        </div>
+        <SanLuongChartSection duLieuComboChart={duLieuComboChart} filters={filters}/>
 
         {/* ==========================================
            PHÂN KHU 4: BẢNG DỮ LIỆU ĐỐI SOÁT (Bảng Trống + Nút Thêm)

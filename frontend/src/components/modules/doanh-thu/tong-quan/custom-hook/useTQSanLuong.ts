@@ -48,15 +48,11 @@ export interface FilterToolbarDto {
 }
 
 export function useTQSanLuong(filters?: FilterToolbarDto) {
-  const [dulieu, setDulieu] = useState<TQSanLuongRes | null>(null);
-  const [isLoading, setDangTai] = useState<boolean>(true);
-  const [error, setLoi] = useState<string | null>(null);
+  const [duLieuKPI, setduLieuKPI] = useState<TQSanLuongRes | null>(null);
 
   useEffect(() => {
     async function goiApiLayDuLieu() {
       try {
-        setDangTai(true);
-        // Đường dẫn gọi đến API Backend của bạn
         const response = await api.get<ApiResponse<TQSanLuongRes>>(
           "/san-luong-doanh-thu?",
           {
@@ -69,19 +65,18 @@ export function useTQSanLuong(filters?: FilterToolbarDto) {
         );
         console.log(response);
         if (response.data && response.data.data) {
-          setDulieu(response.data.data);
+          setduLieuKPI(response.data.data);
         }
       } catch (error) {
         console.error("Lỗi gọi API check sản lượng:", error);
-        setLoi("Lỗi gọi API check sản lượng: " + error);
+
         throw error;
       } finally {
-        setDangTai(false);
       }
     }
 
     goiApiLayDuLieu();
   }, [filters]);
 
-  return { dulieu, isLoading, error };
+  return { duLieuKPI };
 }

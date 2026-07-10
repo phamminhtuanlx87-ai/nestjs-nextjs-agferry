@@ -21,6 +21,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { GetSanLuongDto } from './dto/get-san-luong-doanh-thi.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { FilterToolbarDto } from './dto/filter-toolbar.dto';
+import { GetChartSanLuongDoanhThuDto } from './dto/get-chart-san-luong-doanh-thu.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -77,6 +78,18 @@ export class SanLuongDoanhThuController {
     };
   }
 
+  @Get('chart')
+  @SkipThrottle({ default: true })
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER)
+  async layDuLieuBieuDo(@Query() filters: GetChartSanLuongDoanhThuDto) {
+    const result = await this.sanLuongDoanhThuService.layDuLieuBieuDo(filters);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Lấy dữ liệu biểu đồ thành công',
+      data: result,
+    };
+  }
   // @Get(':id')
   // @SkipThrottle()
   // findOne(@Param('id') id: string) {

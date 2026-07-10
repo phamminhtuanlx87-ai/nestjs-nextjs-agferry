@@ -27,9 +27,21 @@ import { GetSanLuongDto } from './dto/get-san-luong-doanh-thi.dto';
 import { FilterToolbarDto } from './dto/filter-toolbar.dto';
 import { getCompareDateRange, getDateRange } from './utils/date-range.helper';
 import { MAP_TEN_BEN } from './constants/mapping_ben_pha';
+import {
+  ChartSanLuongDoanhThuResponseDto,
+  DuLieuComboChartDto,
+} from './dto/chart-san-luong-doanh-thu-response.dto';
+import { GetChartSanLuongDoanhThuDto } from './dto/get-chart-san-luong-doanh-thu.dto';
 
 export const START_DATE_REALTIME = '2026-08-01';
 export const LEGACY_DAY_SNAPSHOT = '20';
+const MUI_GIO_VIET_NAM = 'Asia/Ho_Chi_Minh';
+
+interface DuLieuBieuDoAggregate {
+  _id: string;
+  san_luong: number;
+  doanh_thu: number;
+}
 // interface BenCaoNhatAggregateResult {
 //   _id: string | null; // ma ben
 //   tongDoanhThuBen: number;
@@ -452,8 +464,8 @@ export class SanLuongDoanhThuService {
                 },
                 tongLuotVeDinhKy: {
                   ...tinhTrend(
-                    currentData?.tongVeDinhKy as number,
-                    compareData?.tongVeDinhKy as number,
+                    currentData?.tongLuotVeDinhKy as number,
+                    compareData?.tongLuotVeDinhKy as number,
                   ),
                   text: bieuThucText,
                 },
@@ -474,6 +486,80 @@ export class SanLuongDoanhThuService {
     }
   }
 
+  async layDuLieuBieuDo(
+    filters: GetChartSanLuongDoanhThuDto,
+  ): Promise<ChartSanLuongDoanhThuResponseDto> {
+    const khoangThoiGian = getDateRange(filters.time);
+    const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);
+
+    const dieuKienLoc: {
+      ngay_nhap: { $gte: Date; $lte: Date };
+      ma_ben?: string;
+    } = {
+      ngay_nhap: {
+        $gte:
+          khoangThoiGian.toDate <= fenceDate
+            ? new Date(`${dayjs(filters.time).year()}-01-01T12:00:00.000Z`)
+            : khoangThoiGian.fromDate,
+        $lte: khoangThoiGian.toDate,
+      },
+    };
+
+    if (filters.location !== 'ALL') {
+      dieuKienLoc.ma_ben = filters.location;
+    }
+
+    const duLieuTongHop = await this.sanLuongModel
+      .aggregate<DuLieuBieuDoAggregate>([
+        { $match: dieuKienLoc },
+        {
+          $project: {
+            ngay: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: '$ngay_nhap',
+                timezone: MUI_GIO_VIET_NAM,
+              },
+            },
+            san_luong: {
+              $sum: {
+                $map: {
+                  input: { $ifNull: ['$chi_tiet_san_luong', []] },
+                  as: 'chiTiet',
+                  in: { $ifNull: ['$$chiTiet.so_luot_xe', 0] },
+                },
+              },
+            },
+            doanh_thu: { $ifNull: ['$doanh_thu_thuan_tong_cong', 0] },
+          },
+        },
+        {
+          $group: {
+            _id: '$ngay',
+            san_luong: { $sum: '$san_luong' },
+            doanh_thu: { $sum: '$doanh_thu' },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ])
+      .exec();
+
+    const duLieu: DuLieuComboChartDto[] = duLieuTongHop.map((item) => ({
+      ngay: item._id,
+      nhan: dayjs(item._id).format('DD/MM'),
+      san_luong: item.san_luong,
+      doanh_thu: item.doanh_thu,
+    }));
+
+    return {
+      don_vi_san_luong: 'lượt',
+      don_vi_doanh_thu: 'đ',
+      loai_nhom: 'NGAY',
+      tu_ngay: dayjs(khoangThoiGian.fromDate).format('YYYY-MM-DD'),
+      den_ngay: dayjs(khoangThoiGian.toDate).format('YYYY-MM-DD'),
+      du_lieu: duLieu,
+    };
+  }
   private async executeAggregation(
     fromDate: Date,
     toDate: Date,
