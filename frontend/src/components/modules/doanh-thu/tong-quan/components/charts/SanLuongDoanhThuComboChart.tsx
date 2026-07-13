@@ -18,9 +18,11 @@ import {
   MAPPING_THOI_GIAN_COMBO_CHART,
 } from "@/services/sanLuongService";
 import { FilterToolbarDto } from "../../custom-hook/useTQSanLuong";
+import dayjs from "dayjs";
 
 interface SanLuongDoanhThuChartItem {
-  thoiGian: string;
+  thoiGian?: string;
+  nhomSanLuong?: string;
   sanLuong: number;
   doanhThu: number;
 }
@@ -50,6 +52,21 @@ const SanLuongDoanhThuComboChart = ({
   duLieuComboChart,
   filters,
 }: DuLieuChartProps) => {
+  const filerLable = (label: string) => {
+    if (label === "HOM_NAY") {
+      const now = dayjs();
+      return (
+        MAPPING_THOI_GIAN_COMBO_CHART[
+          label as keyof typeof MAPPING_THOI_GIAN_COMBO_CHART
+        ] +
+        " " +
+        dayjs(now).format("DD/MM/YYYY")
+      );
+    }
+    return MAPPING_THOI_GIAN_COMBO_CHART[
+      label as keyof typeof MAPPING_THOI_GIAN_COMBO_CHART
+    ];
+  };
   // 2. Chuyển đổi dữ liệu từ duLieuComboChart sang mảng chartData chuẩn cấu trúc của bạn
   const chartData: SanLuongDoanhThuChartItem[] = useMemo(() => {
     // Bẫy logic an toàn: Nếu API chưa trả về hoặc mảng rỗng, trả về mảng rỗng ngay để tránh lỗi crash trang
@@ -59,7 +76,7 @@ const SanLuongDoanhThuComboChart = ({
 
     // Thực hiện map từng phần tử từ API sang kiểu cấu trúc mong muốn
     return duLieuComboChart.du_lieu?.map((item) => ({
-      thoiGian: item.nhan, // API "nhan" -> "thoiGian" (Ví dụ: "20/07")
+      nhomSanLuong: item.nhan, // API "nhan" -> "thoiGian" (Ví dụ: "20/07")
       sanLuong: Number(item.san_luong) || 0, // Ép từ string sang number, tránh bẫy NaN tài chính
       doanhThu: Number(item.doanh_thu) || 0, // Ép từ string sang number, bảo toàn sổ sách
     }));
@@ -77,9 +94,7 @@ const SanLuongDoanhThuComboChart = ({
             MAPPING_THOI_GIAN_COMBO_CHART[
               filters.time as keyof typeof MAPPING_THOI_GIAN_COMBO_CHART
             ]
-              ? MAPPING_THOI_GIAN_COMBO_CHART[
-                  filters.time as keyof typeof MAPPING_THOI_GIAN_COMBO_CHART
-                ]
+              ? filerLable(filters?.time)
               : ""}
           </span>
           {/* 2. Trạng thái Phạm vi bến (Đảm bảo đồng bộ chuẩn mã ALL hoặc TAT_CA_BEN theo service của bạn) */}
@@ -116,13 +131,14 @@ const SanLuongDoanhThuComboChart = ({
                 vertical={false}
               />
               <XAxis
-                dataKey="thoiGian"
+                dataKey="nhomSanLuong"
                 tick={{ fontSize: 12, fill: "#64748b" }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
                 yAxisId="sanLuong"
+                name="sanLuong"
                 orientation="left"
                 tickFormatter={formatNumber}
                 tick={{ fontSize: 12, fill: "#64748b" }}
@@ -133,6 +149,7 @@ const SanLuongDoanhThuComboChart = ({
               <YAxis
                 yAxisId="doanhThu"
                 orientation="right"
+                name="doanhThu"
                 tickFormatter={formatCompactCurrency}
                 tick={{ fontSize: 12, fill: "#64748b" }}
                 axisLine={false}
@@ -141,13 +158,20 @@ const SanLuongDoanhThuComboChart = ({
               />
               <Tooltip
                 formatter={(value, name) => {
-                  if (name === "doanhThu") {
+                  // In ra console để bạn bấm F12 xem thực tế Recharts đang gửi chữ 'name' là gì
+                  console.log("Recharts Name:", name, "Value:", value);
+
+                  // Ép name về chữ thường và kiểm tra xem có chứa chữ "doanh" hay không
+                  const isDoanhThu =
+                    String(name).toLowerCase().includes("doanh") ||
+                    Number(value) > 10000;
+
+                  if (isDoanhThu) {
                     return [`${formatNumber(Number(value))} đ`, "Doanh thu"];
                   }
 
-                  return [formatNumber(Number(value)), "Sản lượng"];
+                  return [`${formatNumber(Number(value))} lượt`, "Sản lượng"];
                 }}
-                labelFormatter={(label) => `Thời gian: ${label}`}
               />
               <Legend verticalAlign="top" height={28} />
               <Bar

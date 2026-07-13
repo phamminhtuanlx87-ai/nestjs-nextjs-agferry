@@ -1,8 +1,14 @@
 import dayjs from 'dayjs';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
+import { GetChartSanLuongDoanhThuDto } from '../dto/get-chart-san-luong-doanh-thu.dto';
+import {
+  CauHinhFilterChart,
+  KieuHienThiChart,
+  LoaiThoiGianBieuDo,
+} from '../constants/mapping_ben_pha';
 dayjs.extend(quarterOfYear);
 
-export function getDateRange(timeType: string) {
+export function getDateRange(timeType?: string) {
   const now = dayjs();
   let fromDate = now.startOf('month'); // Mặc định là đầu tháng này
   let toDate = now.endOf('month'); // Mặc định là cuối tháng này
@@ -135,5 +141,63 @@ export function getCompareDateRange(timeType: string, compareType: string) {
   return {
     compareFromDate: compareFromDate.toDate(),
     compareToDate: compareToDate.toDate(),
+  };
+}
+
+/**
+ * Lấy khoảng thời gian bắt đầu và kết thúc của ngày hôm nay
+ * @returns { ngayBatDau: Date, ngayKetThuc: Date }
+ */
+export function layKhoangThoiGianHomNay() {
+  const ngayHienTai = dayjs();
+
+  return {
+    ngayBatDau: ngayHienTai.startOf('day'),
+    ngayKetThuc: ngayHienTai.endOf('day'),
+  };
+}
+
+/**
+ * Xác định kiểu hiển thị chart và thuộc tính gom nhóm dữ liệu dựa trên loại filter
+ * @param loaiFilter Loại filter thời gian được chọn
+ * @r eturns { kieuChart: KieuHienThiChart, groupBy: string }
+ */
+export function xacDinhKieuHienThiTheoFilter(
+  loaiFilter?: GetChartSanLuongDoanhThuDto,
+) {
+  // Nếu không có filter (mặc định) hoặc filter chọn "Hôm nay" -> hiển thị theo bến pha
+  if (!loaiFilter || loaiFilter.time === LoaiThoiGianBieuDo.HOM_NAY) {
+    return {
+      kieuChart: KieuHienThiChart.THEO_BEN_PHA,
+      groupBy: '$ma_ben', // Định hướng tương lai mở rộng Dimension ở Backend
+    };
+  }
+
+  // Mặc định cho các filter thời gian khác (7 ngày, 30 ngày, tháng, quý, năm)
+  return {
+    kieuChart: KieuHienThiChart.THEO_THOI_GIAN,
+    groupBy: '$ngay',
+  };
+}
+
+/**
+ * Hàm chính xử lý cấu hình filter cho Chart sản lượng doanh thu
+ * @param loaiFilter Loại filter đầu vào từ FilterToolbarDto
+ */
+export function layCauHinhFilterChart(
+  loaiFilter?: GetChartSanLuongDoanhThuDto,
+): CauHinhFilterChart {
+  // 1. Khởi tạo giá trị mặc định cho khoảng thời gian
+  const { fromDate, toDate } = getDateRange(loaiFilter?.time);
+  // 2. Xử lý khoảng thời gian dựa trên filter (Hiện tại tập trung tối ưu trước cho HOM_NAY)
+
+  // 3. Xác định cấu hình hiển thị biểu đồ tương ứng
+  const { kieuChart, groupBy } = xacDinhKieuHienThiTheoFilter(loaiFilter);
+
+  return {
+    ngayBatDau: fromDate,
+    ngayKetThuc: toDate,
+    kieuChart,
+    groupBy,
   };
 }

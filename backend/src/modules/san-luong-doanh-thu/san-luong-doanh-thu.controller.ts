@@ -50,7 +50,6 @@ export class SanLuongDoanhThuController {
   @Get('check-data')
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER)
   async checkData(@Query() query: GetSanLuongDto, @Res() res) {
-    console.log('Dang chay checkData()');
     const result = await this.sanLuongDoanhThuService.checkVaLayDuLieu(query);
 
     // Trả về response chuẩn JSON
@@ -65,12 +64,8 @@ export class SanLuongDoanhThuController {
   @SkipThrottle({ default: true })
   @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER)
   async findAll(@Query() filters: FilterToolbarDto) {
-    console.log('Dang chay findAll()');
-    console.log('--- Đang chạy findAll() tại Controller ---');
-
     // 🌟 PHẢI CÓ chữ "await" ở đây để đợi dữ liệu từ MongoDB Aggregate quét xong
     const result = await this.sanLuongDoanhThuService.findAll(filters);
-    console.log(result);
     return {
       statusCode: HttpStatus.OK,
       message: 'Lấy dữ liệu thàng công',

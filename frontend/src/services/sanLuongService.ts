@@ -237,22 +237,22 @@ export const MAPPING_NHOM_VE: Record<
   XT_TU_15T_DEN_20T: { nhom_cha: "XE_CAC_LOAI", nhom_con: "XE_TAI" },
   XT_20T_TRO_LEN: { nhom_cha: "XE_CAC_LOAI", nhom_con: "XE_TAI" },
 
-  TB_PHA_30T: { nhom_cha: "THUE_BAO", nhom_con: "XE_TAI" },
-  TB_PHA_60T: { nhom_cha: "THUE_BAO", nhom_con: "XE_TAI" },
-  TB_PHA_100T: { nhom_cha: "THUE_BAO", nhom_con: "XE_TAI" },
-  TB_PHA_200T: { nhom_cha: "THUE_BAO", nhom_con: "XE_TAI" },
+  TB_PHA_30T: { nhom_cha: "THUE_BAO", nhom_con: "THUE_BAO" },
+  TB_PHA_60T: { nhom_cha: "THUE_BAO", nhom_con: "THUE_BAO" },
+  TB_PHA_100T: { nhom_cha: "THUE_BAO", nhom_con: "THUE_BAO" },
+  TB_PHA_200T: { nhom_cha: "THUE_BAO", nhom_con: "THUE_BAO" },
 
-  VE_THANG_HK: { nhom_cha: "VE_THANG", nhom_con: "HANH_KHACH" },
-  VE_THANG_DUOI_7C: { nhom_cha: "VE_THANG", nhom_con: "XE_KHACH" },
-  VE_THANG_TU_7C_DEN_12C: { nhom_cha: "VE_THANG", nhom_con: "XE_KHACH" },
+  VE_THANG_HK: { nhom_cha: "VE_THANG", nhom_con: "VE_THANG" },
+  VE_THANG_DUOI_7C: { nhom_cha: "VE_THANG", nhom_con: "VE_THANG" },
+  VE_THANG_TU_7C_DEN_12C: { nhom_cha: "VE_THANG", nhom_con: "VE_THANG" },
 
-  VE_QUI_HK: { nhom_cha: "VE_QUI", nhom_con: "HANH_KHACH" },
-  VE_QUI_7C: { nhom_cha: "VE_QUI", nhom_con: "XE_KHACH" },
-  VE_QUI_TU_7C_DEN_12C: { nhom_cha: "VE_QUI", nhom_con: "XE_KHACH" },
+  VE_QUI_HK: { nhom_cha: "VE_QUI", nhom_con: "VE_QUI" },
+  VE_QUI_7C: { nhom_cha: "VE_QUI", nhom_con: "VE_QUI" },
+  VE_QUI_TU_7C_DEN_12C: { nhom_cha: "VE_QUI", nhom_con: "VE_QUI" },
 
-  VE_NAM_HK: { nhom_cha: "VE_NAM", nhom_con: "HANH_KHACH" },
-  VE_NAM_DUOI_7C: { nhom_cha: "VE_NAM", nhom_con: "XE_KHACH" },
-  VE_NAM_TU_7C_DEN_12C: { nhom_cha: "VE_NAM", nhom_con: "XE_KHACH" },
+  VE_NAM_HK: { nhom_cha: "VE_NAM", nhom_con: "VE_NAM" },
+  VE_NAM_DUOI_7C: { nhom_cha: "VE_NAM", nhom_con: "VE_NAM" },
+  VE_NAM_TU_7C_DEN_12C: { nhom_cha: "VE_NAM", nhom_con: "VE_NAM" },
 };
 
 export const MAPPING_VAT_FIELD = {
@@ -321,7 +321,7 @@ export const DANH_SACH_SO_SANH_OPTIONS = Object.entries(
 
 //map cho combochart hiển thị nhãn dễ hiểu hơn.
 export const MAPPING_THOI_GIAN_COMBO_CHART = {
-  HOM_NAY: "Dữ liệu theo Ngày",
+  HOM_NAY: "Dữ liệu Ngày",
   BAY_NGAY_GAN_NHAT: "7 ngày gần nhất",
   BA_MUOI_NGAY_GAN_NHAT: "30 ngày gần nhất",
   THANG_NAY: "Dữ liệu theo Tháng",

@@ -25,23 +25,32 @@ import {
 import dayjs from 'dayjs';
 import { GetSanLuongDto } from './dto/get-san-luong-doanh-thi.dto';
 import { FilterToolbarDto } from './dto/filter-toolbar.dto';
-import { getCompareDateRange, getDateRange } from './utils/date-range.helper';
-import { MAP_TEN_BEN } from './constants/mapping_ben_pha';
+import {
+  getCompareDateRange,
+  getDateRange,
+  layCauHinhFilterChart,
+} from './utils/date-range.helper';
+import {
+  LoaiThoiGianBieuDo,
+  MAP_TEN_BEN,
+  MAPPING_CHUNG_LOAI_FIELD,
+} from './constants/mapping_ben_pha';
 import {
   ChartSanLuongDoanhThuResponseDto,
   DuLieuComboChartDto,
 } from './dto/chart-san-luong-doanh-thu-response.dto';
 import { GetChartSanLuongDoanhThuDto } from './dto/get-chart-san-luong-doanh-thu.dto';
 
-export const START_DATE_REALTIME = '2026-08-01';
+export const START_DATE_REALTIME = '2026-07-01';
 export const LEGACY_DAY_SNAPSHOT = '20';
 const MUI_GIO_VIET_NAM = 'Asia/Ho_Chi_Minh';
 
-interface DuLieuBieuDoAggregate {
-  _id: string;
-  san_luong: number;
-  doanh_thu: number;
-}
+// interface DuLieuBieuDoAggregate {
+//   _id: string;
+//   san_luong: number;
+//   doanh_thu: number;
+// }
+
 // interface BenCaoNhatAggregateResult {
 //   _id: string | null; // ma ben
 //   tongDoanhThuBen: number;
@@ -489,8 +498,9 @@ export class SanLuongDoanhThuService {
   async layDuLieuBieuDo(
     filters: GetChartSanLuongDoanhThuDto,
   ): Promise<ChartSanLuongDoanhThuResponseDto> {
-    const khoangThoiGian = getDateRange(filters.time);
+    // const khoangThoiGian = getDateRange(filters.time);
     const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);
+    const { ngayBatDau, ngayKetThuc, groupBy } = layCauHinhFilterChart(filters);
 
     const dieuKienLoc: {
       ngay_nhap: { $gte: Date; $lte: Date };
@@ -498,10 +508,10 @@ export class SanLuongDoanhThuService {
     } = {
       ngay_nhap: {
         $gte:
-          khoangThoiGian.toDate <= fenceDate
-            ? new Date(`${dayjs(filters.time).year()}-01-01T12:00:00.000Z`)
-            : khoangThoiGian.fromDate,
-        $lte: khoangThoiGian.toDate,
+          ngayKetThuc < fenceDate
+            ? new Date(`${dayjs(ngayBatDau).year()}-01-01T12:00:00.000Z`)
+            : ngayBatDau,
+        $lte: ngayKetThuc,
       },
     };
 
@@ -509,57 +519,126 @@ export class SanLuongDoanhThuService {
       dieuKienLoc.ma_ben = filters.location;
     }
 
-    const duLieuTongHop = await this.sanLuongModel
-      .aggregate<DuLieuBieuDoAggregate>([
-        { $match: dieuKienLoc },
-        {
-          $project: {
-            ngay: {
-              $dateToString: {
-                format: '%Y-%m-%d',
-                date: '$ngay_nhap',
-                timezone: MUI_GIO_VIET_NAM,
+    let duLieuTongHop;
+    let duLieu: DuLieuComboChartDto[] = [];
+    const THU_TU_UU_TIEN = Object.keys(MAPPING_CHUNG_LOAI_FIELD);
+    switch (filters?.time) {
+      case LoaiThoiGianBieuDo.HOM_NAY:
+        duLieuTongHop = await this.sanLuongModel
+          .aggregate([
+            // 1. Lọc theo ngày hôm nay (dieuKienLoc đã chứa khoảng thời gian start/end của hôm nay)
+            { $match: dieuKienLoc },
+
+            // 2. Trải phẳng mảng chi tiết sản lượng ra thành các bản ghi độc lập
+            {
+              $unwind: {
+                path: '$chi_tiet_san_luong',
+                preserveNullAndEmptyArrays: false, // Bỏ qua nếu mảng rỗng để tránh bản ghi rác
               },
             },
-            san_luong: {
-              $sum: {
-                $map: {
-                  input: { $ifNull: ['$chi_tiet_san_luong', []] },
-                  as: 'chiTiet',
-                  in: { $ifNull: ['$$chiTiet.so_luot_xe', 0] },
+
+            // 3. Chiếu xuất các trường cần thiết ra để tầng sau xử lý cho nhẹ dữ liệu
+            {
+              $project: {
+                nhom_con: '$chi_tiet_san_luong.nhom_con',
+                so_luot_xe: '$chi_tiet_san_luong.so_luot_xe',
+                tong_doanh_thu: '$chi_tiet_san_luong.tong_doanh_thu',
+                ngay: {
+                  $dateToString: {
+                    format: '%Y-%m-%d',
+                    date: '$ngay_nhap',
+                    timezone: MUI_GIO_VIET_NAM,
+                  },
                 },
               },
             },
-            doanh_thu: { $ifNull: ['$doanh_thu_thuan_tong_cong', 0] },
-          },
-        },
-        {
-          $group: {
-            _id: '$ngay',
-            san_luong: { $sum: '$san_luong' },
-            doanh_thu: { $sum: '$doanh_thu' },
-          },
-        },
-        { $sort: { _id: 1 } },
-      ])
-      .exec();
 
-    const duLieu: DuLieuComboChartDto[] = duLieuTongHop.map((item) => ({
-      ngay: item._id,
-      nhan: dayjs(item._id).format('DD/MM'),
-      san_luong: item.san_luong,
-      doanh_thu: item.doanh_thu,
-    }));
+            // 4. 🔥 GOM NHÓM THEO NHÓM CON (Hành Khách, Xe Máy, Xe Tải...)
+            {
+              $group: {
+                _id: '$nhom_con', // Tiêu chí gom nhóm chính xác theo trường nhom_con
+                san_luong: { $sum: { $ifNull: ['$so_luot_xe', 0] } }, // Cộng dồn số lượt xe
+                doanh_thu: { $sum: { $ifNull: ['$tong_doanh_thu', 0] } }, // Cộng dồn tổng doanh thu từng loại
+              },
+            },
 
+            // 5. Sắp xếp kết quả theo tên nhóm con từ A -> Z cho đẹp biểu đồ
+            { $sort: { _id: 1 } },
+          ])
+          .exec();
+        duLieu = duLieuTongHop.map((item) => ({
+          nhom: item._id,
+          // nhan: dayjs(item.ngay as Date).format('DD/MM'),
+          nhan: MAPPING_CHUNG_LOAI_FIELD[item._id],
+          san_luong: item.san_luong,
+          doanh_thu: item.doanh_thu,
+        }));
+
+        duLieu.sort((a: any, b: any) => {
+          const indexA = THU_TU_UU_TIEN.indexOf(String(a.nhom ?? ''));
+          const indexB = THU_TU_UU_TIEN.indexOf(String(b.nhom ?? ''));
+
+          // Nếu không tìm thấy trong cấu hình Record, đẩy về cuối cùng
+          return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
+        });
+
+        break;
+      case LoaiThoiGianBieuDo.BAY_NGAY_GAN_NHAT:
+      case LoaiThoiGianBieuDo.BA_MUOI_NGAY_GAN_NHAT:
+      case LoaiThoiGianBieuDo.THANG_NAY:
+        duLieuTongHop = await this.sanLuongModel
+          .aggregate([
+            { $match: dieuKienLoc },
+            {
+              $project: {
+                ngay: {
+                  $dateToString: {
+                    format: '%Y-%m-%d',
+                    date: '$ngay_nhap',
+                    timezone: MUI_GIO_VIET_NAM,
+                  },
+                },
+                ma_ben: '$ma_ben',
+                san_luong: {
+                  $sum: {
+                    $map: {
+                      input: { $ifNull: ['$chi_tiet_san_luong', []] },
+                      as: 'chiTiet',
+                      in: { $ifNull: ['$$chiTiet.so_luot_xe', 0] },
+                    },
+                  },
+                },
+                doanh_thu: { $ifNull: ['$doanh_thu_thuan_tong_cong', 0] },
+              },
+            },
+            {
+              $group: {
+                _id: groupBy,
+                san_luong: { $sum: '$san_luong' },
+                doanh_thu: { $sum: '$doanh_thu' },
+              },
+            },
+            { $sort: { _id: 1 } },
+          ])
+          .exec();
+        duLieu = duLieuTongHop.map((item) => ({
+          nhom: item._id,
+          nhan: dayjs(item._id as Date).format('DD/MM'),
+          san_luong: item.san_luong,
+          doanh_thu: item.doanh_thu,
+        }));
+        break;
+    }
     return {
       don_vi_san_luong: 'lượt',
       don_vi_doanh_thu: 'đ',
       loai_nhom: 'NGAY',
-      tu_ngay: dayjs(khoangThoiGian.fromDate).format('YYYY-MM-DD'),
-      den_ngay: dayjs(khoangThoiGian.toDate).format('YYYY-MM-DD'),
+      tu_ngay: dayjs(ngayBatDau).format('YYYY-MM-DD'),
+      den_ngay: dayjs(ngayKetThuc).format('YYYY-MM-DD'),
       du_lieu: duLieu,
     };
   }
+
   private async executeAggregation(
     fromDate: Date,
     toDate: Date,
@@ -963,7 +1042,7 @@ export class SanLuongDoanhThuService {
 
     // 1. Phân tích ngày bằng dayjs
     let ngayTruyVan = dayjs(ngay);
-    const mocGioiHan = dayjs('2026-08-01');
+    const mocGioiHan = dayjs(START_DATE_REALTIME);
 
     // 2. 🌟 Bẻ ngày: Nếu ngày nhập < 01/08/2026 thì lấy ngày 20 của tháng đó
     if (ngayTruyVan.isBefore(mocGioiHan)) {

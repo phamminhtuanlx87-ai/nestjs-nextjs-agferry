@@ -1,6 +1,7 @@
 export interface DuLieuComboChartDto {
   ngay: string;
   nhan: string;
+  nhom_con?: string;
   san_luong: number;
   doanh_thu: number;
 }

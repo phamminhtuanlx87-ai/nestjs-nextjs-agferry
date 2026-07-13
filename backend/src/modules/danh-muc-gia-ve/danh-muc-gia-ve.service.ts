@@ -44,30 +44,6 @@ export class DanhMucGiaVeService {
   }
 
   async findAll(ngay?: string) {
-    // 1. Tạo object điều kiện mặc định
-    // const queryCondition: QueryFilter<DanhMucGiaVeDocument> = {
-    //   kich_hoat: true,
-    // };
-    // // 2. Nếu frontend có truyền ngày lên, thêm điều kiện: ngay_ap_dung <= ngay được chọn
-    // if (ngay) {
-    //   const endOfSelectedDay = new Date(ngay);
-    //   endOfSelectedDay.setHours(23, 59, 59, 999);
-    //   // Truy vấn linh hoạt bằng cách ép kiểm tra cả dạng Date Object và chuỗi ISO string phòng hờ dữ liệu lệch kiểu
-    //   queryCondition.$or = [
-    //     { ngay_ap_dung: { $lte: endOfSelectedDay } },
-    //     { ngay_ap_dung: { $lte: ngay } },
-    //     {
-    //       'lich_su_gia.ngay_ap_dung': { $lte: endOfSelectedDay.toISOString() },
-    //     },
-    //   ];
-    // }
-    // // 3. Thực thi query thống nhất theo chuẩn Mongoose của anh
-    // return await this.danhMucGiaVeModel
-    //   .find(queryCondition)
-    //   .sort({ ngay_ap_dung: -1, updatedAt: -1 }) // Ưu tiên ngày áp dụng mới nhất lên đầu
-    //   .select('-permissions -__v')
-    //   .exec();
-
     // 1. Khởi tạo điều kiện lọc mặc định
     const queryCondition: QueryFilter<any> = {
       kich_hoat: true,
@@ -86,13 +62,13 @@ export class DanhMucGiaVeService {
       // Ép ngày nhập về mốc thời gian cuối ngày dưới dạng số (Timestamp) để so sánh chuẩn xác
       const endOfSelectedDay = new Date(ngay);
       endOfSelectedDay.setHours(23, 59, 59, 999);
-      const mốcThờiGianNhập = endOfSelectedDay.getTime();
+      const mocthoigian = endOfSelectedDay.getTime();
 
       for (const ve of danhSachGiaVe) {
         if (ve.lich_su_gia && Array.isArray(ve.lich_su_gia)) {
           // Bước A: Lọc các mốc lịch sử nhỏ hơn hoặc bằng ngày nhập
           const cacMocHopLe = ve.lich_su_gia.filter((lichSu: LichSuGiaDTO) => {
-            return new Date(lichSu.ngay_ap_dung).getTime() <= mốcThờiGianNhập;
+            return new Date(lichSu.ngay_ap_dung).getTime() <= mocthoigian;
           });
 
           // Bước B: Sắp xếp mốc mới nhất lên đầu mảng (Vị trí index 0)

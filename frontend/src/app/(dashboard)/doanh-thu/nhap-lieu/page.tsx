@@ -131,15 +131,15 @@ export default function NhapLieuDoanhThuPage() {
 
             setValue(
               "thue_vat_ve_thang",
-              dataSanLuong.doanh_thu_theo_ve?.vat || 10,
+              dataSanLuong.doanh_thu_theo_ve?.vat || 8,
             );
             setValue(
               "thue_vat_ve_qui",
-              dataSanLuong.doanh_thu_theo_ve?.vat || 10,
+              dataSanLuong.doanh_thu_theo_ve?.vat || 8,
             );
             setValue(
               "thue_vat_ve_nam",
-              dataSanLuong.doanh_thu_theo_ve?.vat || 10,
+              dataSanLuong.doanh_thu_theo_ve?.vat || 8,
             );
           }
         } else {
