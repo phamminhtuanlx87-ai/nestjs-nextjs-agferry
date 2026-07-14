@@ -275,7 +275,6 @@ export default function NhapLieuDoanhThuPage() {
   const onSubmit = async (formData: SanLuongFormInputs) => {
     try {
       setIsLoading(true);
-      console.time("Submit");
       // --- BƯỚC 1: LỌC VÀ ĐÓNG GÓI MẢNG CHI TIẾT SẢN LƯỢNG SẠCH THỦ CÔNG ---
       const mangChiTietSanLuong: ChiTietSanLuongDto[] = [];
 
@@ -333,7 +332,7 @@ export default function NhapLieuDoanhThuPage() {
               ma_loai_ve: ticket.ma_loai_ve,
               so_luot_xe: soLuot,
               nhom_cha: "THUE_BAO",
-              nhom_con: "XE_KHACH" as const, // Hoặc "XE_TAI" tùy DTO quy định cho nhóm này, gán tạm literal hợp lệ để tránh đỏ code
+              nhom_con: "THUE_BAO" as const, // Hoặc "XE_TAI" tùy DTO quy định cho nhóm này, gán tạm literal hợp lệ để tránh đỏ code
             });
           }
         }
@@ -504,7 +503,6 @@ export default function NhapLieuDoanhThuPage() {
           setIsDirty(false);
           // 2. Găm lại ID bản ghi để giữ trạng thái sửa (Edit mode)
           // Kiểm tra cả cấu hình lồng data hoặc object phẳng
-          console.timeEnd("Submit");
           const recordId =
             dataPhanHoi._id || dataPhanHoi.data?._id || currentRecordId;
           if (recordId) {

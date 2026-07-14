@@ -35,10 +35,9 @@ export function getDateRange(timeType?: string) {
       break;
 
     case 'QUI_NAY':
-      fromDate = now.clone().startOf('quarter'); // Sửa lỗi tham số 'quarter' bằng cách dùng moment chuẩn hóa
+      fromDate = now.clone().startOf('quarter');
       toDate = now.clone().endOf('quarter');
       break;
-
     case 'NAM_NAY':
       fromDate = now.clone().startOf('year');
       toDate = now.clone().endOf('year');
@@ -172,7 +171,18 @@ export function xacDinhKieuHienThiTheoFilter(
       groupBy: '$ma_ben', // Định hướng tương lai mở rộng Dimension ở Backend
     };
   }
-
+  if (!loaiFilter || loaiFilter.time === LoaiThoiGianBieuDo.QUI_NAY) {
+    return {
+      kieuChart: KieuHienThiChart.THEO_THOI_GIAN,
+      groupBy: '$qui', // Định hướng tương lai mở rộng Dimension ở Backend
+    };
+  }
+  if (!loaiFilter || loaiFilter.time === LoaiThoiGianBieuDo.NAM_NAY) {
+    return {
+      kieuChart: KieuHienThiChart.THEO_THOI_GIAN,
+      groupBy: '$thang', // Định hướng tương lai mở rộng Dimension ở Backend
+    };
+  }
   // Mặc định cho các filter thời gian khác (7 ngày, 30 ngày, tháng, quý, năm)
   return {
     kieuChart: KieuHienThiChart.THEO_THOI_GIAN,
@@ -188,7 +198,11 @@ export function layCauHinhFilterChart(
   loaiFilter?: GetChartSanLuongDoanhThuDto,
 ): CauHinhFilterChart {
   // 1. Khởi tạo giá trị mặc định cho khoảng thời gian
-  const { fromDate, toDate } = getDateRange(loaiFilter?.time);
+  const { fromDate, toDate } = getDateRange(
+    loaiFilter?.time === LoaiThoiGianBieuDo.QUI_NAY
+      ? LoaiThoiGianBieuDo.NAM_NAY // Chuyển thẳng về NAM_NAY
+      : loaiFilter?.time,
+  );
   // 2. Xử lý khoảng thời gian dựa trên filter (Hiện tại tập trung tối ưu trước cho HOM_NAY)
 
   // 3. Xác định cấu hình hiển thị biểu đồ tương ứng

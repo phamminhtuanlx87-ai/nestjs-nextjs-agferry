@@ -1,5 +1,5 @@
 export interface DuLieuComboChartDto {
-  ngay: string;
+  ngay?: string;
   nhan: string;
   nhom_con?: string;
   san_luong: number;
@@ -9,7 +9,7 @@ export interface DuLieuComboChartDto {
 export interface ChartSanLuongDoanhThuResponseDto {
   don_vi_san_luong: 'lượt';
   don_vi_doanh_thu: 'đ';
-  loai_nhom: 'NGAY';
+  loai_nhom: string;
   tu_ngay: string;
   den_ngay: string;
   du_lieu: DuLieuComboChartDto[];
