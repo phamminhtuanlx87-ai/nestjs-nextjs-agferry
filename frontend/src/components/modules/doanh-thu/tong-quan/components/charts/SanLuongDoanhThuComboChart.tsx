@@ -158,14 +158,10 @@ const SanLuongDoanhThuComboChart = ({
               />
               <Tooltip
                 formatter={(value, name) => {
-                  // In ra console để bạn bấm F12 xem thực tế Recharts đang gửi chữ 'name' là gì
                   console.log("Recharts Name:", name, "Value:", value);
 
-                  // Ép name về chữ thường và kiểm tra xem có chứa chữ "doanh" hay không
                   const isDoanhThu =
-                    String(name).toLowerCase().includes("doanh") ||
-                    Number(value) > 10000;
-
+                    String(name).toLowerCase().includes("doanh") 
                   if (isDoanhThu) {
                     return [`${formatNumber(Number(value))} đ`, "Doanh thu"];
                   }
