@@ -72,24 +72,7 @@ export default function SanLuongToolbar({
               ))}
             </select>
           </div>
-
-          {/* 📊 Chỉ tiêu
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Chỉ tiêu hiển thị
-            </label>
-            <select
-              // value={filters.metric}
-              // onChange={(e) => handleFilterChange('metric', e.target.value)}
-              className="bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 text-sm rounded-lg px-3 py-2.5 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
-            >
-              <option>Tổng doanh thu</option>
-              <option>Tổng lượt xe</option>
-              <option>Tổng hành khách</option>
-              <option>Thuê bao</option>
-            </select>
-          </div> */}
-
+         
           {/* 🔄 So sánh */}
           <div className="flex flex-col gap-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">

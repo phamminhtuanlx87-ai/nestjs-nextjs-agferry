@@ -4,6 +4,7 @@ import SanLuongChartSection from "@/components/modules/doanh-thu/tong-quan/compo
 import SanLuongCard from "@/components/modules/doanh-thu/tong-quan/components/SanLuongCard";
 import SanLuongToolbar from "@/components/modules/doanh-thu/tong-quan/components/SanLuongToolbar";
 import { useDuLieuComboChart } from "@/components/modules/doanh-thu/tong-quan/custom-hook/charts/useDuLieuComboChart";
+import { useDuLieuTyTrongChart } from "@/components/modules/doanh-thu/tong-quan/custom-hook/charts/useDuLieuTyTrongChart";
 import useSanLuongFilter from "@/components/modules/doanh-thu/tong-quan/custom-hook/useSanLuongFilter";
 import { useTQSanLuong } from "@/components/modules/doanh-thu/tong-quan/custom-hook/useTQSanLuong";
 import DynamicBreadcrumb from "@/components/navigation/DynamicBreadcrumb";
@@ -17,7 +18,8 @@ export default function DoanhThuPage() {
 
   const { filters, xuLyThayDoiBoLoc } = useSanLuongFilter();
   const { duLieuKPI } = useTQSanLuong(filters);
-  const {duLieuComboChart } = useDuLieuComboChart(filters);
+  const { duLieuComboChart } = useDuLieuComboChart(filters);
+  const { duLieuTyTrongChart } = useDuLieuTyTrongChart(filters);
   // 1. Quản lý bộ lọc thời gian tập trung tại đây
 
   return (
@@ -43,17 +45,22 @@ export default function DoanhThuPage() {
           </div>
         </div>
         {/* Toolber */}
-        <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 card-soft ">
+        <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 card-soft flex flex-col gap-3">
           <SanLuongToolbar onFilters={xuLyThayDoiBoLoc} filters={filters} />
           {/* ==========================================
            PHÂN KHU 2: CÁC THÈ KPI TỔNG HỢP (Khung Trống)
            ========================================== */}
           <SanLuongCard duLieuKPI={duLieuKPI} />
-        </div>
-        {/* ==========================================
+
+          {/* ==========================================
            PHÂN KHU 3: KHÔNG GIAN BIỂU ĐỒ (Khung Trống)
            ========================================== */}
-        <SanLuongChartSection duLieuComboChart={duLieuComboChart} filters={filters}/>
+          <SanLuongChartSection
+            duLieuComboChart={duLieuComboChart}
+            duLieuTyTrongChart={duLieuTyTrongChart}
+            filters={filters}
+          />
+        </div>
 
         {/* ==========================================
            PHÂN KHU 4: BẢNG DỮ LIỆU ĐỐI SOÁT (Bảng Trống + Nút Thêm)

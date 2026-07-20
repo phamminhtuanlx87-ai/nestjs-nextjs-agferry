@@ -14,9 +14,10 @@ export function getDateRange(timeType?: string) {
   let toDate = now.endOf('month'); // Mặc định là cuối tháng này
 
   switch (timeType) {
+    case 'HOM_QUA':
     case 'HOM_NAY':
-      fromDate = now.clone().startOf('day');
-      toDate = now.clone().endOf('day');
+      fromDate = now.clone().subtract(1, 'days').startOf('day');
+      toDate = now.clone().subtract(1, 'days').endOf('day');
       break;
 
     case 'BAY_NGAY_GAN_NHAT':
@@ -88,6 +89,12 @@ export function getCompareDateRange(timeType: string, compareType: string) {
     case 'KY_TRUOC':
       // Dựa vào loại thời gian hiện tại để lùi kỳ trước một cách chính xác nhất
       switch (timeType) {
+        case 'HOM_QUA':
+          // Kỳ trước của Hôm nay -> Hôm qua
+          compareFromDate = currentFrom.subtract(2, 'day');
+          compareToDate = currentTo.subtract(2, 'day');
+          break;
+
         case 'HOM_NAY':
           // Kỳ trước của Hôm nay -> Hôm qua
           compareFromDate = currentFrom.subtract(1, 'day');
@@ -97,19 +104,19 @@ export function getCompareDateRange(timeType: string, compareType: string) {
         case 'THANG_NAY':
           // Kỳ trước của Tháng này -> Tháng trước
           compareFromDate = currentFrom.subtract(1, 'month').startOf('month');
-          compareToDate = currentTo.subtract(1, 'month').endOf('month');
+          compareToDate = currentTo.subtract(1, 'month');
           break;
 
         case 'QUI_NAY':
           // Kỳ trước của Quý này -> Quý trước (Lùi 3 tháng)
           compareFromDate = currentFrom.subtract(3, 'month').startOf('month');
-          compareToDate = currentTo.subtract(3, 'month').endOf('month');
+          compareToDate = currentTo.subtract(3, 'month');
           break;
 
         case 'NAM_NAY':
           // Kỳ trước của Năm nay -> Năm trước
           compareFromDate = currentFrom.subtract(1, 'year').startOf('year');
-          compareToDate = currentTo.subtract(1, 'year').endOf('year');
+          compareToDate = currentTo.subtract(1, 'year');
           break;
 
         case 'BAY_NGAY_GAN_NHAT':
@@ -164,6 +171,12 @@ export function layKhoangThoiGianHomNay() {
 export function xacDinhKieuHienThiTheoFilter(
   loaiFilter?: GetChartSanLuongDoanhThuDto,
 ) {
+  if (!loaiFilter || loaiFilter.time === LoaiThoiGianBieuDo.HOM_QUA) {
+    return {
+      kieuChart: KieuHienThiChart.THEO_BEN_PHA,
+      groupBy: '$ma_ben', // Định hướng tương lai mở rộng Dimension ở Backend
+    };
+  }
   // Nếu không có filter (mặc định) hoặc filter chọn "Hôm nay" -> hiển thị theo bến pha
   if (!loaiFilter || loaiFilter.time === LoaiThoiGianBieuDo.HOM_NAY) {
     return {

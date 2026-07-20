@@ -23,6 +23,7 @@ export interface CauHinhFilterChart {
 }
 
 export enum LoaiThoiGianBieuDo {
+  HOM_QUA = 'HOM_QUA',
   HOM_NAY = 'HOM_NAY',
   BAY_NGAY_GAN_NHAT = 'BAY_NGAY_GAN_NHAT',
   BA_MUOI_NGAY_GAN_NHAT = 'BA_MUOI_NGAY_GAN_NHAT',

@@ -45,22 +45,19 @@ import {
   getBieuDoNam,
   getBieuDoNgay,
   getBieuDoQui,
+  getBieuDoTyTrongSanLuong,
 } from './helpers/san-luong-chart.helper';
+import { DieuKienLocSanLuongType } from './types/dieu-kien-loc.type';
+import {
+  ChartTyTrongResponseDto,
+  DuLieuTyTrongDto,
+  NHOM_VE_KY,
+  NHOM_VE_LUOT,
+} from './dto/chart-ty-trong-doanh-thu-response.dto';
+import { tinhTyTrongChoNhom } from './utils/tinh-ty-trong-nhom';
 
 export const START_DATE_REALTIME = '2026-07-01';
 export const LEGACY_DAY_SNAPSHOT = '20';
-// const MUI_GIO_VIET_NAM = 'Asia/Ho_Chi_Minh';
-
-// interface DuLieuBieuDoAggregate {
-//   _id: string;
-//   san_luong: number;
-//   doanh_thu: number;
-// }
-
-// interface BenCaoNhatAggregateResult {
-//   _id: string | null; // ma ben
-//   tongDoanhThuBen: number;
-// }
 
 @Injectable()
 export class SanLuongDoanhThuService {
@@ -530,6 +527,7 @@ export class SanLuongDoanhThuService {
     let duLieu: DuLieuComboChartDto[] = [];
     const THU_TU_UU_TIEN = Object.keys(MAPPING_CHUNG_LOAI_FIELD);
     switch (filters?.time) {
+      case LoaiThoiGianBieuDo.HOM_QUA:
       case LoaiThoiGianBieuDo.HOM_NAY:
         duLieu = await getBieuDoHomNay(
           this.sanLuongModel,
@@ -557,6 +555,98 @@ export class SanLuongDoanhThuService {
       tu_ngay: dayjs(ngayBatDau).format('YYYY-MM-DD'),
       den_ngay: dayjs(ngayKetThuc).format('YYYY-MM-DD'),
       du_lieu: duLieu,
+    };
+  }
+
+  async layDuLieuTyTrongSanLuong(
+    filters: GetChartSanLuongDoanhThuDto,
+  ): Promise<ChartTyTrongResponseDto> {
+    const { ngayBatDau, ngayKetThuc } = layCauHinhFilterChart(filters);
+
+    const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);
+    const dieuKienLoc: DieuKienLocSanLuongType = {
+      ngay_nhap: {
+        $gte:
+          ngayKetThuc < fenceDate
+            ? new Date(`${dayjs(ngayBatDau).year()}-01-01T12:00:00.000Z`)
+            : ngayBatDau,
+        $lte: ngayKetThuc,
+      },
+    };
+
+    if (filters.location !== 'ALL') {
+      dieuKienLoc.ma_ben = filters.location;
+    }
+
+    let duLieu: DuLieuTyTrongDto[] = [];
+
+    duLieu = await getBieuDoTyTrongSanLuong(this.sanLuongModel, dieuKienLoc);
+    const veLuot = duLieu.filter((item) =>
+      (NHOM_VE_LUOT as readonly string[]).includes(
+        item.nhom || NHOM_VE_LUOT[0],
+      ),
+    );
+    const veKy = duLieu.filter((item) =>
+      (NHOM_VE_KY as readonly string[]).includes(item.nhom || NHOM_VE_KY[0]),
+    );
+
+    const veLuotDaTinh = tinhTyTrongChoNhom(veLuot);
+    const veKyDaTinh = tinhTyTrongChoNhom(veKy);
+
+    return {
+      don_vi_san_luong: 'lượt',
+      don_vi_doanh_thu: 'đ',
+      // loai_nhom: kieuChart,
+      tu_ngay: dayjs(ngayBatDau).format('YYYY-MM-DD'),
+      den_ngay: dayjs(ngayKetThuc).format('YYYY-MM-DD'),
+      ve_luot: veLuotDaTinh,
+      ve_ky: veKyDaTinh,
+    };
+  }
+
+  async layDuLieuTyTrongDoanhThu(
+    filters: GetChartSanLuongDoanhThuDto,
+  ): Promise<ChartTyTrongResponseDto> {
+    const { ngayBatDau, ngayKetThuc } = layCauHinhFilterChart(filters);
+
+    const fenceDate = new Date(`${START_DATE_REALTIME}T12:00:00.000Z`);
+    const dieuKienLoc: DieuKienLocSanLuongType = {
+      ngay_nhap: {
+        $gte:
+          ngayKetThuc < fenceDate
+            ? new Date(`${dayjs(ngayBatDau).year()}-01-01T12:00:00.000Z`)
+            : ngayBatDau,
+        $lte: ngayKetThuc,
+      },
+    };
+
+    if (filters.location !== 'ALL') {
+      dieuKienLoc.ma_ben = filters.location;
+    }
+
+    let duLieu: DuLieuTyTrongDto[] = [];
+
+    duLieu = await getBieuDoTyTrongSanLuong(this.sanLuongModel, dieuKienLoc);
+    const veLuot = duLieu.filter((item) =>
+      (NHOM_VE_LUOT as readonly string[]).includes(
+        item.nhom || NHOM_VE_LUOT[0],
+      ),
+    );
+    const veKy = duLieu.filter((item) =>
+      (NHOM_VE_KY as readonly string[]).includes(item.nhom || NHOM_VE_KY[0]),
+    );
+
+    const veLuotDaTinh = tinhTyTrongChoNhom(veLuot);
+    const veKyDaTinh = tinhTyTrongChoNhom(veKy);
+
+    return {
+      don_vi_san_luong: 'lượt',
+      don_vi_doanh_thu: 'đ',
+      // loai_nhom: kieuChart,
+      tu_ngay: dayjs(ngayBatDau).format('YYYY-MM-DD'),
+      den_ngay: dayjs(ngayKetThuc).format('YYYY-MM-DD'),
+      ve_luot: veLuotDaTinh,
+      ve_ky: veKyDaTinh,
     };
   }
 

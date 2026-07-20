@@ -2,6 +2,8 @@
 import { Model } from 'mongoose';
 import { DuLieuComboChartDto } from '../dto/chart-san-luong-doanh-thu-response.dto';
 import dayjs from 'dayjs';
+import { DuLieuTyTrongDto } from '../dto/chart-ty-trong-doanh-thu-response.dto';
+import { MAPPING_CHUNG_LOAI_FIELD } from '../constants/mapping_ben_pha';
 
 /**
  * Hàm xử lý Aggregate, Mapping và Sắp xếp dữ liệu biểu đồ cho ngày Hôm Nay (theo Nhóm Con)
@@ -261,4 +263,98 @@ export async function getBieuDoNam(
   }));
 
   return duLieu;
+}
+
+export async function getBieuDoTyTrongSanLuong(
+  sanLuongModel: Model<any>,
+  dieuKienLoc: any,
+): Promise<DuLieuTyTrongDto[]> {
+  const duLieuTongHop = await sanLuongModel
+    .aggregate([
+      { $match: dieuKienLoc },
+      {
+        $unwind: {
+          path: '$chi_tiet_san_luong',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: '$chi_tiet_san_luong.nhom_con',
+          san_luong: {
+            $sum: { $ifNull: ['$chi_tiet_san_luong.so_luot_xe', 0] },
+          },
+          doanh_thu: {
+            $sum: { $ifNull: ['$chi_tiet_san_luong.tong_doanh_thu', 0] },
+          },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ])
+    .exec();
+
+  // Bước mới: tính tổng để làm mẫu số tính %
+  const tongSanLuong = duLieuTongHop.reduce(
+    (tong, item) => tong + item.san_luong,
+    0,
+  );
+
+  const tongDoanhThu = duLieuTongHop.reduce(
+    (tong, item) => tong + item.doanh_thu,
+    0,
+  );
+
+  const duLieu = duLieuTongHop.map((item) => ({
+    nhom: item._id,
+    nhan: MAPPING_CHUNG_LOAI_FIELD[
+      item._id as keyof typeof MAPPING_CHUNG_LOAI_FIELD
+    ],
+    san_luong: item.san_luong,
+    doanh_thu: item.doanh_thu,
+    // Tránh chia cho 0 nếu tongSanLuong = 0 (không có dữ liệu)
+    ty_trong_san_luong:
+      tongSanLuong > 0
+        ? Math.round((item.san_luong / tongSanLuong) * 1000) / 10
+        : 0,
+    ty_trong_doanh_thu:
+      tongDoanhThu > 0
+        ? Math.round((item.san_luong / tongDoanhThu) * 1000) / 10
+        : 0,
+  }));
+
+  return duLieu;
+}
+
+export async function getBieuDoTyTrongDoanhThu(
+  sanLuongModel: Model<any>,
+  dieuKienLoc: any,
+): Promise<DuLieuTyTrongDto[]> {
+  const duLieuTongHop = await sanLuongModel
+    .aggregate([
+      { $match: dieuKienLoc },
+      {
+        $unwind: {
+          path: '$chi_tiet_san_luong',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: '$chi_tiet_san_luong.nhom_con',
+          doanh_thu: {
+            $sum: { $ifNull: ['$chi_tiet_san_luong.tong_doanh_thu', 0] },
+          },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ])
+    .exec();
+
+  return duLieuTongHop.map((item) => ({
+    nhom: item._id,
+    nhan: MAPPING_CHUNG_LOAI_FIELD[
+      item._id as keyof typeof MAPPING_CHUNG_LOAI_FIELD
+    ],
+    doanh_thu: item.doanh_thu,
+  }));
 }

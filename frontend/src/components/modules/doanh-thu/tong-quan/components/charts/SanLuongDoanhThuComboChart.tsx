@@ -60,7 +60,18 @@ const SanLuongDoanhThuComboChart = ({
           label as keyof typeof MAPPING_THOI_GIAN_COMBO_CHART
         ] +
         " " +
-        dayjs(now).format("DD/MM/YYYY")
+        dayjs(now).subtract(1, "days").format("DD/MM/YYYY")
+      );
+    }
+
+    if (label === "HOM_QUA") {
+      const now = dayjs();
+      return (
+        MAPPING_THOI_GIAN_COMBO_CHART[
+          label as keyof typeof MAPPING_THOI_GIAN_COMBO_CHART
+        ] +
+        " " +
+        dayjs(now).subtract(2, "days").format("DD/MM/YYYY")
       );
     }
     return MAPPING_THOI_GIAN_COMBO_CHART[
@@ -85,7 +96,7 @@ const SanLuongDoanhThuComboChart = ({
     !duLieuComboChart || duLieuComboChart?.du_lieu.length === 0;
 
   return (
-    <div className="lg:col-span-8 bg-white p-5 rounded-xl border border-slate-200 flex flex-col gap-4 min-h-80 card-soft">
+    <div className="lg:col-span-12 bg-white p-5 rounded-xl border border-slate-200 flex flex-col gap-4 min-h-80 card-soft">
       <div className="flex flex-col gap-1">
         <h3 className="font-bold text-xs text-slate-800 uppercase tracking-wide">
           Biểu đồ sản lượng và doanh thu -{" "}
@@ -160,8 +171,9 @@ const SanLuongDoanhThuComboChart = ({
                 formatter={(value, name) => {
                   console.log("Recharts Name:", name, "Value:", value);
 
-                  const isDoanhThu =
-                    String(name).toLowerCase().includes("doanh") 
+                  const isDoanhThu = String(name)
+                    .toLowerCase()
+                    .includes("doanh");
                   if (isDoanhThu) {
                     return [`${formatNumber(Number(value))} đ`, "Doanh thu"];
                   }

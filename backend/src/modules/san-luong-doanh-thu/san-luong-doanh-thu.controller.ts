@@ -85,11 +85,22 @@ export class SanLuongDoanhThuController {
       data: result,
     };
   }
-  // @Get(':id')
-  // @SkipThrottle()
-  // findOne(@Param('id') id: string) {
-  //   return this.sanLuongDoanhThuService.findOne(id);
-  // }
+
+  @Get('ttsanluongchart')
+  @SkipThrottle({ default: true })
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.USER)
+  async layDuLieuTyTrongSanLuong(
+    @Query() filters: GetChartSanLuongDoanhThuDto,
+  ) {
+    const result =
+      await this.sanLuongDoanhThuService.layDuLieuTyTrongSanLuong(filters);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Lấy dữ liệu biểu đồ thành công',
+      data: result,
+    };
+  }
 
   @Patch(':id')
   update(

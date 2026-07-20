@@ -1,16 +1,19 @@
 "use client";
 import { ComboChartResponse } from "../../custom-hook/charts/useDuLieuComboChart";
+import { TyTrongChartResponse } from "../../custom-hook/charts/useDuLieuTyTrongChart";
 import { FilterToolbarDto } from "../../custom-hook/useTQSanLuong";
 import SanLuongDoanhThuComboChart from "./SanLuongDoanhThuComboChart";
 import SanLuongTyTrongChart from "./SanLuongTyTrongChart";
 
 interface SanLuonChartProps {
   readonly duLieuComboChart?: ComboChartResponse | null;
+  readonly duLieuTyTrongChart?: TyTrongChartResponse | null;
   readonly filters: FilterToolbarDto;
 }
 
 const SanLuongChartSection = ({
   duLieuComboChart,
+  duLieuTyTrongChart,
   filters,
 }: SanLuonChartProps) => {
   return (
@@ -19,7 +22,10 @@ const SanLuongChartSection = ({
         duLieuComboChart={duLieuComboChart}
         filters={filters}
       />
-      <SanLuongTyTrongChart />
+      <SanLuongTyTrongChart
+        duLieuTyTrongChart={duLieuTyTrongChart}
+        filters={filters}
+      />
     </div>
   );
 };
