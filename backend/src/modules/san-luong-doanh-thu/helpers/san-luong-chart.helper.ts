@@ -318,7 +318,7 @@ export async function getBieuDoTyTrongSanLuong(
         : 0,
     ty_trong_doanh_thu:
       tongDoanhThu > 0
-        ? Math.round((item.san_luong / tongDoanhThu) * 1000) / 10
+        ? Math.round((item.doanh_thu / tongDoanhThu) * 1000) / 10
         : 0,
   }));
 
