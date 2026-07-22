@@ -15,6 +15,7 @@ import { CongtrinhModule } from './modules/congtrinh/congtrinh.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { DanhMucGiaVeModule } from './modules/danh-muc-gia-ve/danh-muc-gia-ve.module';
 import { SanLuongDoanhThuModule } from './modules/san-luong-doanh-thu/san-luong-doanh-thu.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { SanLuongDoanhThuModule } from './modules/san-luong-doanh-thu/san-luong-
     CongtrinhModule,
     DanhMucGiaVeModule,
     SanLuongDoanhThuModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [
