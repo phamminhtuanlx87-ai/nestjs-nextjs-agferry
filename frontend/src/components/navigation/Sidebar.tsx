@@ -9,13 +9,14 @@ import PingStatus from "../modules/ping/PingStatus";
 
 const menuItems = [
   { name: "Tổng quan", href: "/tong-quan", icon: "📊" },
+   { name: "Trợ lý AI", href: "/ai", icon: "✨" },
   { name: "Công trình / Dự án", href: "/cong-trinh", icon: "🛠️" },
   { name: "Hồ sơ / Văn bản", href: "/ho-so", icon: "📄" },
   { name: "Quản lý vật tư", href: "/vat-tu", icon: "📦" },
   { name: "Tua chuyến", href: "/tua-chuyen", icon: "⛴️" },
   { name: "Doanh thu / Lợi nhuận", href: "/doanh-thu", icon: "💰" },
   { name: "Người dùng", href: "/nhan-vien", icon: "👥", requiredRole: "ADMIN" },
-  // { name: "Báo cáo", href: "/bao-cao", icon: "📊" },
+ 
   // { name: "Cài đặt", href: "/cai-dat", icon: "⚙️" },
 ];
 interface SidebarProps {

@@ -33,6 +33,11 @@ export class AiService {
     modelName: AiModelType = DEFAULT_AI_MODEL,
   ): Promise<Record<string, any>> {
     const currentYear = new Date().getFullYear();
+    //  - Chỉ trả về DUY NHẤT 1 chuỗi JSON hợp lệ theo cấu trúc:
+    //   {
+    //     "targetCollection": "congtrinh" | "san_luong_doanh_thu" | "outOfScope",
+    //     "filter": { ...đoạn filter MongoDB... }
+    //   }
     const systemInstruction = `
       Bạn là trợ lý AI CHUYÊN MÔN phân tích câu hỏi tiếng Việt thành JSON Query cho MongoDB của hệ thống Quản lý Công trình & Sản lượng Doanh thu (AGFerryDB).
 
@@ -63,11 +68,6 @@ export class AiService {
         - Mảng con 'chi_tiet_san_luong': ma_loai_ve, so_luot_xe, gia_ve_ap_dung, tong_doanh_thu, nhom_cha, nhom_con
 
       QUY TẮC PHẠM VI & ĐỊNH DẠNG TRẢ VỀ:
-      - Chỉ trả về DUY NHẤT 1 chuỗi JSON hợp lệ theo cấu trúc:
-        {
-          "targetCollection": "congtrinh" | "san_luong_doanh_thu" | "outOfScope",
-          "filter": { ...đoạn filter MongoDB... }
-        }
       - KHÔNG dùng markdown code block, KHÔNG viết câu dẫn hay bất kỳ ký tự dư thừa nào.
       - Dùng BẮT BUỘC $regex kèm $options: "i" cho các trường dạng string (trừ mã bến ma_ben).
       - Dùng dot notation cho mảng con (ví dụ: "giai_doan.dia_diem_tc", "chi_tiet_san_luong.so_luot_xe").
@@ -92,10 +92,10 @@ export class AiService {
       1. "Đang lập dự toán / khảo sát / làm thủ tục":
         -> Lọc các công trình CÓ giai đoạn Dự toán / Thẩm tra VÀ KHÔNG CÓ các giai đoạn Thi công, Nghiệm thu, Quyết toán phía sau.
         -> Query: { "giai_doan.ten_giai_doan": { "$regex": "Dự toán|Thẩm tra dự toán|Khảo sát", "$options": "i" }, "giai_doan.ten_giai_doan": { "$not": { "$regex": "Thi công|Nghiệm thu|Quyết toán", "$options": "i" } } }
-
-      2. "Đang thi công / Đang nghiệm thu":
-        -> Lọc công trình CÓ giai đoạn Thi công hoặc Nghiệm thu VÀ KHÔNG CÓ giai đoạn Quyết toán phía sau.
-        -> Query: { "giai_doan.ten_giai_doan": { "$regex": "Thi công|Nghiệm thu", "$options": "i" }, "giai_doan.ten_giai_doan": { "$not": { "$regex": "Quyết toán", "$options": "i" } } }
+     
+       2. "Đang thi công / Đang nghiệm thu":
+        -> Lọc các công trình có mảng giai_doan chứa từ khóa Thi công hoặc Nghiệm thu.
+        -> Query: { "giai_doan.ten_giai_doan": { "$regex": "Thi công | Nghiệm thu", "$options": "i" } }
 
       3. "Đang làm thủ tục quyết toán":
         -> Lọc công trình đang làm dự toán bổ sung/phát sinh.
@@ -118,13 +118,27 @@ export class AiService {
 
       VÍ DỤ MẪU CHUẨN:
       1. Hỏi: "Công trình nào đang thi công?"
-      -> { "targetCollection": "congtrinh", "filter": { "giai_doan.ten_giai_doan": { "$regex": "Thi công|Nghiệm thu", "$options": "i" }, "giai_doan.ten_giai_doan": { "$not": { "$regex": "Quyết toán", "$options": "i" } } } }
+      -> { "targetCollection": "congtrinh", "filter": { "giai_doan.ten_giai_doan": { "$regex": "Thi công|Nghiệm thu", "$options": "i" } } }
 
       2. Hỏi: "Các công trình được phê duyệt dự toán từ tháng 2 đến tháng 4 năm 2026"
       -> { "targetCollection": "congtrinh", "filter": { "giai_doan.ten_giai_doan": { "$regex": "Phê duyệt dự toán", "$options": "i" }, "giai_doan.ngay_thuc_hien": { "$gte": "2026-02-01T00:00:00.000Z", "$lte": "2026-04-30T23:59:59.999Z" } } }
 
       3. Hỏi: "Doanh thu phà Vàm Cống tháng 03 năm 2026"
       -> { "targetCollection": "san_luong_doanh_thu", "filter": { "ma_ben": "VC", "thang_nam": "2026-03" } }
+
+      4. Xử lý các câu hỏi tóm tắt/thống kê/liệt kê tiến độ ("Tóm tắt tiến độ công trình", "thống kê công trình", "liệt kê công trình đến giai đoạn nào"):
+   - TargetCollection: "congtrinh"
+   - Quy tắc sinh câu trả lời (Answer Rules):
+     + Chỉ cần liệt kê Tên công trình / Mã công trình kèm theo GIAI ĐOẠN CUỐI CÙNG (giai đoạn mới nhất) trong mảng "giai_doan".
+     + Không hiển thị toàn bộ lịch sử các giai đoạn cũ để tránh dài dòng.
+     + Định dạng ngắn gọn bằng gạch đầu dòng: 
+       * **[Mã công trình] Tên công trình**: Giai đoạn hiện tại: **[Tên giai đoạn cuối]** (Ngày: [ngày_thuc_hien])
+
+    QUY TẮC ĐỊNH DẠNG:
+      - Hãy luôn luôn định dạng câu trả lời bằng Markdown đẹp mắt.
+      - Dùng gạch đầu dòng (*) hoặc danh sách đánh số.
+      - In đậm các thông tin quan trọng (**Mã công trình**, **Tổng giá trị**...).
+      - BẮT BUỘC xuống dòng 2 lần (\\n\\n) giữa các công trình để dữ liệu tách biệt, dễ đọc.
 
       `;
     try {
@@ -156,13 +170,13 @@ export class AiService {
     const { targetCollection, filter } = aiAnalysis;
 
     // 🔴 1. CHẶN NGUYÊN TỪ ĐẦU: Nếu phát hiện câu hỏi ngoài phạm vi
-    if (targetCollection === 'outOfScope' || !targetCollection) {
-      return {
-        answer:
-          'Tôi là trợ lý AI quản lý Công trình & Sản lượng Doanh thu phà. Tôi chỉ hỗ trợ các thông tin liên quan đến dự án, công trình, tiến độ thi công, hoặc báo cáo sản lượng, doanh thu của các bến phà trong hệ thống. Bạn vui lòng đặt câu hỏi liên quan nhé!',
-        dbData: [],
-      };
-    }
+    // if (targetCollection === 'outOfScope' || !targetCollection) {
+    //   return {
+    //     answer:
+    //       'Tôi là trợ lý AI quản lý Công trình & Sản lượng Doanh thu phà. Tôi chỉ hỗ trợ các thông tin liên quan đến dự án, công trình, tiến độ thi công, hoặc báo cáo sản lượng, doanh thu của các bến phà trong hệ thống. Bạn vui lòng đặt câu hỏi liên quan nhé!',
+    //     dbData: [],
+    //   };
+    // }
 
     // 2. Query trực tiếp vào Database MongoDB dựa trên targetCollection
     let rawData: any[] = [];
